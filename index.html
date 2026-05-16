@@ -634,6 +634,8 @@ input[type=range]::-moz-range-thumb{
 </div><!-- /.app -->
 
 <script>
+let _emailSent = false; // guard against double-send on fast double-click
+
 /* ============================================================
    ===== CONFIG =====
    ============================================================ */
@@ -649,7 +651,7 @@ const SVC = {
   ej_svc:     'service_nfxu98b',
   ej_client:  'template_ky8g7hp',
   ej_agent:   'template_cp85icg',
-  sheets_url: 'https://script.google.com/macros/s/AKfycbw7eysq6ydYEezrcBL5OLI-ZJ8rmuQewA2bDCw9CPod_WYZq4J0Bnt1EQcwYEPGLK8f3Q/exec',
+  sheets_url: 'https://script.google.com/macros/s/AKfycbxomoBs0TXtvlz8av3bLE08yxCv5C71Jgvguk0ZY2EdKwIB4vSXayfj3KmmvfWiVJ5RYg/exec',
 };
 
 /* ============================================================
@@ -1227,9 +1229,6 @@ function renderResults() {
   collectAnswers();
   const a = answers;
   const h = calcHealth(a), l = calcLife(a), r = calcRetirement(a);
-  const tot = (h + l + r) || 1;
-  const hP = h / tot * 100, lP = l / tot * 100, rP = r / tot * 100;
-
   const avg = (h + l + r) / 3;
   const urg = avg >= 70 ? 'ΚΡΙΣΙΜΗ' : avg >= 50 ? 'ΥΨΗΛΗ' : avg >= 30 ? 'ΜΕΤΡΙΑ' : 'ΧΑΜΗΛΗ';
   const urgIcon = {ΚΡΙΣΙΜΗ:'🔴', ΥΨΗΛΗ:'🟠', ΜΕΤΡΙΑ:'🟡', ΧΑΜΗΛΗ:'🟢'}[urg];
@@ -1238,6 +1237,19 @@ function renderResults() {
   const scenarios = buildScenarios(a, {h, l, r}, annualBudget);
 
   const s0 = scenarios[0];
+
+  // Pie percentages based on recommended budget allocation (not raw scores)
+  const catBudget = { h: 0, l: 0, r: 0 };
+  s0.products.forEach(p => {
+    if (p.cat === '🏥 Υγεία' || p.cat === '🩺 Εξωνοσ.') catBudget.h += p.gross;
+    else if (p.cat === '💛 Ζωή') catBudget.l += p.gross;
+    else catBudget.r += p.gross; // Κρίσιμες, Αποταμίευση
+  });
+  const catTot = catBudget.h + catBudget.l + catBudget.r || 1;
+  const hP = catBudget.h / catTot * 100;
+  const lP = catBudget.l / catTot * 100;
+  const rP = catBudget.r / catTot * 100;
+
   const scenHTML = `
     <div class="scenario-card rec">
       <div class="scen-header">
@@ -1249,12 +1261,11 @@ function renderResults() {
           <div class="prod-row" style="flex-wrap:wrap;gap:6px">
             <span class="prod-cat">${p.cat}</span>
             <span class="prod-name" style="flex:1;min-width:120px">${p.name}${p.detail ? ' <span style="color:var(--text-muted);font-weight:400;font-size:11px">· '+p.detail+'</span>' : ''}</span>
-            <span class="prod-price">€${Math.round(p.gross).toLocaleString('el-GR')}/έτος</span>
+            <span class="prod-price">€${Math.round(p.gross/12).toLocaleString('el-GR')}/μήνα</span>
             ${(p.features||[]).length ? `<div class="prod-features">${p.features.map(f=>`<span class="prod-feat">${f}</span>`).join('')}</div>` : ''}
           </div>`).join('')}
       </div>
       <div class="scen-total">
-        <div class="total-annual">Ετήσιο σύνολο: €${Math.round(s0.total).toLocaleString('el-GR')}</div>
         <div class="total-monthly">€${s0.monthly}<span>/μήνα</span></div>
       </div>
       ${s0.retNote ? `<div class="ret-note">${s0.retNote}</div>` : ''}
@@ -1361,31 +1372,40 @@ function saveToSheets(data) {
   if (!SVC.sheets_url || SVC.sheets_url.startsWith('REPLACE')) return;
   try {
     const p = new URLSearchParams({
-      date: new Date().toLocaleString('el-GR'),
-      name: data.client_name || '',
-      email: data.client_email || '',
-      phone: data.client_phone || '',
-      age: data.age || '',
-      marital_status: data.marital_status || '',
-      children: data.children || '',
-      occupation: data.occupation || '',
-      fund_satisfaction: data.fund_satisfaction || '',
-      deductible_type: data.deductible_type || '',
-      income_concern: data.income_concern || '',
-      life_capital: data.life_capital || '',
-      pension_estimate: data.pension_estimate || '',
-      savings_plan: data.savings_plan || '',
-      monthly_budget: data.monthly_budget || '',
-      health_score: data.health_score || '',
-      life_score: data.life_score || '',
-      retirement_score: data.retirement_score || '',
-      urgency: data.urgency || '',
+      date:             new Date().toLocaleString('el-GR'),
+      name:             data.client_name       || '',
+      email:            data.client_email      || '',
+      phone:            data.client_phone      || '',
+      age:              data.age               || '',
+      marital_status:   data.marital_status    || '',
+      spouse_age:       data.spouse_age        || '',
+      children:         data.children          || '',
+      kids_ages:        (data.kids_ages        || []).join(', '),
+      occupation:       data.occupation        || '',
+      fund_satisfaction:data.fund_satisfaction || '',
+      hospital_mild:    data.hospital_mild     || '',
+      hospital_severe:  data.hospital_severe   || '',
+      health_benefits:  (data.health_benefits  || []).join(', '),
+      deductible_type:  data.deductible_type   || '',
+      income_concern:   data.income_concern    || '',
+      uncovered_needs:  (data.uncovered_needs  || []).join(', '),
+      life_capital:     data.life_capital      || '',
+      pension_estimate: data.pension_estimate  || '',
+      savings_plan:     data.savings_plan      || '',
+      monthly_budget:   data.monthly_budget    || '',
+      health_score:     data.health_score      || '',
+      life_score:       data.life_score        || '',
+      retirement_score: data.retirement_score  || '',
+      urgency:          data.urgency           || '',
+      proposal:         data.proposal_text     || '',
     });
     fetch(SVC.sheets_url + '?' + p, { method: 'GET', mode: 'no-cors' }).catch(() => {});
   } catch (e) {}
 }
 
 function sendEmails(data, scenarios) {
+  if (_emailSent) return;
+  _emailSent = true;
   const statusEl = document.getElementById('email-status');
   const params = {
     client_name:       data.client_name || 'Πελάτης',
@@ -1421,6 +1441,7 @@ function sendEmails(data, scenarios) {
 
 function resetForm() {
   answers = { age: 35, monthly_budget: 100 };
+  _emailSent = false;
   document.querySelectorAll('.opt.sel').forEach(el => el.classList.remove('sel'));
   document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(inp => inp.checked = false);
   document.querySelectorAll('.form-input').forEach(inp => inp.value = '');
