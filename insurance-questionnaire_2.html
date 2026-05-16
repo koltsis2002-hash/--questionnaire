@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ανακαλύψτε τις Ασφαλιστικές σας Ανάγκες | NN Hellas</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600;6..12,700;6..12,800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#07101f;--s1:rgba(255,255,255,.035);--s2:rgba(255,255,255,.065);--bd:rgba(255,255,255,.09);--bdh:rgba(244,121,32,.5);--or:#F47920;--orl:#ff9f4e;--org:rgba(244,121,32,.22);--tx:#eef0f8;--mu:rgba(238,240,248,.5);--ok:#34d399;--er:#f87171;--t:.28s cubic-bezier(.4,0,.2,1)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);background-image:radial-gradient(ellipse 100% 55% at 50% -10%,rgba(244,121,32,.1),transparent),radial-gradient(ellipse 60% 40% at 80% 110%,rgba(201,168,76,.05),transparent);min-height:100vh;font-family:'Nunito Sans',sans-serif;color:var(--tx);line-height:1.6;-webkit-font-smoothing:antialiased}
+    .app{max-width:660px;margin:0 auto;padding:0 20px 100px}
+    /* Header */
+    .hdr{padding:28px 0 36px;display:flex;align-items:center;gap:12px}
+    .lm{width:40px;height:40px;background:linear-gradient(135deg,var(--or),#e05500);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;font-family:'Lora',serif;letter-spacing:-1px}
+    .lt{font-family:'Lora',serif;font-size:20px;font-weight:600;letter-spacing:-.3px}
+    .ls{font-size:10.5px;color:var(--mu);letter-spacing:1.5px;text-transform:uppercase}
+    /* Progress */
+    .pgw{margin-bottom:36px}
+    .pgm{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--mu);margin-bottom:10px}
+    .pgd{display:flex;gap:5px}
+    .pd{width:32px;height:3px;border-radius:99px;background:var(--bd);transition:background .4s}
+    .pd.done{background:var(--or)} .pd.active{background:var(--orl)}
+    /* Steps */
+    .step{display:none}
+    .step.active{display:block;animation:fu .35s ease}
+    @keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    .ey{font-size:11px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--or);margin-bottom:10px}
+    .tt{font-family:'Lora',serif;font-size:30px;font-weight:600;line-height:1.25;letter-spacing:-.5px;margin-bottom:10px}
+    .sb{font-size:15px;color:var(--mu);margin-bottom:36px}
+    /* Questions */
+    .qb{margin-bottom:32px}
+    .ql{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:14px;display:flex;align-items:flex-start;gap:10px}
+    .qn{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:rgba(244,121,32,.18);border:1px solid rgba(244,121,32,.3);font-size:11px;font-weight:800;color:var(--or);display:flex;align-items:center;justify-content:center;margin-top:1px}
+    .qno{font-weight:400;opacity:.6;font-size:13px}
+    /* Options */
+    .opts{display:flex;flex-direction:column;gap:9px}
+    .opts.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .opt{padding:13px 16px;background:var(--s1);border:1.5px solid var(--bd);border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600;color:var(--mu);transition:var(--t);user-select:none}
+    .opt:hover{background:var(--s2);border-color:var(--bdh);color:var(--tx)}
+    .opt.sel{background:rgba(244,121,32,.12);border-color:var(--or);color:var(--tx)}
+    .blt{width:18px;height:18px;border-radius:50%;border:2px solid currentColor;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:var(--t)}
+    .opt.sel .blt{background:var(--or);border-color:var(--or)}
+    .opt.sel .blt::after{content:'';display:block;width:5px;height:5px;background:#fff;border-radius:50%}
+    /* Chips */
+    .chips{display:flex;flex-wrap:wrap;gap:9px}
+    .chip{padding:9px 18px;border-radius:99px;background:var(--s1);border:1.5px solid var(--bd);font-size:13px;font-weight:700;color:var(--mu);cursor:pointer;transition:var(--t);user-select:none}
+    .chip:hover{border-color:var(--bdh);color:var(--tx)}
+    .chip.sel{background:rgba(244,121,32,.12);border-color:var(--or);color:var(--tx)}
+    /* Slider */
+    .bn{font-family:'Lora',serif;font-size:64px;font-weight:600;color:var(--or);text-align:center;line-height:1;margin-bottom:2px}
+    .bl{text-align:center;font-size:11px;color:var(--mu);letter-spacing:2px;text-transform:uppercase;margin-bottom:22px}
+    .slw{padding:4px 0}
+    input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--bd);border-radius:99px;outline:none;cursor:pointer}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--or);cursor:pointer;border:3px solid var(--bg);box-shadow:0 0 0 2px var(--or),0 4px 12px var(--org)}
+    .slt{display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--mu)}
+    /* Number input */
+    .ni{background:var(--s1);border:1.5px solid var(--bd);border-radius:10px;padding:13px 18px;font-family:'Nunito Sans',sans-serif;font-size:18px;font-weight:700;color:var(--tx);outline:none;transition:var(--t);width:140px;text-align:center}
+    .ni:focus{border-color:var(--or);background:rgba(244,121,32,.05)}
+    .ni::placeholder{color:var(--mu);font-size:15px;font-weight:400}
+    /* Kids ages */
+    .kg{display:flex;flex-wrap:wrap;gap:16px;margin-top:4px}
+    .kg-g{display:flex;flex-direction:column;align-items:center;gap:6px}
+    .kg-l{font-size:11px;color:var(--mu);font-weight:800;letter-spacing:.8px;text-transform:uppercase}
+    /* Form inputs */
+    .fg{margin-bottom:18px}
+    .fl{display:block;font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--mu);margin-bottom:8px}
+    .fi{width:100%;background:var(--s1);border:1.5px solid var(--bd);border-radius:10px;padding:13px 16px;font-family:'Nunito Sans',sans-serif;font-size:15px;color:var(--tx);outline:none;transition:var(--t)}
+    .fi:focus{border-color:var(--or);background:rgba(244,121,32,.05)}
+    .fi::placeholder{color:var(--mu)}
+    /* Buttons */
+    .nav{display:flex;gap:12px;margin-top:36px}
+    .btn{padding:15px 26px;border-radius:10px;font-family:'Nunito Sans',sans-serif;font-size:14px;font-weight:800;cursor:pointer;border:none;transition:var(--t)}
+    .bb{background:var(--s1);border:1.5px solid var(--bd);color:var(--mu);flex:0 0 auto}
+    .bb:hover{background:var(--s2);color:var(--tx)}
+    .bp{flex:1;background:var(--or);color:#fff;box-shadow:0 4px 20px var(--org)}
+    .bp:hover{background:var(--orl);transform:translateY(-1px);box-shadow:0 6px 28px rgba(244,121,32,.4)}
+    /* Welcome */
+    .wi{width:80px;height:80px;background:linear-gradient(135deg,rgba(244,121,32,.18),rgba(201,168,76,.08));border:1px solid rgba(244,121,32,.25);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:28px}
+    .fll{display:flex;flex-direction:column;gap:11px;margin:28px 0 36px}
+    .fli{display:flex;align-items:center;gap:16px;padding:15px 18px;background:var(--s1);border:1px solid var(--bd);border-radius:12px}
+    .fi2{font-size:22px;flex-shrink:0} .ftx{font-size:14px;color:var(--mu)}
+    .ftx strong{display:block;color:var(--tx);font-weight:700;margin-bottom:1px}
+    /* Results */
+    .rh{text-align:center;margin-bottom:32px}
+    .up{display:inline-block;padding:5px 20px;border-radius:99px;font-size:11px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:14px}
+    .sr{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+    .sb2{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px 14px;text-align:center}
+    .sn{font-family:'Lora',serif;font-size:42px;font-weight:600;line-height:1;margin-bottom:4px}
+    .sl2{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--mu);text-transform:uppercase}
+    .cb{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:24px;margin-bottom:28px}
+    .stl{font-family:'Lora',serif;font-size:19px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+    .pcc{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:18px 20px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .pll{flex:1;min-width:0}
+    .pca{font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;padding:3px 10px;border-radius:99px;display:inline-block;margin-bottom:6px}
+    .pn{font-size:15px;font-weight:700;margin-bottom:3px} .pd2{font-size:13px;color:var(--mu);line-height:1.4}
+    .prp{text-align:right;flex-shrink:0}
+    .pm{font-family:'Lora',serif;font-size:24px;font-weight:600;color:var(--or)} .pu{font-size:11px;color:var(--mu)}
+    .tot{background:rgba(244,121,32,.1);border:1.5px solid rgba(244,121,32,.25);border-radius:12px;padding:20px 22px;display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+    .tla{font-size:14px;font-weight:700} .tls{font-size:12px;color:var(--mu);margin-top:2px}
+    .ta{font-family:'Lora',serif;font-size:30px;font-weight:600;color:var(--or)}
+    .pricard{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px 22px;margin:20px 0}
+    .ctab{background:linear-gradient(135deg,rgba(244,121,32,.1),rgba(201,168,76,.07));border:1px solid rgba(244,121,32,.2);border-radius:16px;padding:32px 28px;text-align:center;margin-top:24px}
+    .ctat{font-family:'Lora',serif;font-size:22px;font-weight:600;margin-bottom:10px}
+    .ctas{color:var(--mu);font-size:14px;margin-bottom:22px;line-height:1.6}
+    .okb{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);border-radius:10px;padding:14px 18px;font-size:14px;color:var(--ok);display:flex;align-items:center;gap:10px;margin-bottom:20px}
+    .erb{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:10px;padding:14px 18px;font-size:14px;color:var(--er);display:flex;align-items:center;gap:10px;margin-bottom:20px}
+    .prv{font-size:11.5px;color:var(--mu);margin-top:10px;display:flex;align-items:flex-start;gap:6px}
+    /* Loader */
+    #ldr{position:fixed;inset:0;background:rgba(7,16,31,.92);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:999;backdrop-filter:blur(6px)}
+    #ldr.on{display:flex}
+    .sp{width:52px;height:52px;border:3px solid rgba(244,121,32,.15);border-top-color:var(--or);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:18px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:520px){.opts.g2{grid-template-columns:1fr}.sr{grid-template-columns:1fr}.sb2{display:flex;align-items:center;gap:14px;text-align:left;padding:14px 18px}.sn{font-size:32px}.bn{font-size:52px}.tt{font-size:26px}}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="hdr">
+    <div class="lm">NN</div>
+    <div><div class="lt">NN Hellas</div><div class="ls" id="hdrSub">Χρήστος Κόλτσης · Σύμβουλος</div></div>
+  </div>
+
+  <div class="pgw" id="pgw" style="display:none">
+    <div class="pgm"><span id="pgl">Βήμα 1</span><span id="pgp">0%</span></div>
+    <div class="pgd" id="pgd"></div>
+  </div>
+
+  <!-- STEP 1: WELCOME -->
+  <div class="step active" id="s1">
+    <div class="wi">🛡️</div>
+    <div class="ey">Ασφαλιστική Ανάλυση Αναγκών</div>
+    <h1 class="tt">Ανακαλύψτε τι χρειάζεστε πραγματικά</h1>
+    <p class="sb">Απαντήστε σε 5 σύντομες ενότητες και λάβετε αμέσως μια εξατομικευμένη πρόταση ασφάλισης βασισμένη στο δικό σας προφίλ και budget.</p>
+    <div class="fll">
+      <div class="fli"><div class="fi2">⏱️</div><div class="ftx"><strong>3 λεπτά</strong>Γρήγορο ερωτηματολόγιο χωρίς περίπλοκες ερωτήσεις</div></div>
+      <div class="fli"><div class="fi2">🎯</div><div class="ftx"><strong>Εξατομικευμένο Score</strong>Μαθαίνετε αμέσως πού υπάρχει ανάγκη</div></div>
+      <div class="fli"><div class="fi2">📧</div><div class="ftx"><strong>Πρόταση στο inbox σας</strong>Τα αποτελέσματα αποστέλλονται αυτόματα</div></div>
+    </div>
+    <button class="btn bp" style="width:100%" onclick="goNext()">Ξεκινώ →</button>
+  </div>
+
+  <!-- STEPS 2-5: Rendered dynamically from QUESTIONS config -->
+  <div class="step" id="s2"></div>
+  <div class="step" id="s3"></div>
+  <div class="step" id="s4"></div>
+  <div class="step" id="s5"></div>
+
+  <!-- STEP 6: BUDGET + CONTACT -->
+  <div class="step" id="s6">
+    <div class="ey">Βήμα 5 · Budget & Στοιχεία</div>
+    <h2 class="tt">Τελευταίο βήμα!</h2>
+    <p class="sb">Ορίστε το μηνιαίο ποσό που μπορείτε να διαθέσετε και εισαγάγετε τα στοιχεία σας.</p>
+    <div class="qb">
+      <div class="ql"><span class="qn">1</span>Μηνιαίο ποσό για ασφαλιστική κάλυψη</div>
+      <div class="bn" id="budD">€80</div>
+      <div class="bl">ΑΝΑ ΜΗΝΑ</div>
+      <div class="slw">
+        <input type="range" min="20" max="500" value="80" step="5" id="budSl" oninput="A.budget=+this.value;document.getElementById('budD').textContent='€'+this.value;fillSl(this)">
+        <div class="slt"><span>€20</span><span>€100</span><span>€200</span><span>€300</span><span>€500</span></div>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Ονοματεπώνυμο *</label><input class="fi" type="text" placeholder="π.χ. Μαρία Παπαδοπούλου" id="fName" oninput="A.name=this.value"></div>
+    <div class="fg"><label class="fl">Email *</label><input class="fi" type="email" placeholder="email@example.com" id="fEmail" oninput="A.email=this.value"></div>
+    <div class="fg"><label class="fl">Τηλέφωνο (προαιρετικό)</label><input class="fi" type="tel" placeholder="69XXXXXXXX" id="fPhone" oninput="A.phone=this.value"></div>
+    <p class="prv">🔒 Τα στοιχεία σας χρησιμοποιούνται αποκλειστικά για την αποστολή της ασφαλιστικής σας πρότασης.</p>
+    <div class="nav">
+      <button class="btn bb" onclick="goPrev()">←</button>
+      <button class="btn bp" onclick="doSubmit()">Δείτε την Πρότασή σας 🎯</button>
+    </div>
+  </div>
+
+  <!-- STEP 7: RESULTS -->
+  <div class="step" id="s7">
+    <div id="okBar" class="okb" style="display:none">✅ <span id="okMsg"></span></div>
+    <div id="erBar" class="erb" style="display:none">⚠️ <span id="erMsg"></span></div>
+    <div class="rh">
+      <div id="upill" class="up"></div>
+      <h2 class="tt" id="rtitle" style="margin-bottom:6px">Τα Αποτελέσματά σας</h2>
+      <p class="sb" id="rsub" style="margin-bottom:0"></p>
+    </div>
+    <div class="sr">
+      <div class="sb2"><div class="sn" id="scH">–</div><div class="sl2">🏥 Υγεία</div></div>
+      <div class="sb2"><div class="sn" id="scL">–</div><div class="sl2">💙 Ζωή</div></div>
+      <div class="sb2"><div class="sn" id="scR">–</div><div class="sl2">👴 Σύνταξη</div></div>
+    </div>
+    <div class="cb">
+      <div style="font-size:13px;color:var(--mu);margin-bottom:12px;font-weight:700;letter-spacing:.5px">ΧΑΡΤΗΣ ΑΝΑΓΚΩΝ</div>
+      <canvas id="rChart" height="260"></canvas>
+    </div>
+    <div class="stl">🎯 Προτεινόμενη Κάλυψη</div>
+    <div id="prods"></div>
+    <div class="tot">
+      <div><div class="tla">Εκτιμώμενο Μηνιαίο Κόστος</div><div class="tls">Μικτό ασφάλιστρο (συμπ. φόρων & εισφορών)</div></div>
+      <div class="ta" id="rTot">€0</div>
+    </div>
+    <div class="pricard">
+      <div style="font-size:14px;font-weight:800;margin-bottom:8px">🎯 Η #1 Προτεραιότητά σας</div>
+      <div style="font-size:14px;color:var(--mu);line-height:1.65" id="priText"></div>
+    </div>
+    <div class="ctab">
+      <div class="ctat">Θέλετε αναλυτική συζήτηση;</div>
+      <div class="ctas">Ο σύμβουλός σας <span id="ctaName">Χρήστος Κόλτσης</span> θα επικοινωνήσει μαζί σας για να αναλύσει λεπτομερώς την πρόταση και να σχεδιάσετε μαζί την καλύτερη λύση.</div>
+      <a id="ctaLink" href="#" style="text-decoration:none"><button class="btn bp" style="width:100%;max-width:320px">📞 Κλείστε Ραντεβού</button></a>
+    </div>
+  </div>
+
+</div><!-- /app -->
+<div id="ldr"><div class="sp"></div><div style="color:var(--mu);font-size:14px">Υπολογισμός πρότασης…</div></div>
+
+<script>
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║  ⚙️  ΤΜΗΜΑ Α — ΒΑΣΙΚΕΣ ΡΥΘΜΙΣΕΙΣ                                ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+const BRAND = {
+  name:    'NN Hellas',
+  advisor: 'Χρήστος Κόλτσης',
+  email:   'koltsis2002@gmail.com',
+  phone:   '69XXXXXXXXX',   // ← Βάλτε το τηλέφωνό σας
+};
+
+const SVC = {
+  // ── EmailJS (βλ. ΟΔΗΓΙΕΣ.md για setup) ──
+  ej_key:     'YOUR_PUBLIC_KEY',
+  ej_svc:     'YOUR_SERVICE_ID',
+  ej_client:  'YOUR_TEMPLATE_CLIENT',
+  ej_agent:   'YOUR_TEMPLATE_AGENT',
+  // ── Google Sheets (βλ. ΟΔΗΓΙΕΣ.md για setup) ──
+  sheets_url: 'YOUR_APPS_SCRIPT_URL',
+};
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║  📝 ΤΜΗΜΑ Β — ΕΡΩΤΗΣΕΙΣ (ΕΠΕΞΕΡΓΑΣΤΕ ΕΛΕΥΘΕΡΑ)                 ║
+// ║                                                                   ║
+// ║  ΤΥΠΟΙ: 'radio'=μία επιλογή | 'multi'=πολλές                    ║
+// ║          'slider'=ρυθμιστής | 'number'=αριθμός                  ║
+// ║          'kidsAges' = αυτόματα πεδία ηλικιών παιδιών            ║
+// ║                                                                   ║
+// ║  ΕΠΙΛΟΓΕΣ: { v:'internal', l:'Κείμενο για χρήστη' }             ║
+// ║    ✅ Αλλάξτε ελεύθερα:  l (label)                               ║
+// ║    ⚠️  ΜΗΝ αλλάξετε:     v (value - χρησιμοποιείται εσωτερικά) ║
+// ║                                                                   ║
+// ║  showIf: Εμφανίζεται μόνο όταν άλλη ερώτηση (id) έχει           ║
+// ║           μία από τις τιμές (vals)                               ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+const QUESTIONS = [
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ΒΗΜΑ 1: ΠΡΟΦΙΛ  (step id: 2)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  {
+    step:    2,
+    eyebrow: 'Βήμα 1 · Προφίλ',
+    title:   'Μερικά στοιχεία για εσάς',
+    subtitle:'Θα χρησιμοποιηθούν αποκλειστικά για τον υπολογισμό της πρότασής σας.',
+    qs: [
+      {
+        id:'age', type:'slider',
+        label:'Η ηλικία σας',
+        min:18, max:70, def:35, unit:'ΕΤΩΝ',
+      },
+      {
+        id:'family', type:'radio', cols:2,
+        label:'Οικογενειακή κατάσταση',
+        opts:[
+          {v:'single',   l:'Άγαμος/η'},
+          {v:'married',  l:'Έγγαμος/η'},
+          {v:'divorced', l:'Διαζευγμένος/η'},
+          {v:'mono',     l:'Μονογονεϊκή'},
+        ],
+      },
+      {
+        // ↓ Εμφανίζεται ΜΟΝΟ όταν επιλεγεί "Έγγαμος/η"
+        id:'spouseAge', type:'number',
+        label:'Ηλικία συζύγου / ζυγής',
+        placeholder:'π.χ. 38', min:18, max:80,
+        showIf:{id:'family', vals:['married']},
+      },
+      {
+        id:'kids', type:'radio', cols:2,
+        label:'Παιδιά / Εξαρτώμενα μέλη',
+        opts:[
+          {v:'0', l:'Κανένα'},
+          {v:'1', l:'1 παιδί'},
+          {v:'2', l:'2 παιδιά'},
+          {v:'3', l:'3+ παιδιά'},
+        ],
+      },
+      {
+        // ↓ Εμφανίζεται αυτόματα με N πεδία, ένα ανά παιδί
+        id:'kidsAges', type:'kidsAges',
+        label:'Ηλικίες παιδιών',
+        showIf:{id:'kids', vals:['1','2','3']},
+      },
+      {
+        id:'job', type:'radio', cols:1,
+        label:'Επαγγελματική κατάσταση',
+        opts:[
+          {v:'private',  l:'Μισθωτός/ή — Ιδιωτικός Τομέας'},
+          {v:'public',   l:'Μισθωτός/ή — Δημόσιος Τομέας'},
+          {v:'free',     l:'Ελεύθερος Επαγγελματίας / Αυτοαπασχολούμενος'},
+          {v:'biz',      l:'Επιχειρηματίας / Εργοδότης'},
+          {v:'retired',  l:'Συνταξιούχος'},
+        ],
+      },
+    ],
+  },
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ΒΗΜΑ 2: ΥΓΕΙΑ  (step id: 3)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  {
+    step:    3,
+    eyebrow: 'Βήμα 2 · Υγεία',
+    title:   'Υγεία & Νοσοκομειακή κάλυψη',
+    subtitle:'Κατανοούμε πώς βλέπετε το σύστημα υγείας και ποια κάλυψη χρειάζεστε.',
+    qs: [
+      {
+        id:'hsat', type:'radio', cols:1,
+        label:'Πόσο ικανοποιημένοι είστε από τις παροχές υγείας του δημόσιου ταμείου σας;',
+        opts:[
+          {v:'none', l:'Καθόλου — δεν με καλύπτει όπως θέλω'},
+          {v:'low',  l:'Λίγο — καλύπτεται μόνο το βασικό'},
+          {v:'med',  l:'Αρκετά — έχω ικανοποιητική κάλυψη'},
+          {v:'high', l:'Απόλυτα — δεν έχω κανένα παράπονο'},
+        ],
+      },
+      {
+        id:'mild', type:'radio', cols:1,
+        label:'Για ένα ήπιο θέμα υγείας, σε ποιο νοσοκομείο θα επιλέγατε;',
+        opts:[
+          {v:'pub_local',  l:'Τοπικό δημόσιο νοσοκομείο'},
+          {v:'pub_city',   l:'Δημόσιο νοσοκομείο Αθήνας / Θεσσαλονίκης'},
+          {v:'priv_local', l:'Τοπικό ιδιωτικό νοσοκομείο'},
+          {v:'priv_big',   l:'Μεγάλο ιδιωτικό (Αθήνα / Θεσσ.)'},
+        ],
+      },
+      {
+        id:'serious', type:'radio', cols:1,
+        label:'Σε σοβαρό θέμα υγείας, πού θα επιλέγατε να νοσηλευτείτε;',
+        opts:[
+          {v:'pub_local',  l:'Τοπικό δημόσιο νοσοκομείο'},
+          {v:'pub_city',   l:'Δημόσιο νοσοκομείο Αθήνας / Θεσσαλονίκης'},
+          {v:'priv_local', l:'Τοπικό ιδιωτικό νοσοκομείο'},
+          {v:'priv_big',   l:'Μεγάλο ιδιωτικό (Αθήνα / Θεσσ.)'},
+          {v:'abroad',     l:'Νοσοκομείο του εξωτερικού'},
+        ],
+      },
+      {
+        id:'hneeds', type:'multi', cols:1,
+        label:'Ποιες παροχές θέλετε από ιδιωτικό φορέα;',
+        opts:[
+          {v:'diag',    l:'🔬 Διαγνωστικές εξετάσεις'},
+          {v:'visits',  l:'👨‍⚕️ Επισκέψεις γιατρών'},
+          {v:'hosp',    l:'🏥 Νοσοκομειακή περίθαλψη'},
+          {v:'checkup', l:'✅ Ετήσιο check-up'},
+          {v:'abroad',  l:'✈️ Πρόσβαση στο εξωτερικό'},
+        ],
+      },
+    ],
+  },
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ΒΗΜΑ 3: ΖΩΗ  (step id: 4)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  {
+    step:    4,
+    eyebrow: 'Βήμα 3 · Ζωή & Προστασία',
+    title:   'Ζωή & Εισοδηματική προστασία',
+    subtitle:'Το πιο σημαντικό περιουσιακό στοιχείο σας είναι εσείς οι ίδιοι.',
+    qs: [
+      {
+        id:'worry', type:'radio', cols:2,
+        label:'Έχετε αναλογιστεί τι θα συνέβαινε οικονομικά αν χαθεί το εισόδημά σας;',
+        opts:[
+          {v:'yes', l:'Ναι, με ανησυχεί πολύ'},
+          {v:'no',  l:'Όχι ιδιαίτερα'},
+        ],
+      },
+      {
+        id:'lneeds', type:'multi', cols:1,
+        label:'Ποιες ανάγκες ΔΕΝ θα καλύπτονταν σε περίπτωση απώλειάς σας;',
+        opts:[
+          {v:'expenses',  l:'🏠 Πάγια έξοδα (ενοίκιο, λογαριασμοί)'},
+          {v:'education', l:'🎓 Σπουδές παιδιών'},
+          {v:'loans',     l:'💳 Δάνεια'},
+          {v:'taxes',     l:'📋 Φορολογικές υποχρεώσεις'},
+        ],
+      },
+      {
+        id:'capital', type:'radio', cols:2,
+        label:'Ποιο κεφάλαιο θεωρείτε ικανοποιητικό για τη στήριξη των αγαπημένων σας;',
+        opts:[
+          {v:'50000',  l:'€50.000'},
+          {v:'100000', l:'€100.000'},
+          {v:'150000', l:'€150.000'},
+          {v:'200000', l:'€200.000+'},
+        ],
+      },
+    ],
+  },
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ΒΗΜΑ 4: ΣΥΝΤΑΞΗ  (step id: 5)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  {
+    step:    5,
+    eyebrow: 'Βήμα 4 · Σύνταξη & Μέλλον',
+    title:   'Η συνταξιοδοτική σας εικόνα',
+    subtitle:'Οι κρατικές συντάξεις μειώνονται συνεχώς. Πού βρίσκεστε σήμερα;',
+    qs: [
+      {
+        id:'pension', type:'radio', cols:2,
+        label:'Πώς εκτιμάτε τη μελλοντική σας σύνταξη;',
+        opts:[
+          {v:'none',  l:'Δεν θα λάβω καθόλου'},
+          {v:'small', l:'Θα είναι μικρή'},
+          {v:'ok',    l:'Θα είναι ικανοποιητική'},
+          {v:'good',  l:'Θα είναι μεγάλη'},
+        ],
+      },
+      {
+        id:'pplan', type:'multi', cols:1,
+        label:'Πώς σχεδιάζετε να εξασφαλίσετε το οικονομικό σας μέλλον;',
+        opts:[
+          {v:'bank', l:'🏦 Τραπεζική αποταμίευση'},
+          {v:'prog', l:'📊 Ασφαλιστικό / Αποταμιευτικό πρόγραμμα'},
+          {v:'prop', l:'🏠 Ακίνητα'},
+          {v:'fam',  l:'👨‍👩‍👧 Οικογένεια / παιδιά'},
+          {v:'soon', l:'⏳ Σκοπεύω να μεριμνήσω σύντομα'},
+        ],
+      },
+    ],
+  },
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ΠΡΟΣΘΕΣΤΕ ΝΕΑ ΒΗΜΑΤΑ ΕΔΩ
+  // Αντιγράψτε ένα από τα παραπάνω blocks και
+  // δώστε step: 6 (ή όποιο επόμενο αριθμό)
+  // ΣΗΜΑΝΤΙΚΟ: Προσθέστε επίσης <div class="step" id="s6"></div>
+  //             στο HTML παραπάνω (πριν το s6 budget)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+]; // ← τέλος QUESTIONS
+
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║  💰 ΤΜΗΜΑ Γ — ΤΙΜΟΛΟΓΙΑ (Καθαρά Ασφάλιστρα, Class B, 06.2025) ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+const P={
+  h500: {18:525,20:547,25:598,30:659,35:729,40:807,45:950,50:1167,55:1478,60:1877,65:2339,70:2872},
+  h1500:{18:271,20:278,25:310,30:339,35:387,40:442,45:536,50:688,55:890,60:1188,65:1468,70:1905},
+  cP:   {18:750,20:786,25:859,30:939,35:1028,40:1130,45:1264,50:1430,55:1640,60:1890,65:2215,70:2600},
+  lR:   {18:.000995,20:.001198,25:.001323,30:.001231,35:.001276,40:.001797,45:.002670,50:.004368,55:.006940,60:.011293,65:.018233},
+};
+const FC=187.25;
+
+function interp(t,age){
+  const k=Object.keys(t).map(Number).sort((a,b)=>a-b);
+  if(age<=k[0]) return t[k[0]];
+  if(age>=k[k.length-1]) return t[k[k.length-1]];
+  for(let i=0;i<k.length-1;i++){
+    if(age>=k[i]&&age<=k[i+1]){
+      const f=(age-k[i])/(k[i+1]-k[i]);
+      return t[k[i]]*(1-f)+t[k[i+1]]*f;
+    }
+  }
+}
+const pr=(t,a)=>Math.round(interp(t,a));
+const lpR=(a,c)=>Math.round(interp(P.lR,a)*c+41);
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let cur=1, chartI=null;
+let A={age:35,family:'',spouseAge:'',kids:'',kidsAges:[],job:'',hsat:'',mild:'',serious:'',hneeds:[],worry:'',lneeds:[],capital:'',pension:'',pplan:[],budget:80,name:'',email:'',phone:''};
+
+// ═══════════════════════════════════════════════════════
+// RENDER ENGINE
+// ═══════════════════════════════════════════════════════
+function buildSteps(){
+  QUESTIONS.forEach(cfg=>{
+    const el=document.getElementById('s'+cfg.step);
+    if(!el) return;
+    let h=`<div class="ey">${cfg.eyebrow}</div><h2 class="tt">${cfg.title}</h2><p class="sb">${cfg.subtitle}</p>`;
+    cfg.qs.forEach((q,i)=>{ h+=buildQ(q,i+1); });
+    h+=`<div class="nav"><button class="btn bb" onclick="goPrev()">←</button><button class="btn bp" onclick="goNext()">Επόμενο →</button></div>`;
+    el.innerHTML=h;
+  });
+  document.querySelectorAll('input[type=range]').forEach(fillSl);
+}
+
+function buildQ(q,n){
+  const si=q.showIf?`data-si="${q.showIf.id}" data-sv="${q.showIf.vals.join(',')}" style="display:none"`:'';
+  const mn=q.type==='multi'?` <span class="qno">(πολλαπλή επιλογή)</span>`:'';
+  let inner='';
+
+  if(q.type==='radio'){
+    inner=`<div class="opts${q.cols===2?' g2':''}">`;
+    q.opts.forEach(o=>{ inner+=`<div class="opt" onclick="pick(this,'${q.id}','${o.v}')"><div class="blt"></div>${o.l}</div>`; });
+    inner+='</div>';
+  } else if(q.type==='multi'){
+    inner='<div class="chips">';
+    q.opts.forEach(o=>{ inner+=`<div class="chip" onclick="tog(this,'${q.id}','${o.v}')">${o.l}</div>`; });
+    inner+='</div>';
+  } else if(q.type==='slider'){
+    const t=[]; for(let i=0;i<6;i++) t.push(Math.round(q.min+i*(q.max-q.min)/5));
+    inner=`<div class="bn" id="d_${q.id}">${q.def}</div><div class="bl">${q.unit}</div>
+      <div class="slw"><input type="range" min="${q.min}" max="${q.max}" value="${q.def}" step="1" id="sl_${q.id}"
+        oninput="A.${q.id}=+this.value;document.getElementById('d_${q.id}').textContent=this.value;fillSl(this)">
+      <div class="slt">${t.map(x=>`<span>${x}</span>`).join('')}</div></div>`;
+  } else if(q.type==='number'){
+    inner=`<input class="ni" type="number" min="${q.min||0}" max="${q.max||99}" placeholder="${q.placeholder||''}" oninput="A.${q.id}=this.value">`;
+  } else if(q.type==='kidsAges'){
+    inner=`<div class="kg" id="kgrid"></div>`;
+  }
+
+  return `<div class="qb" id="qb_${q.id}" ${si}><div class="ql"><span class="qn">${n}</span>${q.label}${mn}</div>${inner}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// INTERACTION
+// ═══════════════════════════════════════════════════════
+function pick(el,k,v){
+  el.closest('.opts').querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel'); A[k]=v; checkCond();
+}
+function tog(el,k,v){
+  el.classList.toggle('sel');
+  if(!A[k]) A[k]=[];
+  if(el.classList.contains('sel')){if(!A[k].includes(v)) A[k].push(v);}
+  else A[k]=A[k].filter(x=>x!==v);
+}
+function fillSl(s){
+  const p=((s.value-s.min)/(s.max-s.min))*100;
+  s.style.background=`linear-gradient(to right,var(--or) 0%,var(--or) ${p}%,var(--bd) ${p}%,var(--bd) 100%)`;
+}
+
+// ═══════════════════════════════════════════════════════
+// CONDITIONAL LOGIC
+// ═══════════════════════════════════════════════════════
+function checkCond(){
+  document.querySelectorAll('[data-si]').forEach(el=>{
+    const key=el.dataset.si, vals=el.dataset.sv.split(','), cur=A[key];
+    const show=Array.isArray(cur)?cur.some(v=>vals.includes(v)):vals.includes(cur);
+    el.style.display=show?'block':'none';
+    if(!show){
+      const id=el.id.replace('qb_','');
+      if(Array.isArray(A[id])) A[id]=[];
+      else if(id!=='kidsAges') A[id]='';
+    }
+  });
+  updateKidsAges();
+}
+
+function updateKidsAges(){
+  const g=document.getElementById('kgrid');
+  if(!g) return;
+  const n=A.kids==='3'?3:+(A.kids||0);
+  if(g.dataset.n==n) return;
+  g.dataset.n=n;
+  A.kidsAges=Array(n).fill('');
+  g.innerHTML='';
+  for(let i=0;i<n;i++){
+    g.innerHTML+=`<div class="kg-g"><span class="kg-l">Παιδί ${i+1}</span>
+      <input class="ni" type="number" min="0" max="25" placeholder="ηλ." style="width:100px"
+        oninput="A.kidsAges[${i}]=this.value"></div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+const PROG=5;
+function showStep(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s'+n).classList.add('active');
+  cur=n; window.scrollTo({top:0,behavior:'smooth'});
+  const pgw=document.getElementById('pgw');
+  if(n===1){pgw.style.display='none';return;}
+  pgw.style.display='block';
+  const pct=n===7?100:Math.round(((n-1)/PROG)*100);
+  document.getElementById('pgp').textContent=pct+'%';
+  document.getElementById('pgl').textContent=n===7?'✓ Ολοκληρώθηκε!':`Βήμα ${n-1} από ${PROG}`;
+  const d=document.getElementById('pgd'); d.innerHTML='';
+  for(let i=1;i<=PROG;i++){const x=document.createElement('div');x.className='pd'+(i<n-1?' done':i===n-1?' active':'');d.appendChild(x);}
+}
+function goNext(){if(cur<7) showStep(cur+1);}
+function goPrev(){if(cur>1) showStep(cur-1);}
+
+// ═══════════════════════════════════════════════════════
+// ⚖️  SCORING ENGINE
+// ═══════════════════════════════════════════════════════
+function calcScores(){
+  let h=0,l=0,r=0;
+  // ΥΓΕΙΑ
+  h+={none:35,low:25,med:10,high:0}[A.hsat]||0;
+  h+={pub_local:0,pub_city:6,priv_local:22,priv_big:30}[A.mild]||0;
+  h+={pub_local:0,pub_city:6,priv_local:13,priv_big:22,abroad:25}[A.serious]||0;
+  h+=Math.min((A.hneeds||[]).length*4,20);
+  // ΖΩΗ
+  if(A.worry==='yes') l+=42;
+  l+={50000:10,100000:22,150000:32,200000:38}[A.capital]||0;
+  l+=Math.min((A.lneeds||[]).length*7,21);
+  if(['married','mono'].includes(A.family)) l+=10;
+  l+={0:0,1:8,2:12,3:16}[A.kids]||0;
+  // ΣΥΝΤΑΞΗ
+  r+={none:55,small:38,ok:18,good:4}[A.pension]||0;
+  const pp=A.pplan||[];
+  if(!pp.includes('prog')&&!pp.includes('prop')&&!pp.includes('bank')||pp.includes('soon')) r+=28;
+  if(pp.includes('fam')) r+=12;
+  if(A.age>42) r+=10;
+  return{h:Math.min(100,Math.round(h)),l:Math.min(100,Math.round(l)),r:Math.min(100,Math.round(r))};
+}
+
+// ═══════════════════════════════════════════════════════
+// 🏥 RECOMMENDATION ENGINE
+// ═══════════════════════════════════════════════════════
+function buildProposal(sc){
+  const age=A.age,rem=[A.budget*12];
+  const sp=a=>{rem[0]-=a;return a;}, ok=a=>rem[0]>=a, prods=[];
+  if(sc.h>=55){
+    const cp=pr(P.cP,age),h5=pr(P.h500,age),h15=pr(P.h1500,age);
+    if(sc.h>=78&&ok(cp)) prods.push({n:'NN Orange Cross Plus',v:'χωρίς εκπιπτόμενο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ+',clr:'#3b82f6',d:'Πλήρης νοσοκομειακή & εξωνοσοκομειακή χωρίς franchise',ann:sp(cp),tax:.15});
+    else if(ok(h5)) prods.push({n:'NN Orange Health',v:'€500 εκπιπτόμενο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#38bdf8',d:'Νοσοκομειακή κάλυψη υψηλών ορίων — Class B δίκτυο',ann:sp(h5),tax:.15});
+    else if(ok(h15)) prods.push({n:'NN Orange Health',v:'€1.500 εκπιπτόμενο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#38bdf8',d:'Νοσοκομειακή κάλυψη με franchise — οικονομικότερη επιλογή',ann:sp(h15),tax:.15});
+  }
+  if(!prods.find(p=>p.n.includes('Cross'))&&sc.h>=30&&ok(FC))
+    prods.push({n:'NN Orange First Care OFC 1',v:'AFFIDEA',cat:'ΕΞΩΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#34d399',d:'Επισκέψεις, διαγνωστικές & check-up στο δίκτυο AFFIDEA',ann:sp(FC),tax:.15});
+  if(sc.l>=38&&age<=65){
+    const cap=sc.l>=72?150000:sc.l>=55?100000:50000,la=lpR(age,cap);
+    if(ok(la)) prods.push({n:'NN Orange Life',v:`κεφάλαιο €${cap.toLocaleString('el-GR')}`,cat:'ΖΩΗΣ',clr:'#a78bfa',d:'Ασφάλεια ζωής — εξασφαλίζει τους αγαπημένους σας ανεξαρτήτως περίστασης',ann:sp(la),tax:.0075});
+  }
+  if(sc.r>=45) prods.push({n:'Αποταμιευτικό / Συνταξιοδοτικό Πρόγραμμα',v:'κατόπιν αξιολόγησης',cat:'ΣΥΝΤΑΞΗ',clr:'#fbbf24',d:'Ο σύμβουλός σας θα σχεδιάσει το κατάλληλο πλάνο',ann:null,tax:0});
+  return prods;
+}
+
+function urgency(sc){
+  const a=(sc.h+sc.l+sc.r)/3;
+  if(a>=70) return{lbl:'ΚΡΙΣΙΜΗ ΑΝΑΓΚΗ',  color:'#f87171',bg:'rgba(248,113,113,.12)'};
+  if(a>=50) return{lbl:'ΥΨΗΛΗ ΑΝΑΓΚΗ',   color:'#fb923c',bg:'rgba(251,146,60,.12)'};
+  if(a>=30) return{lbl:'ΜΕΤΡΙΑ ΑΝΑΓΚΗ',  color:'#fbbf24',bg:'rgba(251,191,36,.12)'};
+  return      {lbl:'ΧΑΜΗΛΗ ΑΝΑΓΚΗ', color:'#34d399',bg:'rgba(52,211,153,.12)'};
+}
+
+// ═══════════════════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════════════════
+async function doSubmit(){
+  const n=document.getElementById('fName').value.trim(), e=document.getElementById('fEmail').value.trim();
+  if(!n){alert('Παρακαλώ εισαγάγετε το ονοματεπώνυμό σας.');return;}
+  if(!e||!e.includes('@')){alert('Παρακαλώ εισαγάγετε έγκυρο email.');return;}
+  A.name=n; A.email=e; A.phone=document.getElementById('fPhone').value.trim();
+  document.getElementById('ldr').classList.add('on');
+  const sc=calcScores(), props=buildProposal(sc), urg=urgency(sc);
+  renderResults(sc,props,urg);
+  await Promise.allSettled([sendEmails(sc,props,urg), saveSheets(sc,props,urg)]);
+  document.getElementById('ldr').classList.remove('on');
+  showStep(7);
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER RESULTS
+// ═══════════════════════════════════════════════════════
+const sc2c=v=>v>=70?'#f87171':v>=50?'#fb923c':v>=30?'#fbbf24':'#34d399';
+
+function renderResults(sc,props,urg){
+  const up=document.getElementById('upill');
+  up.textContent=urg.lbl; up.style.cssText=`background:${urg.bg};color:${urg.color};border:1px solid ${urg.color}33`;
+  document.getElementById('rtitle').textContent=`Γεια σας, ${A.name.split(' ')[0]}!`;
+  document.getElementById('rsub').textContent=`Ηλικία ${A.age} ετών · Budget €${A.budget}/μήνα · ${new Date().toLocaleDateString('el-GR')}`;
+  [['scH',sc.h],['scL',sc.l],['scR',sc.r]].forEach(([id,v])=>{const el=document.getElementById(id);el.textContent=v;el.style.color=sc2c(v);});
+  if(chartI) chartI.destroy();
+  chartI=new Chart(document.getElementById('rChart').getContext('2d'),{
+    type:'radar',
+    data:{labels:['Υγεία','Ζωή & Προστασία','Σύνταξη'],datasets:[{data:[sc.h,sc.l,sc.r],backgroundColor:'rgba(244,121,32,.14)',borderColor:'#F47920',borderWidth:2.5,pointBackgroundColor:'#F47920',pointRadius:6}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{stepSize:25,color:'rgba(238,240,248,.25)',backdropColor:'transparent',font:{size:10}},grid:{color:'rgba(255,255,255,.07)'},angleLines:{color:'rgba(255,255,255,.07)'},pointLabels:{color:'rgba(238,240,248,.7)',font:{size:13,family:"'Nunito Sans',sans-serif",weight:'700'}}}}}
+  });
+  const list=document.getElementById('prods'); list.innerHTML=''; let tot=0;
+  props.forEach(p=>{
+    const gr=p.ann?Math.round(p.ann*(1+p.tax)):null; if(gr) tot+=gr;
+    const mo=gr?Math.round(gr/12):null;
+    list.innerHTML+=`<div class="pcc"><div class="pll"><div class="pca" style="background:${p.clr}22;color:${p.clr}">${p.cat}</div><div class="pn">${p.n}</div><div class="pd2">${p.v} — ${p.d}</div></div>
+      <div class="prp">${mo?`<div class="pm">€${mo}</div><div class="pu">/μήνα (μικτό)</div>`:`<div style="font-size:13px;color:var(--mu);text-align:right">Κατόπιν<br>αξιολόγησης</div>`}</div></div>`;
+  });
+  document.getElementById('rTot').textContent='€'+Math.round(tot/12);
+  const mk=sc.h>=sc.l&&sc.h>=sc.r?'h':sc.l>=sc.r?'l':'r';
+  document.getElementById('priText').innerHTML={
+    h:'🏥 Η ανάλυση δείχνει υψηλή ανάγκη σε <strong>Υγεία & Νοσηλεία</strong>. Ένα απρόσμενο ιατρικό γεγονός χωρίς κάλυψη μπορεί να δημιουργήσει σοβαρά οικονομικά βάρη.',
+    l:'💙 Η ανάλυση δείχνει υψηλή ανάγκη σε <strong>Προστασία Ζωής & Εισοδήματος</strong>. Η οικογένειά σας εξαρτάται από εσάς — προτεραιότητα είναι η οικονομική τους ασφάλεια.',
+    r:'👴 Η ανάλυση δείχνει σημαντική ανάγκη σε <strong>Συνταξιοδοτική Εξασφάλιση</strong>. Η κρατική σύνταξη δεν επαρκεί — η αποθεματοποίηση σήμερα είναι η καλύτερη επένδυση.',
+  }[mk];
+}
+
+// ═══════════════════════════════════════════════════════
+// 📧 EMAIL
+// ═══════════════════════════════════════════════════════
+function propTxt(ps){
+  const tot=ps.filter(p=>p.ann).reduce((s,p)=>s+Math.round(p.ann*(1+p.tax)),0);
+  return ps.map(p=>{const g=p.ann?Math.round(p.ann*(1+p.tax)):null;return `• ${p.n} (${p.v}): ${g?'€'+Math.round(g/12)+'/μήνα':'Κατόπιν αξιολόγησης'}`;}).join('\n')+`\n\nΣΥΝΟΛΟ: €${Math.round(tot/12)}/μήνα`;
+}
+
+async function sendEmails(sc,props,urg){
+  if(!SVC.ej_key||SVC.ej_key==='YOUR_PUBLIC_KEY'){
+    showMsg('ok','Αποτελέσματα εμφανίστηκαν! (EmailJS: ρυθμίστε το SVC στον κώδικα)'); return;
+  }
+  const base={
+    client_name:A.name, client_email:A.email, client_phone:A.phone||'—',
+    client_age:A.age+' ετών', family_status:A.family||'—',
+    spouse_age:A.spouseAge||'—',
+    kids_count:A.kids||'0', kids_ages:(A.kidsAges||[]).filter(Boolean).join(', ')||'—',
+    health_score:sc.h+'/100', life_score:sc.l+'/100', retirement_score:sc.r+'/100',
+    urgency_level:urg.lbl, monthly_budget:'€'+A.budget,
+    proposal_text:propTxt(props),
+    date:new Date().toLocaleDateString('el-GR',{day:'2-digit',month:'long',year:'numeric'}),
+  };
+  try{
+    await emailjs.send(SVC.ej_svc,SVC.ej_client,{...base,to_email:A.email,to_name:A.name});
+    await emailjs.send(SVC.ej_svc,SVC.ej_agent, {...base,to_email:BRAND.email,to_name:BRAND.advisor});
+    showMsg('ok','✅ Η πρόταση στάλθηκε επιτυχώς στο email σας!');
+  }catch(e){
+    console.error('EmailJS:',e);
+    showMsg('er','Σφάλμα αποστολής email. Ελέγξτε τη διαμόρφωση EmailJS.');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// 🗃️ GOOGLE SHEETS
+// ═══════════════════════════════════════════════════════
+async function saveSheets(sc,props,urg){
+  if(!SVC.sheets_url||SVC.sheets_url==='YOUR_APPS_SCRIPT_URL') return;
+  const tot=props.filter(p=>p.ann).reduce((s,p)=>s+Math.round(p.ann*(1+p.tax)),0);
+  const d={
+    date:new Date().toLocaleString('el-GR'), name:A.name, email:A.email, phone:A.phone||'',
+    age:A.age, family:A.family, spouseAge:A.spouseAge||'',
+    kids:A.kids||'0', kidsAges:(A.kidsAges||[]).filter(Boolean).join(', '),
+    job:A.job, hsat:A.hsat, mild:A.mild, serious:A.serious,
+    hneeds:(A.hneeds||[]).join(', '), worry:A.worry,
+    lneeds:(A.lneeds||[]).join(', '), capital:A.capital,
+    pension:A.pension, pplan:(A.pplan||[]).join(', '),
+    budget:A.budget, scH:sc.h, scL:sc.l, scR:sc.r,
+    urgency:urg.lbl, proposal:props.map(p=>p.n).join(' | '), monthly:Math.round(tot/12),
+  };
+  try{ await fetch(SVC.sheets_url+'?'+new URLSearchParams(d),{mode:'no-cors'}); }
+  catch(e){ console.warn('Sheets:',e); }
+}
+
+function showMsg(t,m){
+  if(t==='ok'){document.getElementById('okBar').style.display='flex';document.getElementById('okMsg').textContent=m;}
+  else{document.getElementById('erBar').style.display='flex';document.getElementById('erMsg').textContent=m;}
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('hdrSub').textContent=BRAND.advisor+' · Σύμβουλος';
+  document.getElementById('ctaName').textContent=BRAND.advisor;
+  document.getElementById('ctaLink').href=`mailto:${BRAND.email}?subject=Αίτημα Ραντεβού`;
+  buildSteps();
+  document.querySelectorAll('input[type=range]').forEach(fillSl);
+  if(SVC.ej_key&&SVC.ej_key!=='YOUR_PUBLIC_KEY') emailjs.init(SVC.ej_key);
+});
+</script>
+</body>
+</html>
