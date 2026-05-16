@@ -219,15 +219,17 @@ const BRAND = {
   name:    'NN Hellas',
   advisor: 'Χρήστος Κόλτσης',
   email:   'koltsis2002@gmail.com',
-  phone:   '6989118348',   // ← Βάλτε το τηλέφωνό σας
+  phone:   '69XXXXXXXXX',   // ← Βάλτε το τηλέφωνό σας
 };
 
 const SVC = {
-  ej_key:     '3qFxGixe2gHChiZ0T',
-  ej_svc:     'service_nfxu98b',
-  ej_client:  'template_ky8g7hp',
-  ej_agent:   'template_cp85icg',
-  sheets_url: 'https://script.google.com/macros/s/AKfycbw7eysq6ydYEezrcBL5OLI-ZJ8rmuQewA2bDCw9CPod_WYZq4J0Bnt1EQcwYEPGLK8f3Q/exec',
+  // ── EmailJS (βλ. ΟΔΗΓΙΕΣ.md για setup) ──
+  ej_key:     'YOUR_PUBLIC_KEY',
+  ej_svc:     'YOUR_SERVICE_ID',
+  ej_client:  'YOUR_TEMPLATE_CLIENT',
+  ej_agent:   'YOUR_TEMPLATE_AGENT',
+  // ── Google Sheets (βλ. ΟΔΗΓΙΕΣ.md για setup) ──
+  sheets_url: 'YOUR_APPS_SCRIPT_URL',
 };
 
 // ╔═══════════════════════════════════════════════════════════════════╗
@@ -617,19 +619,25 @@ function calcScores(){
 // 🏥 RECOMMENDATION ENGINE
 // ═══════════════════════════════════════════════════════
 function buildProposal(sc){
-  const age=A.age,rem=[A.budget*12];
-  const sp=a=>{rem[0]-=a;return a;}, ok=a=>rem[0]>=a, prods=[];
+  // Ο έλεγχος budget γίνεται με ΜΙΚΤΑ ασφάλιστρα (καθαρό × φόρος)
+  // ώστε το σύνολο να μην υπερβαίνει ποτέ το budget του πελάτη
+  const age=A.age, budgetAnn=A.budget*12;
+  let usedGross=0;
+  const g=(net,tax)=>Math.round(net*(1+tax));
+  const okG=(net,tax)=>(usedGross+g(net,tax))<=budgetAnn;
+  const add=obj=>{if(obj.ann) usedGross+=g(obj.ann,obj.tax); return obj;};
+  const prods=[];
   if(sc.h>=55){
-    const cp=pr(P.cP,age),h5=pr(P.h500,age),h15=pr(P.h1500,age);
-    if(sc.h>=78&&ok(cp)) prods.push({n:'NN Orange Cross Plus',v:'χωρίς εκπιπτόμενο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ+',clr:'#3b82f6',d:'Πλήρης νοσοκομειακή & εξωνοσοκομειακή χωρίς franchise',ann:sp(cp),tax:.15});
-    else if(ok(h5)) prods.push({n:'NN Orange Health',v:'€500 εκπιπτόμενο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#38bdf8',d:'Νοσοκομειακή κάλυψη υψηλών ορίων — Class B δίκτυο',ann:sp(h5),tax:.15});
-    else if(ok(h15)) prods.push({n:'NN Orange Health',v:'€1.500 εκπιπτόμενο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#38bdf8',d:'Νοσοκομειακή κάλυψη με franchise — οικονομικότερη επιλογή',ann:sp(h15),tax:.15});
+    const cpN=pr(P.cP,age),h5N=pr(P.h500,age),h15N=pr(P.h1500,age);
+    if(sc.h>=78&&okG(cpN,.15)) prods.push(add({n:'NN Orange Cross Plus',v:'χωρίς εκπιπτόμενο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ+',clr:'#3b82f6',d:'Πλήρης νοσοκομειακή & εξωνοσοκομειακή χωρίς franchise',ann:cpN,tax:.15}));
+    else if(okG(h5N,.15)) prods.push(add({n:'NN Orange Health',v:'€500 εκπιπτόμενο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#38bdf8',d:'Νοσοκομειακή κάλυψη υψηλών ορίων — Class B δίκτυο',ann:h5N,tax:.15}));
+    else if(okG(h15N,.15)) prods.push(add({n:'NN Orange Health',v:'€1.500 εκπιπτόμενο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#38bdf8',d:'Νοσοκομειακή κάλυψη με franchise — οικονομικότερη επιλογή',ann:h15N,tax:.15}));
   }
-  if(!prods.find(p=>p.n.includes('Cross'))&&sc.h>=30&&ok(FC))
-    prods.push({n:'NN Orange First Care OFC 1',v:'AFFIDEA',cat:'ΕΞΩΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#34d399',d:'Επισκέψεις, διαγνωστικές & check-up στο δίκτυο AFFIDEA',ann:sp(FC),tax:.15});
+  if(!prods.find(p=>p.n.includes('Cross'))&&sc.h>=30&&okG(FC,.15))
+    prods.push(add({n:'NN Orange First Care OFC 1',v:'AFFIDEA',cat:'ΕΞΩΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#34d399',d:'Επισκέψεις, διαγνωστικές & check-up στο δίκτυο AFFIDEA',ann:FC,tax:.15}));
   if(sc.l>=38&&age<=65){
-    const cap=sc.l>=72?150000:sc.l>=55?100000:50000,la=lpR(age,cap);
-    if(ok(la)) prods.push({n:'NN Orange Life',v:`κεφάλαιο €${cap.toLocaleString('el-GR')}`,cat:'ΖΩΗΣ',clr:'#a78bfa',d:'Ασφάλεια ζωής — εξασφαλίζει τους αγαπημένους σας ανεξαρτήτως περίστασης',ann:sp(la),tax:.0075});
+    const cap=sc.l>=72?150000:sc.l>=55?100000:50000,laN=lpR(age,cap);
+    if(okG(laN,.0075)) prods.push(add({n:'NN Orange Life',v:`κεφάλαιο €${cap.toLocaleString('el-GR')}`,cat:'ΖΩΗΣ',clr:'#a78bfa',d:'Ασφάλεια ζωής — εξασφαλίζει τους αγαπημένους σας ανεξαρτήτως περίστασης',ann:laN,tax:.0075}));
   }
   if(sc.r>=45) prods.push({n:'Αποταμιευτικό / Συνταξιοδοτικό Πρόγραμμα',v:'κατόπιν αξιολόγησης',cat:'ΣΥΝΤΑΞΗ',clr:'#fbbf24',d:'Ο σύμβουλός σας θα σχεδιάσει το κατάλληλο πλάνο',ann:null,tax:0});
   return prods;
