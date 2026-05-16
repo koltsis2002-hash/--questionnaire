@@ -102,6 +102,24 @@
     .tla{font-size:14px;font-weight:700} .tls{font-size:12px;color:var(--mu);margin-top:2px}
     .ta{font-family:'Lora',serif;font-size:30px;font-weight:600;color:var(--or)}
     .pricard{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px 22px;margin:20px 0}
+    /* ── 3 ΣΕΝΑΡΙΑ ── */
+    .sccard{background:var(--s1);border:1.5px solid var(--bd);border-radius:14px;margin-bottom:16px;overflow:hidden;position:relative}
+    .sccard.rec{border-color:var(--or);box-shadow:0 0 0 1px var(--or),0 8px 24px rgba(244,121,32,.15)}
+    .scbadge{position:absolute;top:0;right:0;background:var(--or);color:#fff;font-size:10px;font-weight:800;letter-spacing:1px;padding:5px 14px;border-bottom-left-radius:10px}
+    .schead{padding:18px 20px 4px}
+    .sclabel{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--or)}
+    .scname{font-family:'Lora',serif;font-size:20px;font-weight:600;margin-top:2px}
+    .scdesc{padding:0 20px 14px;font-size:13px;color:var(--mu);line-height:1.5}
+    .scbody{padding:0 20px}
+    .scp{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--bd)}
+    .scpl{flex:1;min-width:0}
+    .scpc{font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;padding:2px 8px;border-radius:99px;display:inline-block;margin-bottom:5px}
+    .scpn{font-size:14px;font-weight:700;line-height:1.3} .scpd{font-size:12px;color:var(--mu);margin-top:1px}
+    .scpr{font-family:'Lora',serif;font-size:20px;font-weight:600;color:var(--tx);text-align:right;flex-shrink:0}
+    .scpr span{font-size:11px;color:var(--mu);font-family:'Nunito Sans',sans-serif}
+    .sctot{background:rgba(244,121,32,.08);border-top:1.5px solid rgba(244,121,32,.2);padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+    .sctl{font-size:13px;font-weight:700} .sctv{font-family:'Lora',serif;font-size:24px;font-weight:600;color:var(--or)}
+    .sctv span{font-size:12px;color:var(--mu);font-family:'Nunito Sans',sans-serif}
     .ctab{background:linear-gradient(135deg,rgba(244,121,32,.1),rgba(201,168,76,.07));border:1px solid rgba(244,121,32,.2);border-radius:16px;padding:32px 28px;text-align:center;margin-top:24px}
     .ctat{font-family:'Lora',serif;font-size:22px;font-weight:600;margin-bottom:10px}
     .ctas{color:var(--mu);font-size:14px;margin-bottom:22px;line-height:1.6}
@@ -188,19 +206,17 @@
       <div class="sb2"><div class="sn" id="scR">–</div><div class="sl2">👴 Σύνταξη</div></div>
     </div>
     <div class="cb">
-      <div style="font-size:13px;color:var(--mu);margin-bottom:12px;font-weight:700;letter-spacing:.5px">ΧΑΡΤΗΣ ΑΝΑΓΚΩΝ</div>
-      <canvas id="rChart" height="260"></canvas>
-    </div>
-    <div class="stl">🎯 Προτεινόμενη Κάλυψη</div>
-    <div id="prods"></div>
-    <div class="tot">
-      <div><div class="tla">Εκτιμώμενο Μηνιαίο Κόστος</div><div class="tls">Μικτό ασφάλιστρο (συμπ. φόρων & εισφορών)</div></div>
-      <div class="ta" id="rTot">€0</div>
+      <div style="font-size:13px;color:var(--mu);margin-bottom:4px;font-weight:700;letter-spacing:.5px">🥧 ΚΑΤΑΝΟΜΗ ΑΝΑΓΚΩΝ</div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:12px">Σύνολο 100% — οι ανάγκες κατατάσσονται με βάση το ποσοστό</div>
+      <canvas id="rChart" height="240"></canvas>
     </div>
     <div class="pricard">
       <div style="font-size:14px;font-weight:800;margin-bottom:8px">🎯 Η #1 Προτεραιότητά σας</div>
       <div style="font-size:14px;color:var(--mu);line-height:1.65" id="priText"></div>
     </div>
+    <div class="stl">📋 3 Προτεινόμενα Σενάρια Κάλυψης</div>
+    <p class="sb" style="margin-top:-8px;margin-bottom:16px;font-size:13px">Επιλέξτε το σενάριο που ταιριάζει στις προτεραιότητές σας. Το <strong style="color:var(--or)">Σενάριο Β</strong> είναι η ισορροπημένη μας σύσταση.</p>
+    <div id="scenarios"></div>
     <div class="ctab">
       <div class="ctat">Θέλετε αναλυτική συζήτηση;</div>
       <div class="ctas">Ο σύμβουλός σας <span id="ctaName">Χρήστος Κόλτσης</span> θα επικοινωνήσει μαζί σας για να αναλύσει λεπτομερώς την πρόταση και να σχεδιάσετε μαζί την καλύτερη λύση.</div>
@@ -219,17 +235,17 @@ const BRAND = {
   name:    'NN Hellas',
   advisor: 'Χρήστος Κόλτσης',
   email:   'koltsis2002@gmail.com',
-  phone:   '69XXXXXXXXX',   // ← Βάλτε το τηλέφωνό σας
+  phone:   '6989118348',   // ← Βάλτε το τηλέφωνό σας
 };
 
 const SVC = {
   // ── EmailJS (βλ. ΟΔΗΓΙΕΣ.md για setup) ──
-  ej_key:     'YOUR_PUBLIC_KEY',
-  ej_svc:     'YOUR_SERVICE_ID',
-  ej_client:  'YOUR_TEMPLATE_CLIENT',
-  ej_agent:   'YOUR_TEMPLATE_AGENT',
+  ej_key:     '3qFxGixe2gHChiZ0T',
+  ej_svc:     'service_nfxu98b',
+  ej_client:  'template_ky8g7hp',
+  ej_agent:   'template_cp85icg',
   // ── Google Sheets (βλ. ΟΔΗΓΙΕΣ.md για setup) ──
-  sheets_url: 'YOUR_APPS_SCRIPT_URL',
+  sheets_url: 'https://script.google.com/macros/s/AKfycbw7eysq6ydYEezrcBL5OLI-ZJ8rmuQewA2bDCw9CPod_WYZq4J0Bnt1EQcwYEPGLK8f3Q/exec',
 };
 
 // ╔═══════════════════════════════════════════════════════════════════╗
@@ -360,6 +376,15 @@ const QUESTIONS = [
           {v:'abroad',  l:'✈️ Πρόσβαση στο εξωτερικό'},
         ],
       },
+      {
+        id:'deductible', type:'radio', cols:1,
+        label:'Τι τύπο εκπιπτόμενου (franchise) προτιμάτε για τη νοσοκομειακή σας κάλυψη;',
+        opts:[
+          {v:'none',         l:'🏆 Κανένα — πλήρης κάλυψη χωρίς franchise'},
+          {v:'annual',       l:'📅 Ετήσιο — πληρώνω μία φορά τον χρόνο, ανεξαρτήτως νοσηλειών'},
+          {v:'per_incident', l:'🏥 Ανά Νοσηλεία — εκπιπτόμενο για κάθε νοσηλεία ξεχωριστά'},
+        ],
+      },
     ],
   },
 
@@ -450,12 +475,25 @@ const QUESTIONS = [
 // ║  💰 ΤΜΗΜΑ Γ — ΤΙΜΟΛΟΓΙΑ (Καθαρά Ασφάλιστρα, Class B, 06.2025) ║
 // ╚═══════════════════════════════════════════════════════════════════╝
 const P={
+  // ── Νοσοκομειακή μόνο (εκπιπτόμενο ΑΝΑ ΠΕΡΙΣΤΑΤΙΚΟ) ──
   h500: {18:525,20:547,25:598,30:659,35:729,40:807,45:950,50:1167,55:1478,60:1877,65:2339,70:2872},
   h1500:{18:271,20:278,25:310,30:339,35:387,40:442,45:536,50:688,55:890,60:1188,65:1468,70:1905},
-  cP:   {18:750,20:786,25:859,30:939,35:1028,40:1130,45:1264,50:1430,55:1640,60:1890,65:2215,70:2600},
+  ed1:  {18:500,20:512,25:548,30:585,35:669,40:764,45:897,50:1057,55:1350,60:1700,65:2050},
+  ed2:  {18:420,20:429,25:454,30:486,35:548,40:617,45:718,50:835,55:1080,60:1350,65:1650},
+  // ── Νοσοκομειακή + Εξωνοσοκομειακή (εκπιπτόμενο ΕΤΗΣΙΟ) ──
+  cP:   {18:750,20:786,25:859,30:939,35:1028,40:1130,45:1315,50:1616,55:2137,60:2774,65:3500},
+  c1:   {18:622,20:654,25:712,30:783,35:863,40:950,45:1138,50:1467,55:1889,60:2428,65:3100},
+  c2:   {18:330,20:336,25:377,30:424,35:492,40:574,45:738,50:981,55:1273,60:1711,65:2200},
+  c3:   {18:253,20:260,25:293,30:330,35:388,40:456,45:569,50:710,55:918,60:1174,65:1500},
+  c4:   {18:169,20:173,25:193,30:216,35:247,40:283,45:338,50:403,55:485,60:584,65:700},
+  // ── Ασφάλεια Ζωής — rates ──
   lR:   {18:.000995,20:.001198,25:.001323,30:.001231,35:.001276,40:.001797,45:.002670,50:.004368,55:.006940,60:.011293,65:.018233},
+  lPR:  {18:.001433,20:.001636,25:.001761,30:.001669,35:.001792,40:.002659,45:.004035,50:.006865,55:.011737,60:.020114},
+  // ── ExtraMed rates (κρίσιμες ασθένειες — rate × κεφάλαιο) ──
+  em7:  {18:.001397,20:.001595,25:.002288,30:.003300,35:.004730,40:.006787,45:.009724,50:.013926,55:.019910,60:.028457},
+  em31: {18:.003091,20:.003476,25:.004664,30:.006259,35:.008371,40:.011198,45:.014949,50:.019921,55:.027665,60:.038423},
 };
-const FC=187.25;
+const FC={ofc1:187.25,ofc2:114.43,ofc3:168.70};
 
 function interp(t,age){
   const k=Object.keys(t).map(Number).sort((a,b)=>a-b);
@@ -469,13 +507,15 @@ function interp(t,age){
   }
 }
 const pr=(t,a)=>Math.round(interp(t,a));
-const lpR=(a,c)=>Math.round(interp(P.lR,a)*c+41);
+const lpR =(a,c)=>Math.round(interp(P.lR,a)*c+41);    // Life TR1
+const lpPR=(a,c)=>Math.round(interp(P.lPR,a)*c+41);   // Life Plus TR2&3
+const emR =(t,a,c)=>Math.round(interp(t,a)*c);        // ExtraMed rider
 
 // ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════
 let cur=1, chartI=null;
-let A={age:35,family:'',spouseAge:'',kids:'',kidsAges:[],job:'',hsat:'',mild:'',serious:'',hneeds:[],worry:'',lneeds:[],capital:'',pension:'',pplan:[],budget:80,name:'',email:'',phone:''};
+let A={age:35,family:'',spouseAge:'',kids:'',kidsAges:[],job:'',hsat:'',mild:'',serious:'',hneeds:[],deductible:'',worry:'',lneeds:[],capital:'',pension:'',pplan:[],budget:80,name:'',email:'',phone:''};
 
 // ═══════════════════════════════════════════════════════
 // RENDER ENGINE
@@ -595,18 +635,26 @@ function goPrev(){if(cur>1) showStep(cur-1);}
 // ═══════════════════════════════════════════════════════
 function calcScores(){
   let h=0,l=0,r=0;
-  // ΥΓΕΙΑ
+  // ── ΥΓΕΙΑ (max raw 100) ──
   h+={none:35,low:25,med:10,high:0}[A.hsat]||0;
   h+={pub_local:0,pub_city:6,priv_local:22,priv_big:30}[A.mild]||0;
   h+={pub_local:0,pub_city:6,priv_local:13,priv_big:22,abroad:25}[A.serious]||0;
   h+=Math.min((A.hneeds||[]).length*4,20);
-  // ΖΩΗ
-  if(A.worry==='yes') l+=42;
-  l+={50000:10,100000:22,150000:32,200000:38}[A.capital]||0;
-  l+=Math.min((A.lneeds||[]).length*7,21);
-  if(['married','mono'].includes(A.family)) l+=10;
-  l+={0:0,1:8,2:12,3:16}[A.kids]||0;
-  // ΣΥΝΤΑΞΗ
+
+  // ── ΖΩΗ — η βαρύτητα ΕΝΕΡΓΟΠΟΙΕΙΤΑΙ από εξαρτώμενους & υποχρεώσεις ──
+  // Πραγματικοί λόγοι ανάγκης ασφάλειας ζωής (οικογένεια, παιδιά, υποχρεώσεις):
+  const famPts  = ['married','mono'].includes(A.family) ? 15 : 0;
+  const kidPts  = {0:0,1:10,2:15,3:20}[A.kids]||0;
+  const needPts = Math.min((A.lneeds||[]).length*7,28);   // ακάλυπτες ανάγκες/δάνεια/φόροι
+  const depPts  = famPts + kidPts + needPts;              // σύνολο πραγματικών υποχρεώσεων
+  // Υποκειμενικά (ανησυχία + επιθυμητό κεφάλαιο):
+  const subj = (A.worry==='yes'?50:0) + ({50000:14,100000:28,150000:38,200000:45}[A.capital]||0);
+  // Κλιμάκωση υποκειμενικών βάσει ύπαρξης εξαρτώμενων — χωρίς υποχρεώσεις,
+  // η ανάγκη ασφάλειας ζωής είναι αντικειμενικά μικρότερη:
+  const depFactor = depPts>=30 ? 1.0 : depPts>=12 ? 0.70 : depPts>0 ? 0.50 : 0.30;
+  l = depPts + Math.round(subj*depFactor);
+
+  // ── ΣΥΝΤΑΞΗ (max raw 105) ──
   r+={none:55,small:38,ok:18,good:4}[A.pension]||0;
   const pp=A.pplan||[];
   if(!pp.includes('prog')&&!pp.includes('prop')&&!pp.includes('bank')||pp.includes('soon')) r+=28;
@@ -615,32 +663,110 @@ function calcScores(){
   return{h:Math.min(100,Math.round(h)),l:Math.min(100,Math.round(l)),r:Math.min(100,Math.round(r))};
 }
 
+// Normalize scores to sum = 100 (για την πίτα μεριδίων)
+function pieShares(sc){
+  const t=sc.h+sc.l+sc.r||1;
+  let h=Math.round(sc.h/t*100), l=Math.round(sc.l/t*100), r=100-h-l;
+  return{h,l,r};
+}
+
 // ═══════════════════════════════════════════════════════
-// 🏥 RECOMMENDATION ENGINE
+// 🏥 RECOMMENDATION ENGINE — 3 ΣΕΝΑΡΙΑ (Decision Tree)
 // ═══════════════════════════════════════════════════════
-function buildProposal(sc){
-  // Ο έλεγχος budget γίνεται με ΜΙΚΤΑ ασφάλιστρα (καθαρό × φόρος)
-  // ώστε το σύνολο να μην υπερβαίνει ποτέ το budget του πελάτη
-  const age=A.age, budgetAnn=A.budget*12;
-  let usedGross=0;
-  const g=(net,tax)=>Math.round(net*(1+tax));
-  const okG=(net,tax)=>(usedGross+g(net,tax))<=budgetAnn;
-  const add=obj=>{if(obj.ann) usedGross+=g(obj.ann,obj.tax); return obj;};
-  const prods=[];
-  if(sc.h>=55){
-    const cpN=pr(P.cP,age),h5N=pr(P.h500,age),h15N=pr(P.h1500,age);
-    if(sc.h>=78&&okG(cpN,.15)) prods.push(add({n:'NN Orange Cross Plus',v:'χωρίς εκπιπτόμενο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ+',clr:'#3b82f6',d:'Πλήρης νοσοκομειακή & εξωνοσοκομειακή χωρίς franchise',ann:cpN,tax:.15}));
-    else if(okG(h5N,.15)) prods.push(add({n:'NN Orange Health',v:'€500 εκπιπτόμενο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#38bdf8',d:'Νοσοκομειακή κάλυψη υψηλών ορίων — Class B δίκτυο',ann:h5N,tax:.15}));
-    else if(okG(h15N,.15)) prods.push(add({n:'NN Orange Health',v:'€1.500 εκπιπτόμενο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#38bdf8',d:'Νοσοκομειακή κάλυψη με franchise — οικονομικότερη επιλογή',ann:h15N,tax:.15}));
+function buildScenarios(sc){
+  const age=A.age, dep=A.deductible||'annual', annBudget=A.budget*12;
+  const G=(net,tax)=>Math.round(net*(1+tax));
+
+  // ── Health products ανά προτίμηση εκπιπτόμενου (sorted: best→cheapest) ──
+  function healthCatalog(){
+    const t=[];
+    if(dep==='none'){
+      t.push({id:'cP',n:'NN Orange Cross Plus',v:'χωρίς εκπιπτόμενο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ+',clr:'#3b82f6',out:true,ann:pr(P.cP,age),tax:.15,d:'Πλήρης νοσοκομειακή & εξωνοσοκομειακή χωρίς franchise'});
+      t.push({id:'c1',n:'NN Orange Cross 1',v:'20% ετήσιο (max €300)',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ+',clr:'#60a5fa',out:true,ann:pr(P.c1,age),tax:.15,d:'Νοσοκ. & εξωνοσοκ. — ελάχιστο ετήσιο εκπιπτόμενο'});
+      t.push({id:'c2',n:'NN Orange Cross 2',v:'€1.500 ετήσιο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ+',clr:'#38bdf8',out:true,ann:pr(P.c2,age),tax:.15,d:'Νοσοκ. & εξωνοσοκ. — ισορροπία κόστους/κάλυψης ⭐'});
+    } else if(dep==='annual'){
+      t.push({id:'c1',n:'NN Orange Cross 1',v:'20% ετήσιο (max €300)',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ+',clr:'#3b82f6',out:true,ann:pr(P.c1,age),tax:.15,d:'Νοσοκ. & εξωνοσοκ. — ελάχιστο ετήσιο εκπιπτόμενο'});
+      t.push({id:'c2',n:'NN Orange Cross 2',v:'€1.500 ετήσιο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ+',clr:'#F47920',out:true,ann:pr(P.c2,age),tax:.15,d:'Νοσοκ. & εξωνοσοκ. — η συνιστώμενη επιλογή ⭐',star:true});
+      t.push({id:'c3',n:'NN Orange Cross 3',v:'€3.000 ετήσιο',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ+',clr:'#7dd3fc',out:true,ann:pr(P.c3,age),tax:.15,d:'Νοσοκ. & εξωνοσοκ. — οικονομική, ίδια τιμή με Health €1.500'});
+    } else { // per_incident
+      t.push({id:'h500',n:'NN Orange Health',v:'€500 ανά νοσηλεία',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#3b82f6',out:false,ann:pr(P.h500,age),tax:.15,d:'Νοσοκομειακή κάλυψη υψηλών ορίων'});
+      t.push({id:'ed1',n:'NN Orange Easy Dunant 1',v:'ανά νοσηλεία',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#60a5fa',out:false,ann:pr(P.ed1,age),tax:.15,d:'Νοσοκομειακή κάλυψη Dunant — Πλάνο Ι'});
+      t.push({id:'h1500',n:'NN Orange Health',v:'€1.500 ανά νοσηλεία',cat:'ΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#7dd3fc',out:false,ann:pr(P.h1500,age),tax:.15,d:'Νοσοκομειακή κάλυψη — οικονομικότερη επιλογή'});
+    }
+    return t;
   }
-  if(!prods.find(p=>p.n.includes('Cross'))&&sc.h>=30&&okG(FC,.15))
-    prods.push(add({n:'NN Orange First Care OFC 1',v:'AFFIDEA',cat:'ΕΞΩΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#34d399',d:'Επισκέψεις, διαγνωστικές & check-up στο δίκτυο AFFIDEA',ann:FC,tax:.15}));
-  if(sc.l>=38&&age<=65){
-    const cap=sc.l>=72?150000:sc.l>=55?100000:50000,laN=lpR(age,cap);
-    if(okG(laN,.0075)) prods.push(add({n:'NN Orange Life',v:`κεφάλαιο €${cap.toLocaleString('el-GR')}`,cat:'ΖΩΗΣ',clr:'#a78bfa',d:'Ασφάλεια ζωής — εξασφαλίζει τους αγαπημένους σας ανεξαρτήτως περίστασης',ann:laN,tax:.0075}));
+  const HC=healthCatalog();
+  const ofc1={n:'NN Orange First Care OFC1',v:'AFFIDEA',cat:'ΕΞΩΝΟΣΟΚΟΜΕΙΑΚΗ',clr:'#34d399',out:true,ann:FC.ofc1,tax:.15,d:'Επισκέψεις, διαγνωστικές & check-up στο δίκτυο AFFIDEA'};
+
+  // ── Life Plus priority (TR2&3 έως 60 ετών), fallback Life TR1 ──
+  function lifeProd(cap){
+    const usePlus=age<=60;
+    const net=usePlus?lpPR(age,cap):lpR(age,cap);
+    return{n:usePlus?'NN Orange Life Plus':'NN Orange Life',v:`κεφάλαιο €${cap.toLocaleString('el-GR')}`,cat:'ΖΩΗΣ',clr:'#a78bfa',ann:net,tax:.0075,
+      d:usePlus?'Ασφάλεια ζωής TR2&3 — ενισχυμένη προστασία για τους αγαπημένους σας':'Ασφάλεια ζωής — εξασφαλίζει τους αγαπημένους σας'};
   }
-  if(sc.r>=45) prods.push({n:'Αποταμιευτικό / Συνταξιοδοτικό Πρόγραμμα',v:'κατόπιν αξιολόγησης',cat:'ΣΥΝΤΑΞΗ',clr:'#fbbf24',d:'Ο σύμβουλός σας θα σχεδιάσει το κατάλληλο πλάνο',ann:null,tax:0});
-  return prods;
+  // ── ExtraMed rider (κρίσιμες ασθένειες) ──
+  function emProd(use31){
+    const cap=50000;
+    const net=use31?emR(P.em31,age,cap):emR(P.em7,age,cap);
+    return{n:use31?'NN ExtraMed 31 (προσάρτημα)':'NN ExtraMed 7 (προσάρτημα)',v:`κεφάλαιο €${cap.toLocaleString('el-GR')}`,cat:'ΚΡΙΣΙΜΕΣ ΑΣΘΕΝΕΙΕΣ',clr:'#c084fc',ann:net,tax:.15,
+      d:use31?'Προσάρτημα ζωής — 31 κρίσιμες ασθένειες':'Προσάρτημα ζωής — 7 κρίσιμες ασθένειες (καρκίνος, έμφραγμα κ.ά.)'};
+  }
+
+  // ── Δόμηση ενός σεναρίου: hIdx=δείκτης health tier, lvl=επίπεδο (0=max,1=mid,2=min) ──
+  function build(hIdx,lvl){
+    const prods=[]; let used=0;
+    const ok=g=>used+g<=annBudget;
+    const push=p=>{ if(p.ann){used+=G(p.ann,p.tax);} prods.push(p); };
+
+    // 1) ΥΓΕΙΑ — επιλογή tier, fallback σε φθηνότερο αν δεν χωράει
+    if(sc.h>=30){
+      let hp=null;
+      for(let i=hIdx;i<HC.length;i++){ if(ok(G(HC[i].ann,HC[i].tax))){hp=HC[i];break;} }
+      if(hp){
+        push(hp);
+        // 1b) Αν δεν καλύπτει εξωνοσοκομειακή → προσθήκη First Care OFC1
+        if(!hp.out && ok(G(ofc1.ann,ofc1.tax))) push(ofc1);
+      } else if(ok(G(ofc1.ann,ofc1.tax))){
+        push(ofc1); // ελάχιστη κάλυψη
+      }
+    }
+
+    // 2) ΖΩΗ — Life Plus priority. Κεφάλαιο βάσει score + επιπέδου σεναρίου
+    if(sc.l>=38&&age<=65){
+      const capByLvl=[
+        sc.l>=72?150000:sc.l>=55?100000:50000,  // lvl 0 = max
+        sc.l>=72?100000:50000,                   // lvl 1 = mid
+        50000,                                    // lvl 2 = min
+      ];
+      let cap=capByLvl[lvl];
+      // fallback: μείωση κεφαλαίου αν δεν χωράει
+      while(cap>=50000){
+        const lp=lifeProd(cap);
+        if(ok(G(lp.ann,lp.tax))){ push(lp); break; }
+        cap-=50000;
+      }
+      // 2b) ExtraMed rider — προστίθεται αν χωράει (προτεραιότητα σε υψηλό score ζωής)
+      if(prods.find(p=>p.cat==='ΖΩΗΣ')){
+        const use31=sc.l>=72;
+        const em=emProd(use31);
+        if(ok(G(em.ann,em.tax))) push(em);
+        else { const em7=emProd(false); if(!use31?false:ok(G(em7.ann,em7.tax))) push(em7); }
+      }
+    }
+
+    // 3) ΣΥΝΤΑΞΗ / ΑΠΟΤΑΜΙΕΥΣΗ — ισοδύναμης σημασίας
+    if(sc.r>=45) prods.push({n:'Αποταμιευτικό / Συνταξιοδοτικό Πρόγραμμα',v:'κατόπιν αξιολόγησης',cat:'ΣΥΝΤΑΞΗ',clr:'#fbbf24',d:'Σχεδιασμός αποταμίευσης βάσει ηλικίας & στόχων (π.χ. NN Accelerator+)',ann:null,tax:0});
+
+    const tot=prods.filter(p=>p.ann).reduce((s,p)=>s+G(p.ann,p.tax),0);
+    return{prods,monthly:Math.round(tot/12),rem:Math.round((annBudget-used)/12)};
+  }
+
+  return[
+    {id:'A',label:'Σενάριο Α',name:'Πρωτεύουσα Ανάγκη',desc:'Βέλτιστη κάλυψη στην κύρια ανάγκη',...build(0,2)},
+    {id:'B',label:'Σενάριο Β',name:'Ισορροπημένη Κάλυψη',desc:'Καλύπτει όλες τις ανάγκες — η συνιστώμενη επιλογή',rec:true,...build(1,1)},
+    {id:'C',label:'Σενάριο Γ',name:'Δευτερεύουσα Ανάγκη',desc:'Έμφαση στην ασφάλεια ζωής & αποταμίευση',...build(2,0)},
+  ];
 }
 
 function urgency(sc){
@@ -660,9 +786,9 @@ async function doSubmit(){
   if(!e||!e.includes('@')){alert('Παρακαλώ εισαγάγετε έγκυρο email.');return;}
   A.name=n; A.email=e; A.phone=document.getElementById('fPhone').value.trim();
   document.getElementById('ldr').classList.add('on');
-  const sc=calcScores(), props=buildProposal(sc), urg=urgency(sc);
-  renderResults(sc,props,urg);
-  await Promise.allSettled([sendEmails(sc,props,urg), saveSheets(sc,props,urg)]);
+  const sc=calcScores(), scenarios=buildScenarios(sc), urg=urgency(sc);
+  renderResults(sc,scenarios,urg);
+  await Promise.allSettled([sendEmails(sc,scenarios,urg), saveSheets(sc,scenarios,urg)]);
   document.getElementById('ldr').classList.remove('on');
   showStep(7);
 }
@@ -672,62 +798,101 @@ async function doSubmit(){
 // ═══════════════════════════════════════════════════════
 const sc2c=v=>v>=70?'#f87171':v>=50?'#fb923c':v>=30?'#fbbf24':'#34d399';
 
-function renderResults(sc,props,urg){
+function renderResults(sc,scenarios,urg){
   const up=document.getElementById('upill');
   up.textContent=urg.lbl; up.style.cssText=`background:${urg.bg};color:${urg.color};border:1px solid ${urg.color}33`;
   document.getElementById('rtitle').textContent=`Γεια σας, ${A.name.split(' ')[0]}!`;
   document.getElementById('rsub').textContent=`Ηλικία ${A.age} ετών · Budget €${A.budget}/μήνα · ${new Date().toLocaleDateString('el-GR')}`;
-  [['scH',sc.h],['scL',sc.l],['scR',sc.r]].forEach(([id,v])=>{const el=document.getElementById(id);el.textContent=v;el.style.color=sc2c(v);});
+
+  // ── Πίτα μεριδίων (σύνολο 100%) ──
+  const sh=pieShares(sc);
+  [['scH',sh.h],['scL',sh.l],['scR',sh.r]].forEach(([id,v])=>{const el=document.getElementById(id);el.textContent=v+'%';el.style.color=sc2c(sc[id==='scH'?'h':id==='scL'?'l':'r']);});
   if(chartI) chartI.destroy();
   chartI=new Chart(document.getElementById('rChart').getContext('2d'),{
-    type:'radar',
-    data:{labels:['Υγεία','Ζωή & Προστασία','Σύνταξη'],datasets:[{data:[sc.h,sc.l,sc.r],backgroundColor:'rgba(244,121,32,.14)',borderColor:'#F47920',borderWidth:2.5,pointBackgroundColor:'#F47920',pointRadius:6}]},
-    options:{responsive:true,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{stepSize:25,color:'rgba(238,240,248,.25)',backdropColor:'transparent',font:{size:10}},grid:{color:'rgba(255,255,255,.07)'},angleLines:{color:'rgba(255,255,255,.07)'},pointLabels:{color:'rgba(238,240,248,.7)',font:{size:13,family:"'Nunito Sans',sans-serif",weight:'700'}}}}}
+    type:'doughnut',
+    data:{labels:[`🏥 Υγεία ${sh.h}%`,`💙 Ζωή ${sh.l}%`,`👴 Σύνταξη ${sh.r}%`],
+      datasets:[{data:[sh.h,sh.l,sh.r],backgroundColor:['#3b82f6','#a78bfa','#fbbf24'],borderColor:'#0a1626',borderWidth:3}]},
+    options:{responsive:true,cutout:'58%',plugins:{legend:{position:'bottom',labels:{color:'rgba(238,240,248,.85)',font:{size:13,family:"'Nunito Sans',sans-serif",weight:'700'},padding:14}},
+      tooltip:{callbacks:{label:c=>` ${c.label}`}}}}
   });
-  const list=document.getElementById('prods'); list.innerHTML=''; let tot=0;
-  props.forEach(p=>{
-    const gr=p.ann?Math.round(p.ann*(1+p.tax)):null; if(gr) tot+=gr;
-    const mo=gr?Math.round(gr/12):null;
-    list.innerHTML+=`<div class="pcc"><div class="pll"><div class="pca" style="background:${p.clr}22;color:${p.clr}">${p.cat}</div><div class="pn">${p.n}</div><div class="pd2">${p.v} — ${p.d}</div></div>
-      <div class="prp">${mo?`<div class="pm">€${mo}</div><div class="pu">/μήνα (μικτό)</div>`:`<div style="font-size:13px;color:var(--mu);text-align:right">Κατόπιν<br>αξιολόγησης</div>`}</div></div>`;
-  });
-  document.getElementById('rTot').textContent='€'+Math.round(tot/12);
-  const mk=sc.h>=sc.l&&sc.h>=sc.r?'h':sc.l>=sc.r?'l':'r';
+
+  // ── Προτεραιότητα κειμένου (μεγαλύτερο μερίδιο) ──
+  const mk=sh.h>=sh.l&&sh.h>=sh.r?'h':sh.l>=sh.r?'l':'r';
   document.getElementById('priText').innerHTML={
-    h:'🏥 Η ανάλυση δείχνει υψηλή ανάγκη σε <strong>Υγεία & Νοσηλεία</strong>. Ένα απρόσμενο ιατρικό γεγονός χωρίς κάλυψη μπορεί να δημιουργήσει σοβαρά οικονομικά βάρη.',
-    l:'💙 Η ανάλυση δείχνει υψηλή ανάγκη σε <strong>Προστασία Ζωής & Εισοδήματος</strong>. Η οικογένειά σας εξαρτάται από εσάς — προτεραιότητα είναι η οικονομική τους ασφάλεια.',
-    r:'👴 Η ανάλυση δείχνει σημαντική ανάγκη σε <strong>Συνταξιοδοτική Εξασφάλιση</strong>. Η κρατική σύνταξη δεν επαρκεί — η αποθεματοποίηση σήμερα είναι η καλύτερη επένδυση.',
+    h:`🏥 Με <strong>${sh.h}%</strong> μερίδιο, η μεγαλύτερη ανάγκη σας είναι <strong>Υγεία & Νοσηλεία</strong>. Ένα απρόσμενο ιατρικό γεγονός χωρίς κάλυψη μπορεί να δημιουργήσει σοβαρά οικονομικά βάρη.`,
+    l:`💙 Με <strong>${sh.l}%</strong> μερίδιο, η μεγαλύτερη ανάγκη σας είναι <strong>Προστασία Ζωής & Εισοδήματος</strong>. Η οικογένειά σας εξαρτάται από εσάς — προτεραιότητα η οικονομική τους ασφάλεια.`,
+    r:`👴 Με <strong>${sh.r}%</strong> μερίδιο, η μεγαλύτερη ανάγκη σας είναι <strong>Συνταξιοδοτική Εξασφάλιση</strong>. Η κρατική σύνταξη δεν επαρκεί — η αποταμίευση σήμερα είναι η καλύτερη επένδυση.`,
   }[mk];
+
+  // ── 3 Σενάρια ──
+  const box=document.getElementById('scenarios'); box.innerHTML='';
+  scenarios.forEach(s=>{
+    let rows='';
+    s.prods.forEach(p=>{
+      const gr=p.ann?Math.round(p.ann*(1+p.tax)):null, mo=gr?Math.round(gr/12):null;
+      rows+=`<div class="scp">
+        <div class="scpl"><span class="scpc" style="background:${p.clr}22;color:${p.clr}">${p.cat}</span>
+          <div class="scpn">${p.n}</div><div class="scpd">${p.v}</div></div>
+        <div class="scpr">${mo?`€${mo}<span>/μ</span>`:`<span style="font-size:11px">κατόπιν<br>αξιολ.</span>`}</div>
+      </div>`;
+    });
+    box.innerHTML+=`<div class="sccard${s.rec?' rec':''}">
+      ${s.rec?'<div class="scbadge">⭐ ΣΥΝΙΣΤΑΤΑΙ</div>':''}
+      <div class="schead">
+        <div><div class="sclabel">${s.label}</div><div class="scname">${s.name}</div></div>
+      </div>
+      <div class="scdesc">${s.desc}</div>
+      <div class="scbody">${rows||'<div style="padding:14px 0;color:var(--mu);font-size:13px">Δεν προέκυψαν προτάσεις εντός budget.</div>'}</div>
+      <div class="sctot"><div class="sctl">Σύνολο</div><div class="sctv">€${s.monthly}<span>/μήνα</span></div></div>
+    </div>`;
+  });
 }
 
 // ═══════════════════════════════════════════════════════
 // 📧 EMAIL
 // ═══════════════════════════════════════════════════════
-function propTxt(ps){
-  const tot=ps.filter(p=>p.ann).reduce((s,p)=>s+Math.round(p.ann*(1+p.tax)),0);
-  return ps.map(p=>{const g=p.ann?Math.round(p.ann*(1+p.tax)):null;return `• ${p.n} (${p.v}): ${g?'€'+Math.round(g/12)+'/μήνα':'Κατόπιν αξιολόγησης'}`;}).join('\n')+`\n\nΣΥΝΟΛΟ: €${Math.round(tot/12)}/μήνα`;
+function scenTxt(scenarios){
+  return scenarios.map(s=>{
+    const lines=s.prods.map(p=>{
+      const g=p.ann?Math.round(p.ann*(1+p.tax)):null;
+      return `   • ${p.n} (${p.v}): ${g?'€'+Math.round(g/12)+'/μήνα':'Κατόπιν αξιολόγησης'}`;
+    }).join('\n');
+    return `${s.label} — ${s.name}${s.rec?' ⭐ ΣΥΝΙΣΤΑΤΑΙ':''}\n${lines}\n   ΣΥΝΟΛΟ: €${s.monthly}/μήνα`;
+  }).join('\n\n');
 }
 
-async function sendEmails(sc,props,urg){
+async function sendEmails(sc,scenarios,urg){
   if(!SVC.ej_key||SVC.ej_key==='YOUR_PUBLIC_KEY'){
     showMsg('ok','Αποτελέσματα εμφανίστηκαν! (EmailJS: ρυθμίστε το SVC στον κώδικα)'); return;
   }
+  // Το EmailJS ΔΕΝ λειτουργεί από file:// — μόνο από https (live διεύθυνση)
+  if(location.protocol==='file:'){
+    showMsg('ok','✅ Αποτελέσματα έτοιμα! (Η αποστολή email λειτουργεί μόνο από τη live διεύθυνση — όχι κατά το τοπικό άνοιγμα του αρχείου)');
+    return;
+  }
+  const sh=pieShares(sc);
   const base={
     client_name:A.name, client_email:A.email, client_phone:A.phone||'—',
     client_age:A.age+' ετών', family_status:A.family||'—',
     spouse_age:A.spouseAge||'—',
     kids_count:A.kids||'0', kids_ages:(A.kidsAges||[]).filter(Boolean).join(', ')||'—',
-    health_score:sc.h+'/100', life_score:sc.l+'/100', retirement_score:sc.r+'/100',
+    health_score:sh.h+'%', life_score:sh.l+'%', retirement_score:sh.r+'%',
     urgency_level:urg.lbl, monthly_budget:'€'+A.budget,
-    proposal_text:propTxt(props),
+    deductible_pref:{none:'Χωρίς εκπιπτόμενο',annual:'Ετήσιο εκπιπτόμενο',per_incident:'Ανά νοσηλεία'}[A.deductible]||'—',
+    proposal_text:scenTxt(scenarios),
     date:new Date().toLocaleDateString('el-GR',{day:'2-digit',month:'long',year:'numeric'}),
   };
-  try{
-    await emailjs.send(SVC.ej_svc,SVC.ej_client,{...base,to_email:A.email,to_name:A.name});
-    await emailjs.send(SVC.ej_svc,SVC.ej_agent, {...base,to_email:BRAND.email,to_name:BRAND.advisor});
+  // Αποστολή ανεξάρτητα — αν αποτύχει το ένα, το άλλο συνεχίζει
+  const res=await Promise.allSettled([
+    emailjs.send(SVC.ej_svc,SVC.ej_client,{...base,to_email:A.email,to_name:A.name}),
+    emailjs.send(SVC.ej_svc,SVC.ej_agent, {...base,to_email:BRAND.email,to_name:BRAND.advisor}),
+  ]);
+  const okClient=res[0].status==='fulfilled', okAgent=res[1].status==='fulfilled';
+  if(okClient){
     showMsg('ok','✅ Η πρόταση στάλθηκε επιτυχώς στο email σας!');
-  }catch(e){
-    console.error('EmailJS:',e);
+    if(!okAgent) console.warn('EmailJS agent template:',res[1].reason);
+  } else {
+    console.error('EmailJS:',res[0].reason,res[1].reason);
     showMsg('er','Σφάλμα αποστολής email. Ελέγξτε τη διαμόρφωση EmailJS.');
   }
 }
@@ -735,19 +900,23 @@ async function sendEmails(sc,props,urg){
 // ═══════════════════════════════════════════════════════
 // 🗃️ GOOGLE SHEETS
 // ═══════════════════════════════════════════════════════
-async function saveSheets(sc,props,urg){
+async function saveSheets(sc,scenarios,urg){
   if(!SVC.sheets_url||SVC.sheets_url==='YOUR_APPS_SCRIPT_URL') return;
-  const tot=props.filter(p=>p.ann).reduce((s,p)=>s+Math.round(p.ann*(1+p.tax)),0);
+  const sh=pieShares(sc);
+  const recB=scenarios.find(s=>s.rec);
   const d={
     date:new Date().toLocaleString('el-GR'), name:A.name, email:A.email, phone:A.phone||'',
     age:A.age, family:A.family, spouseAge:A.spouseAge||'',
     kids:A.kids||'0', kidsAges:(A.kidsAges||[]).filter(Boolean).join(', '),
     job:A.job, hsat:A.hsat, mild:A.mild, serious:A.serious,
-    hneeds:(A.hneeds||[]).join(', '), worry:A.worry,
-    lneeds:(A.lneeds||[]).join(', '), capital:A.capital,
+    hneeds:(A.hneeds||[]).join(', '), deductible:A.deductible||'',
+    worry:A.worry, lneeds:(A.lneeds||[]).join(', '), capital:A.capital,
     pension:A.pension, pplan:(A.pplan||[]).join(', '),
-    budget:A.budget, scH:sc.h, scL:sc.l, scR:sc.r,
-    urgency:urg.lbl, proposal:props.map(p=>p.n).join(' | '), monthly:Math.round(tot/12),
+    budget:A.budget, scH:sh.h+'%', scL:sh.l+'%', scR:sh.r+'%',
+    urgency:urg.lbl,
+    scenarioB:recB?recB.prods.map(p=>p.n).join(' | '):'',
+    monthlyB:recB?recB.monthly:0,
+    allScenarios:scenarios.map(s=>`${s.label}: €${s.monthly}/μ`).join(' || '),
   };
   try{ await fetch(SVC.sheets_url+'?'+new URLSearchParams(d),{mode:'no-cors'}); }
   catch(e){ console.warn('Sheets:',e); }
