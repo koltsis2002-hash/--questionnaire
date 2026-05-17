@@ -174,6 +174,17 @@ input[type=range]::-moz-range-thumb{
 .welcome{
   text-align:center;padding:40px 16px;
 }
+.brand-logo{
+  display:block;margin:0 auto 12px;
+  max-width:220px;width:60%;height:auto;
+  border-radius:16px;
+  box-shadow:0 8px 32px rgba(244,121,32,0.25);
+}
+.brand-logo-sm{
+  display:block;margin:0 auto 8px;
+  max-width:120px;width:40%;height:auto;
+  border-radius:10px;
+}
 .nn-logo{
   font-family:'Lora',serif;font-size:48px;font-weight:700;
   color:var(--primary);letter-spacing:-1px;
@@ -353,6 +364,122 @@ input[type=range]::-moz-range-thumb{
 /* divider */
 .divider{border:none;border-top:1px solid var(--border2);margin:20px 0}
 
+/* ===== SCORE SUMMARY CARDS ===== */
+.score-summary{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+  margin-bottom:28px;
+}
+.score-pill{
+  background:var(--card);border-radius:14px;padding:16px 12px;
+  text-align:center;border:1px solid var(--border2);
+  position:relative;overflow:hidden;
+}
+.score-pill::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+}
+.score-pill.h::after{background:var(--primary);}
+.score-pill.l::after{background:var(--accent);}
+.score-pill.r::after{background:#4a9eda;}
+.score-pill-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:700;margin-bottom:8px;}
+.score-pill-val{font-family:'Lora',serif;font-size:32px;font-weight:700;line-height:1;}
+.score-pill.h .score-pill-val{color:var(--primary);}
+.score-pill.l .score-pill-val{color:var(--accent);}
+.score-pill.r .score-pill-val{color:#4a9eda;}
+.score-pill-bar{height:4px;background:var(--border2);border-radius:2px;margin-top:10px;overflow:hidden;}
+.score-pill-fill{height:100%;border-radius:2px;transition:width 1s ease;}
+.score-pill.h .score-pill-fill{background:var(--primary);}
+.score-pill.l .score-pill-fill{background:var(--accent);}
+.score-pill.r .score-pill-fill{background:#4a9eda;}
+.score-pill-desc{font-size:10px;color:var(--text-muted);margin-top:6px;}
+
+/* ===== URGENCY BANNER (upgraded) ===== */
+.urgency-banner{position:relative;overflow:hidden;}
+.urgency-banner-inner{display:flex;align-items:center;gap:12px;position:relative;z-index:1;}
+.urgency-icon{font-size:28px;animation:pulse-icon 2s ease-in-out infinite;}
+@keyframes pulse-icon{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+.urgency-ΚΡΙΣΙΜΗ{background:rgba(224,85,85,0.15);border:1px solid rgba(224,85,85,0.4);color:#f87}
+.urgency-ΥΨΗΛΗ{background:rgba(244,121,32,0.15);border:1px solid rgba(244,121,32,0.4);color:var(--primary)}
+.urgency-ΜΕΤΡΙΑ{background:rgba(240,192,64,0.12);border:1px solid rgba(240,192,64,0.35);color:var(--warning)}
+.urgency-ΧΑΜΗΛΗ{background:rgba(76,175,112,0.12);border:1px solid rgba(76,175,112,0.35);color:var(--success)}
+
+/* ===== SAVINGS SCENARIOS ===== */
+.savings-section{
+  background:linear-gradient(135deg,rgba(244,121,32,0.06),rgba(74,158,218,0.04));
+  border:1px solid rgba(244,121,32,0.2);
+  border-radius:var(--radius);padding:22px 20px;margin-bottom:24px;
+}
+.savings-title{
+  font-family:'Lora',serif;font-size:17px;color:var(--text);margin-bottom:6px;
+}
+.savings-sub{font-size:12px;color:var(--text-muted);margin-bottom:18px;}
+.savings-target{
+  background:var(--surface);border-radius:10px;padding:12px 16px;margin-bottom:14px;
+  font-size:13px;color:var(--text-muted);text-align:center;
+}
+.savings-target strong{color:var(--primary);font-size:18px;font-weight:700;}
+.savings-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(max-width:560px){.savings-grid{grid-template-columns:1fr;}}
+.savings-card{
+  background:var(--card);border:2px solid var(--border2);border-radius:10px;
+  padding:14px 12px;text-align:center;position:relative;overflow:hidden;
+}
+.savings-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--scen-color);
+}
+.savings-label{
+  font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--scen-color);margin-bottom:6px;
+}
+.savings-pmt{font-size:22px;font-weight:700;color:var(--text);line-height:1.1;}
+.savings-pmt span{font-size:11px;font-weight:400;color:var(--text-muted);}
+.savings-rate{font-size:10px;color:var(--text-muted);margin-top:4px;}
+.savings-desc{font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.4;min-height:30px;}
+.family-discount-note{
+  background:rgba(244,121,32,0.08);border:1px solid rgba(244,121,32,0.25);
+  border-radius:8px;padding:10px 14px;margin-bottom:16px;
+  font-size:12px;color:var(--accent);text-align:center;
+}
+.family-discount-note strong{color:var(--primary);}
+.indicative-banner{
+  background:rgba(240,192,64,0.1);border:1px solid rgba(240,192,64,0.35);
+  border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;
+  font-size:13px;color:var(--warning);text-align:center;line-height:1.5;
+}
+.indicative-banner strong{color:var(--accent);}
+
+/* ===== CONTACT CTA ===== */
+.contact-cta-section{
+  background:linear-gradient(135deg,rgba(244,121,32,0.06),rgba(201,168,76,0.04));
+  border:1px solid rgba(244,121,32,0.2);
+  border-radius:var(--radius);padding:22px 20px;margin-bottom:24px;
+}
+.contact-cta-title{
+  font-family:'Lora',serif;font-size:16px;color:var(--text);
+  margin-bottom:16px;text-align:center;
+}
+.contact-cta-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.contact-card{
+  background:var(--card);border:2px solid var(--border2);border-radius:12px;
+  padding:18px 14px;text-align:center;cursor:pointer;
+  transition:border-color .25s, transform .2s, box-shadow .25s;
+  user-select:none;
+}
+.contact-card:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:0 6px 20px rgba(244,121,32,0.2);}
+.contact-card-icon{font-size:28px;margin-bottom:8px;}
+.contact-card-label{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+.contact-card-hint{font-size:12px;color:var(--text-muted);margin-top:6px;transition:opacity .2s;}
+.contact-reveal{
+  display:none;
+  margin-top:10px;padding:10px 12px;
+  background:var(--surface);border-radius:8px;
+  font-size:16px;font-weight:700;
+}
+.contact-reveal a{color:var(--primary);text-decoration:none;word-break:break-all;}
+.contact-reveal a:hover{text-decoration:underline;}
+.contact-card.revealed{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-glow);}
+.contact-card.revealed .contact-card-hint{opacity:0;}
+
 /* ===== RESPONSIVE ===== */
 @media(max-width:480px){
   .app{padding:24px 12px 60px}
@@ -371,12 +498,15 @@ input[type=range]::-moz-range-thumb{
 <!-- ===== SCREEN 0: WELCOME ===== -->
 <div class="screen active" id="s0">
 <div class="welcome">
-  <div class="nn-logo">NN</div>
-  <div class="nn-sub">Hellas · Insurance Group</div>
-  <div class="advisor-badge">👤 <span>Χρήστος Κόλτσης — Ασφαλιστικός Σύμβουλος</span></div>
+  <img src="logo.png" alt="Κόλτσης Χρήστος — Insurance & Financial Advisor" class="brand-logo" onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block'"/>
+  <div id="logo-fallback" style="display:none">
+    <div class="nn-logo">K</div>
+    <div class="nn-sub">Κόλτσης Χρήστος</div>
+  </div>
+  <div class="advisor-badge">👤 <span>Ασφαλιστικός &amp; Χρηματοοικονομικός Σύμβουλος</span></div>
   <div class="welcome-card">
     <h2>Ανακαλύψτε τις Ασφαλιστικές σας Ανάγκες</h2>
-    <p>Ένα σύντομο, εξατομικευμένο ερωτηματολόγιο <strong>6 βημάτων</strong> που αναλύει το προφίλ σας και παράγει <strong>3 σενάρια κάλυψης</strong> προσαρμοσμένα στις πραγματικές σας ανάγκες και δυνατότητες.</p>
+    <p>Ένα σύντομο, εξατομικευμένο ερωτηματολόγιο <strong>5 βημάτων</strong> που αναλύει το προφίλ σας και παράγει <strong>1 εξατομικευμένη πρόταση κάλυψης</strong> προσαρμοσμένη στις πραγματικές σας ανάγκες και δυνατότητες.</p>
     <div class="steps-list">
       <div class="step-item"><div class="step-num">1</div>Προφίλ &amp; Οικογένεια</div>
       <div class="step-item"><div class="step-num">2</div>Ασφάλεια Υγείας</div>
@@ -392,7 +522,7 @@ input[type=range]::-moz-range-thumb{
 
 <!-- ===== SCREEN 1: PROFILE ===== -->
 <div class="screen" id="s1">
-  <div class="step-label">Βήμα 1 από 6</div>
+  <div class="step-label">Βήμα 1 από 5</div>
   <h2 class="screen-title">Το Προφίλ σας</h2>
   <p class="screen-sub">Βασικά στοιχεία για να κατανοήσουμε την οικογενειακή σας κατάσταση.</p>
   <div id="err1" class="error-msg"></div>
@@ -456,7 +586,7 @@ input[type=range]::-moz-range-thumb{
 
 <!-- ===== SCREEN 2: HEALTH ===== -->
 <div class="screen" id="s2">
-  <div class="step-label">Βήμα 2 από 6</div>
+  <div class="step-label">Βήμα 2 από 5</div>
   <h2 class="screen-title">Ασφάλεια Υγείας</h2>
   <p class="screen-sub">Αξιολογήστε τις τρέχουσες καλύψεις σας και τις ανάγκες σας.</p>
   <div id="err2" class="error-msg"></div>
@@ -502,6 +632,25 @@ input[type=range]::-moz-range-thumb{
     </div>
   </div>
 
+  <div class="q-block">
+    <div class="q-label">Ενδιαφέρεστε για κάλυψη Κρίσιμων Ασθενειών (ExtraMed);</div>
+    <div class="q-hint">Εφάπαξ αποζημίωση σε διάγνωση καρκίνου, καρδιακής προσβολής, ΑΕΕ και άλλων σοβαρών παθήσεων.</div>
+    <div class="opts" id="opts-ci">
+      <label class="opt" onclick="selOpt(this,'ci_pref','em31')"><input type="radio" name="ci_pref" value="em31"/><div class="opt-dot"></div><span class="opt-text">Ναι — ExtraMed 31 (31 κρίσιμες ασθένειες, πλήρης κάλυψη)</span></label>
+      <label class="opt" onclick="selOpt(this,'ci_pref','em7')"><input type="radio" name="ci_pref" value="em7"/><div class="opt-dot"></div><span class="opt-text">Ναι — ExtraMed 7 (7 κύριες ασθένειες, οικονομική επιλογή)</span></label>
+      <label class="opt" onclick="selOpt(this,'ci_pref','none')"><input type="radio" name="ci_pref" value="none"/><div class="opt-dot"></div><span class="opt-text">Όχι — δεν με ενδιαφέρει</span></label>
+    </div>
+  </div>
+
+  <div class="q-block">
+    <div class="q-label">Επιθυμείτε ημερήσιο επίδομα νοσηλείας;</div>
+    <div class="q-hint">Πρόσθετη ημερήσια αποζημίωση (MDP Rider) για κάθε ημέρα νοσηλείας σας στο νοσοκομείο.</div>
+    <div class="opts grid2" id="opts-allowance">
+      <label class="opt" onclick="selOpt(this,'hospital_allowance','yes')"><input type="radio" name="hospital_allowance" value="yes"/><div class="opt-dot"></div><span class="opt-text">Ναι — με ενδιαφέρει</span></label>
+      <label class="opt" onclick="selOpt(this,'hospital_allowance','no')"><input type="radio" name="hospital_allowance" value="no"/><div class="opt-dot"></div><span class="opt-text">Όχι</span></label>
+    </div>
+  </div>
+
   <div class="nav-row">
     <button class="btn btn-ghost" onclick="prevStep()">← Πίσω</button>
     <button class="btn btn-primary" onclick="nextStep()">Επόμενο →</button>
@@ -510,7 +659,7 @@ input[type=range]::-moz-range-thumb{
 
 <!-- ===== SCREEN 3: LIFE ===== -->
 <div class="screen" id="s3">
-  <div class="step-label">Βήμα 3 από 6</div>
+  <div class="step-label">Βήμα 3 από 5</div>
   <h2 class="screen-title">Ασφάλεια Ζωής</h2>
   <p class="screen-sub">Αξιολογήστε την ανάγκη οικονομικής προστασίας της οικογένειάς σας.</p>
   <div id="err3" class="error-msg"></div>
@@ -551,7 +700,7 @@ input[type=range]::-moz-range-thumb{
 
 <!-- ===== SCREEN 4: RETIREMENT ===== -->
 <div class="screen" id="s4">
-  <div class="step-label">Βήμα 4 από 6</div>
+  <div class="step-label">Βήμα 4 από 5</div>
   <h2 class="screen-title">Συνταξιοδοτική Προστασία</h2>
   <p class="screen-sub">Αξιολογήστε την επάρκεια της μελλοντικής σας σύνταξης.</p>
   <div id="err4" class="error-msg"></div>
@@ -576,6 +725,27 @@ input[type=range]::-moz-range-thumb{
     </div>
   </div>
 
+  <div class="q-block">
+    <div class="q-label">🎯 Ποιο ποσό θέλετε να συγκεντρώσετε μέσω αποταμίευσης;</div>
+    <div class="q-hint">Επιλέξτε τον στόχο που θα θέλατε να επιτύχετε. Ο σύμβουλος θα σας προτείνει 3 σενάρια προγραμμάτων με βάση την απόδοση.</div>
+    <div class="opts grid2" id="opts-target-amount">
+      <label class="opt" onclick="selOpt(this,'target_amount','20000')"><input type="radio" name="target_amount" value="20000"/><div class="opt-dot"></div><span class="opt-text">€20.000</span></label>
+      <label class="opt" onclick="selOpt(this,'target_amount','50000')"><input type="radio" name="target_amount" value="50000"/><div class="opt-dot"></div><span class="opt-text">€50.000</span></label>
+      <label class="opt" onclick="selOpt(this,'target_amount','100000')"><input type="radio" name="target_amount" value="100000"/><div class="opt-dot"></div><span class="opt-text">€100.000</span></label>
+      <label class="opt" onclick="selOpt(this,'target_amount','200000')"><input type="radio" name="target_amount" value="200000"/><div class="opt-dot"></div><span class="opt-text">€200.000+</span></label>
+      <label class="opt" onclick="selOpt(this,'target_amount','none')"><input type="radio" name="target_amount" value="none"/><div class="opt-dot"></div><span class="opt-text">Δεν με ενδιαφέρει αποταμίευση</span></label>
+    </div>
+  </div>
+
+  <div class="q-block" id="target-years-section" style="display:none">
+    <div class="q-label">⏳ Σε πόσα χρόνια θέλετε να φτάσετε αυτόν τον στόχο;</div>
+    <div class="slider-wrap">
+      <div class="slider-val"><span id="target-years-display">15</span> χρόνια</div>
+      <input type="range" id="target-years-slider" min="5" max="35" value="15" step="1"/>
+      <div class="slider-labels"><span>5 έτη</span><span>35 έτη</span></div>
+    </div>
+  </div>
+
   <div class="nav-row">
     <button class="btn btn-ghost" onclick="prevStep()">← Πίσω</button>
     <button class="btn btn-primary" onclick="nextStep()">Επόμενο →</button>
@@ -584,7 +754,7 @@ input[type=range]::-moz-range-thumb{
 
 <!-- ===== SCREEN 5: BUDGET + CONTACT ===== -->
 <div class="screen" id="s5">
-  <div class="step-label">Βήμα 5 από 6</div>
+  <div class="step-label">Βήμα 5 από 5</div>
   <h2 class="screen-title">Προϋπολογισμός &amp; Στοιχεία</h2>
   <p class="screen-sub">Ορίστε το μηνιαίο budget σας και δώστε μας τα στοιχεία επικοινωνίας.</p>
   <div id="err5" class="error-msg"></div>
@@ -634,7 +804,8 @@ input[type=range]::-moz-range-thumb{
 </div><!-- /.app -->
 
 <script>
-let _emailSent = false; // guard against double-send on fast double-click
+let _emailSent  = false; // guard against double email send
+let _submitted  = false; // guard against double form submit
 
 /* ============================================================
    ===== CONFIG =====
@@ -673,11 +844,14 @@ const P = {
   lR:    {18:.000995,25:.001323,30:.001231,35:.001276,40:.001797,45:.002670,50:.004368,55:.006940,60:.011293,65:.018233},
   lPR:   {18:.001433,25:.001761,30:.001669,35:.001792,40:.002659,45:.004035,50:.006865,55:.011737,60:.020114},
   // ExtraMed — rate × κεφάλαιο (καθαρό), μικτό × 1.15
-  em7:   {18:.001397,25:.002288,30:.003300,35:.004730,40:.006787,45:.009724,50:.013926,55:.019910,60:.028457},
-  em31:  {18:.003091,25:.004664,30:.006259,35:.008371,40:.011198,45:.014949,50:.019921,55:.027665,60:.038423},
+  em7:   {18:.001397,25:.002288,30:.003300,35:.004730,40:.006787,45:.009724,50:.013926,55:.019910,60:.028457,65:.040634,69:.053999},
+  em31:  {18:.003091,25:.004664,30:.006259,35:.008371,40:.011198,45:.014949,50:.019921,55:.027665,60:.038423,65:.053350,69:.069377},
+  mp500: {18:88,20:91,25:99,30:108,35:120,40:133,45:149,50:167,55:185,60:204,65:222,70:241},
 };
 
-const FC_OFC1_NET = 187.25; // First Care εξωνοσοκομειακή, net
+const FC_OFC1_NET = 187.25; // First Care OFC1 net (ηλ. 19-65)
+const FC_OFC2_NET = 114.43; // First Care OFC2 net (ηλ. 19-65, AFFIDEA, χαμηλότερη κάλυψη)
+const PA_RIDER_GROSS_30K = 65.00; // Rider Ατυχήματος €30k — gross (φόρος 0%)
 
 /* ============================================================
    ===== PRODUCT INFO DATABASE (14 προγράμματα NN Hellas)
@@ -706,6 +880,12 @@ const PROD_INFO = {
   // ── Εξωνοσοκομειακή (flat) ──
   OFC1: { name:'First Care OFC1',    cat:'🩺 Εξωνοσ.',
           features:['Εξωνοσοκομειακή κάλυψη','Γιατροί & Εξετάσεις','Φαρμακευτική κάλυψη'] },
+  OFC2: { name:'First Care OFC2',    cat:'🩺 Εξωνοσ.',
+          features:['Εξωνοσοκομειακή κάλυψη','Δίκτυο AFFIDEA','Οικονομική επιλογή'] },
+  mp500:{ name:'MediPlan (€40/ημέρα)', cat:'🏨 Επίδομα',
+          features:['€40/ημέρα νοσηλείας','Κάλυψη χειρουργείου','ΜΕΘ κάλυψη'] },
+  PA:   { name:'Rider Ατυχήματος €30k', cat:'🚨 Ατύχημα',
+          features:['Θάνατος/Αναπηρία ατυχήματος','Κεφάλαιο €30.000','Φόρος 0%'] },
   // ── Ζωή ──
   lPR:  { name:'Life Plus',          cat:'💛 Ζωή',
           features:['Θάνατος + ΜΑΝΕ','Εγγυημένη ανανέωση','Εως 60 ετών'] },
@@ -803,6 +983,23 @@ const HEALTH_TIERS = {
 };
 
 /* ============================================================
+   ===== THRESHOLDS — εδώ ορίζεις τη λογική των προτάσεων
+   ============================================================
+   health_pct  : % health επί συνόλου  → συμπεριλαμβάνεται υγεία
+   life_pct    : % life επί συνόλου    → συμπεριλαμβάνεται ζωή
+   em_score    : raw health/life score → προστίθεται ExtraMed 7
+   em31_score  : raw score             → ExtraMed 31 (αντί 7)
+   ret_note    : retirement score      → σημείωση για συνταξιοδοτικό
+   ============================================================ */
+const THRESHOLDS = {
+  health_pct:  20,   // ≥20% → υγεία στην πρόταση
+  life_pct:    20,   // ≥20% → ζωή στην πρόταση
+  em_score:    40,   // score ≥40 → ExtraMed 7
+  em31_score:  70,   // score ≥70 → ExtraMed 31
+  ret_note:    45,   // retirement score ≥45 → σημείωση σύνταξης
+};
+
+/* ============================================================
    ===== STATE
    ============================================================ */
 let currentStep = 0;
@@ -836,12 +1033,30 @@ function prevStep() {
 }
 
 function submitForm() {
+  if (_submitted) return;
   const errs = validateStep(5);
   if (errs.length) { showErr(5, errs[0]); return; }
+  _submitted = true;
+  // Disable submit button to prevent double-click
+  const btn = document.querySelector('#s5 .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Φόρτωση…'; }
   hideErr(5);
   collectAnswers();
   showStep(6);
   renderResults();
+}
+
+function revealContact(type, card) {
+  const reveal = document.getElementById('reveal-' + type);
+  if (!reveal) return;
+  const isRevealed = reveal.style.display === 'block';
+  reveal.style.display = isRevealed ? 'none' : 'block';
+  card.classList.toggle('revealed', !isRevealed);
+  // Auto-navigate on mobile: follow the link immediately after showing
+  if (!isRevealed) {
+    const link = reveal.querySelector('a');
+    if (link && window.innerWidth <= 600) setTimeout(() => link.click(), 300);
+  }
 }
 
 function showErr(step, msg) {
@@ -901,6 +1116,7 @@ function updateKidsAges(count) {
 function collectAnswers() {
   answers.age = parseInt(document.getElementById('age-slider').value) || 35;
   answers.monthly_budget = parseInt(document.getElementById('budget-slider').value) || 100;
+  answers.target_years = parseInt(document.getElementById('target-years-slider').value) || 15;
   answers.client_name = (document.getElementById('client-name')?.value || '').trim();
   answers.client_email = (document.getElementById('client-email')?.value || '').trim();
   answers.client_phone = (document.getElementById('client-phone')?.value || '').trim();
@@ -910,7 +1126,7 @@ function collectAnswers() {
 
   ['marital_status','hospital_mild','hospital_severe','fund_satisfaction',
    'deductible_type','income_concern','life_capital','pension_estimate',
-   'savings_plan','occupation','children'].forEach(name => {
+   'savings_plan','occupation','children','ci_pref','hospital_allowance','target_amount'].forEach(name => {
     const el = document.querySelector('input[name="' + name + '"]:checked');
     if (el) answers[name] = el.value;
   });
@@ -949,6 +1165,8 @@ function validateStep(step) {
     if (!a.hospital_mild)      return ['Επιλέξτε νοσοκομείο για ήπιο θέμα υγείας'];
     if (!a.hospital_severe)    return ['Επιλέξτε νοσοκομείο για σοβαρό θέμα υγείας'];
     if (!a.deductible_type)    return ['Επιλέξτε τύπο εκπιπτόμενου'];
+    if (!a.ci_pref)            return ['Επιλέξτε προτίμηση για Κρίσιμες Ασθένειες'];
+    if (!a.hospital_allowance) return ['Επιλέξτε αν επιθυμείτε ημερήσιο επίδομα νοσηλείας'];
     return [];
   }
   if (step === 3) {
@@ -959,6 +1177,7 @@ function validateStep(step) {
   if (step === 4) {
     if (!a.pension_estimate) return ['Εκτιμήστε την κρατική σύνταξή σας'];
     if (!a.savings_plan)     return ['Επιλέξτε σχέδιο αποταμίευσης'];
+    if (!a.target_amount)    return ['Επιλέξτε στόχο αποταμίευσης (ή «δεν με ενδιαφέρει»)'];
     return [];
   }
   if (step === 5) {
@@ -1025,6 +1244,61 @@ function grossExtraMed(key, cap, age)   { return interp(P[key], age) * cap * 1.1
 function grossFirstCare()               { return FC_OFC1_NET * 1.15; }
 
 /* ============================================================
+   Family discount — εφαρμόζεται ΜΟΝΟ στα κύρια προγράμματα υγείας
+   (κατηγορία 🏥 Υγεία). Όχι σε ExtraMed/MediPlan/First Care/Life/PA.
+
+   Πίνακας έκπτωσης (επίσημος NN):
+     1 ασφαλισμένος → 0%
+     2 ασφαλισμένοι → 10%
+     3 ασφαλισμένοι → 15%
+     4+ ασφαλισμένοι → 20%
+
+   Έως 2 ενήλικοι + έως 4 ανήλικοι.
+   ============================================================ */
+function countInsured(a) {
+  let n = 1; // ο ίδιος ο πελάτης
+  if (a.marital_status === 'married') n += 1; // σύζυγος
+  const kids = parseInt(a.children) || 0;
+  n += Math.min(kids, 4); // έως 4 ανήλικοι
+  return n;
+}
+function getFamilyDiscount(a) {
+  const n = countInsured(a);
+  if (n >= 4) return 0.20;
+  if (n === 3) return 0.15;
+  if (n === 2) return 0.10;
+  return 0;
+}
+function isFamilyClient(a) {
+  return getFamilyDiscount(a) > 0;
+}
+
+/* ============================================================
+   Savings target — 3 σενάρια απόδοσης (μετά από έξοδα διαχείρισης)
+   FV = PMT × [((1+r)^n − 1) / r],  r = monthly rate, n = months
+   ============================================================ */
+function calcSavingsScenarios(targetAmount, years) {
+  if (!targetAmount || !years || targetAmount <= 0 || years <= 0) return null;
+  // Καθαρές αποδόσεις μετά τα έξοδα του προγράμματος (~1% management fee)
+  const returns = [
+    { label: 'Συντηρητικό',  annual: 0.03, color: '#4a9eda', desc: 'Χαμηλό ρίσκο · μεγαλύτερη σταθερότητα'  },
+    { label: 'Ισορροπημένο', annual: 0.05, color: '#C9A84C', desc: 'Μέτριο ρίσκο · ισορροπία απόδοσης/ασφάλειας' },
+    { label: 'Δυναμικό',     annual: 0.07, color: '#F47920', desc: 'Υψηλότερο ρίσκο · μέγιστη δυνητική απόδοση' },
+  ];
+  const months = years * 12;
+  return returns.map(s => {
+    const r = s.annual / 12;
+    const pmt = targetAmount * r / (Math.pow(1 + r, months) - 1);
+    return {
+      ...s,
+      monthlyRequired: Math.round(pmt),
+      annualRequired:  Math.round(pmt * 12),
+      totalContrib:    Math.round(pmt * months),
+    };
+  });
+}
+
+/* ============================================================
    ===== RECOMMENDATION ENGINE
    ============================================================ */
 function buildScenarios(a, scores, annualBudget) {
@@ -1033,48 +1307,76 @@ function buildScenarios(a, scores, annualBudget) {
   const lifeK = age <= 60 ? 'lPR' : 'lR';
   const tiers = HEALTH_TIERS[ded] || HEALTH_TIERS.annual;
 
-  // === NEED ANALYSIS (validate questionnaire → real needs) ===
+  // === PERCENTAGE-BASED NEED ANALYSIS ===
+  const tot  = (scores.h + scores.l + scores.r) || 1;
+  const hPct = scores.h / tot * 100;
+  const lPct = scores.l / tot * 100;
+
+  // Υγεία: ποσοστό ≥ threshold ΄Η εξπρές ανάγκη (θέλει ιδιωτικό νοσοκομείο)
+  const needsHealth = a.hospital_mild  === 'big_priv'
+    || a.hospital_severe === 'big_priv' || a.hospital_severe === 'abroad'
+    || a.fund_satisfaction === 'none'   || a.fund_satisfaction === 'little';
+  const includeHealth = hPct >= THRESHOLDS.health_pct || needsHealth;
+
+  // Ζωή: ποσοστό ≥ threshold ΄Η οικογενειακή ανάγκη
   const needsLife = a.income_concern === 'yes'
     || a.marital_status === 'married'
     || a.marital_status === 'single_parent'
     || (a.children && a.children !== '0');
+  const includeLife = lPct >= THRESHOLDS.life_pct || needsLife;
 
-  const needsEM    = scores.h >= 40 || scores.l >= 50;
-  const useEm31    = scores.l >= 72 || scores.h >= 75;
+  const ciPref   = a.ci_pref || 'none';
+  const needsEM  = ciPref !== 'none';
+  const useEm31  = ciPref === 'em31';
+  const needsMDP = a.hospital_allowance === 'yes';
   const preferCap  = ({_50k:50000,'50k':50000,_100k:100000,'100k':100000,
                         _150k:150000,'150k':150000,_200k:200000,'200k':200000})[a.life_capital] || 100000;
+
+  // Οικογενειακή έκπτωση — ΜΟΝΟ στα κύρια προγράμματα υγείας (🏥 Υγεία)
+  const familyDisc     = getFamilyDiscount(a);          // 0 | 0.10 | 0.15 | 0.20
+  const familyHealthMult = 1 - familyDisc;              // πολλαπλασιαστής τιμής
+  const familyDiscPct  = Math.round(familyDisc * 100);
+  const insuredCount   = countInsured(a);
+  const isFamily       = familyDisc > 0;
 
   // === PACKAGE BUILDER ===
   function buildPackage(hTierIdx, lifeCaps, emKey, emCap) {
     const products = [];
     let rem = annualBudget;
 
-    // 1. Health — try from tier index, fall back
+    // 1. Health — μόνο αν includeHealth (έκπτωση οικογενείας εφαρμόζεται ΜΟΝΟ εδώ)
     let hPicked = null;
-    for (let i = hTierIdx; i < tiers.length; i++) {
-      const t = tiers[i];
-      const g = grossHealth(t.key, age);
-      if (g <= rem) {
-        hPicked = t;
-        const info = PROD_INFO[t.key] || {};
-        products.push({ cat: info.cat||'🏥 Υγεία', name: t.name, gross: g,
-                        detail: t.deductible, features: info.features||[] });
-        rem -= g; break;
+    if (includeHealth) {
+      for (let i = hTierIdx; i < tiers.length; i++) {
+        const t = tiers[i];
+        const g = grossHealth(t.key, age) * familyHealthMult;
+        if (g <= rem) {
+          hPicked = t;
+          const info = PROD_INFO[t.key] || {};
+          products.push({ cat: info.cat||'🏥 Υγεία', name: t.name, gross: g,
+                          detail: t.deductible + (isFamily ? ` · 👨‍👩‍👧 Οικογ. -${familyDiscPct}%` : ''),
+                          features: info.features||[] });
+          rem -= g; break;
+        }
+      }
+      // First Care — ΧΩΡΙΣ έκπτωση οικογενείας (δεν είναι κύριο πρόγραμμα υγείας)
+      if (hPicked && !hPicked.outpatient) {
+        const g1 = FC_OFC1_NET * 1.15;
+        const g2 = FC_OFC2_NET * 1.15;
+        if (g1 <= rem) {
+          products.push({ cat:'🩺 Εξωνοσ.', name:'First Care OFC1', gross: g1,
+                          features: PROD_INFO.OFC1.features });
+          rem -= g1;
+        } else if (g2 <= rem) {
+          products.push({ cat:'🩺 Εξωνοσ.', name:'First Care OFC2', gross: g2,
+                          features: PROD_INFO.OFC2.features });
+          rem -= g2;
+        }
       }
     }
 
-    // 2. First Care if hospital-only
-    if (hPicked && !hPicked.outpatient) {
-      const g = FC_OFC1_NET * 1.15;
-      if (g <= rem) {
-        products.push({ cat:'🩺 Εξωνοσ.', name:'First Care OFC1', gross: g,
-                        features: PROD_INFO.OFC1.features });
-        rem -= g;
-      }
-    }
-
-    // 3. Life insurance — only if genuinely needed
-    if (needsLife) {
+    // 2. Life — μόνο αν includeLife
+    if (includeLife) {
       for (const cap of lifeCaps) {
         const g = grossLife(lifeK, cap, age);
         if (g <= rem) {
@@ -1086,7 +1388,7 @@ function buildScenarios(a, scores, annualBudget) {
       }
     }
 
-    // 4. ExtraMed — only if real need detected
+    // 4. ExtraMed — ΧΩΡΙΣ έκπτωση οικογενείας (δεν είναι κύριο πρόγραμμα υγείας)
     if (needsEM && emKey) {
       const g = grossExtraMed(emKey, emCap, age);
       if (g <= rem) {
@@ -1097,34 +1399,71 @@ function buildScenarios(a, scores, annualBudget) {
       }
     }
 
-    // 5. Accelerator+ — always considered if budget allows
+    // 5. MediPlan — ΧΩΡΙΣ έκπτωση οικογενείας (rider, όχι κύριο πρόγραμμα)
+    let mdpAdded = false;
+    if (needsMDP && hPicked) {
+      const g = interp(P.mp500, age) * 1.15;
+      if (g <= rem) {
+        products.push({ cat:'🏨 Επίδομα', name:'MediPlan (€40/ημέρα)', gross: g,
+                        features: PROD_INFO.mp500.features });
+        rem -= g;
+        mdpAdded = true;
+      }
+    }
+
+    // 6. PA Rider — αν υπάρχει βασικό πρόγραμμα υγείας κι ο ασφαλισμένος < 65
+    if (hPicked && age < 65 && rem >= PA_RIDER_GROSS_30K) {
+      products.push({ cat:'🚨 Ατύχημα', name:'Rider Ατυχήματος €30k', gross: PA_RIDER_GROSS_30K,
+                      features: PROD_INFO.PA.features });
+      rem -= PA_RIDER_GROSS_30K;
+    }
+
+    // 7. Accelerator+ — μόνο αν υπάρχει retirement need (r ≥ threshold)
+    //    Χρησιμοποιεί ΟΛΟΚΛΗΡΟ το υπόλοιπο budget για μέγιστη αποταμίευση
     const accMin = PROD_INFO.acc.minAnnual;
-    if (rem >= accMin) {
-      products.push({ cat: PROD_INFO.acc.cat, name:'Accelerator+', gross: accMin,
-                      detail:'Ελάχιστη συνεισφορά €50/μήνα', features: PROD_INFO.acc.features });
-      rem -= accMin;
+    if (scores.r >= THRESHOLDS.ret_note && rem >= accMin) {
+      const accGross   = rem;
+      const accMonthly = Math.round(accGross / 12);
+      products.push({ cat: PROD_INFO.acc.cat, name:'Accelerator+', gross: accGross,
+                      detail:`Συνεισφορά €${accMonthly}/μήνα`, features: PROD_INFO.acc.features });
+      rem = 0;
     }
 
     const total = annualBudget - rem;
-    return { products, total, monthly: Math.ceil(total / 12) };
+    return { products, total, monthly: Math.ceil(total / 12), mdpAdded };
   }
-
-  const retNote = scores.r >= 45 ? '📌 Συνιστάται επίσης Αποταμιευτικό / Συνταξιοδοτικό Πρόγραμμα' : null;
 
   // Σενάριο Α — ΠΡΟΤΕΙΝΟΜΕΝΟ: πλήρης κάλυψη αναγκών, βέλτιστη αξία
   const A = buildPackage(1, [preferCap, Math.max(50000, preferCap-50000)],
-                         useEm31 ? 'em31' : 'em7', 50000);
+                         needsEM ? (useEm31 ? 'em31' : 'em7') : null, 50000);
 
   // Σενάριο Β — ΒΑΣΙΚΟ: κύρια ανάγκη μόνο, ελάχιστο κόστος
   const B = buildPackage(tiers.length - 1, [50000], null, 0);
 
   // Σενάριο Γ — ΕΚΤΕΤΑΜΕΝΟ: μέγιστη κάλυψη εντός budget
-  const C = buildPackage(0, [200000,150000,100000,50000], 'em31', 50000);
+  const C = buildPackage(0, [200000,150000,100000,50000], needsEM ? (useEm31 ? 'em31' : 'em7') : null, 50000);
+
+  // allowanceNote: μόνο αν ο χρήστης το ζήτησε αλλά δεν χώρεσε στον προϋπολογισμό
+  const allowanceNote = needsMDP && !A.mdpAdded
+    ? '📌 Το MediPlan (€40/ημέρα νοσηλείας) δεν χώρεσε στον προϋπολογισμό — ζητήστε προσφορά από τον σύμβουλό σας'
+    : null;
+
+  // lifeNote: ανάγκη ζωής υπάρχει αλλά δεν χώρεσε στον προϋπολογισμό
+  const lifeInA = A.products.some(p => p.cat === '💛 Ζωή');
+  const lifeNote = includeLife && !lifeInA
+    ? '📌 Ασφάλεια Ζωής: δεν χώρεσε στον τρέχοντα προϋπολογισμό — ζητήστε ξεχωριστή προσφορά'
+    : null;
+
+  // retNote: εμφανίζεται ΜΟΝΟ αν υπάρχει retirement need αλλά το Accelerator+ ΔΕΝ χώρεσε στο σενάριο Α
+  const accInA  = A.products.some(p => p.cat === '📈 Αποταμίευση');
+  const retNote = scores.r >= THRESHOLDS.ret_note && !accInA
+    ? '📌 Συνιστάται επίσης Αποταμιευτικό / Συνταξιοδοτικό Πρόγραμμα'
+    : null;
 
   return [
-    { label:'Α', title:'Προτεινόμενο',  subtitle:'Πλήρης κάλυψη των αναγκών σας — βέλτιστη αξία', ...A, rec:true,  retNote },
-    { label:'Β', title:'Βασικό',        subtitle:'Κάλυψη κύριας ανάγκης — χαμηλότερο κόστος',     ...B, rec:false, retNote:null },
-    { label:'Γ', title:'Εκτεταμένο',    subtitle:'Μέγιστη κάλυψη εντός του προϋπολογισμού σας',   ...C, rec:false, retNote },
+    { label:'Α', title:'Προτεινόμενο',  subtitle:'Πλήρης κάλυψη των αναγκών σας — βέλτιστη αξία', ...A, rec:true,  retNote, allowanceNote, lifeNote },
+    { label:'Β', title:'Βασικό',        subtitle:'Κάλυψη κύριας ανάγκης — χαμηλότερο κόστος',     ...B, rec:false, retNote:null, allowanceNote, lifeNote },
+    { label:'Γ', title:'Εκτεταμένο',    subtitle:'Μέγιστη κάλυψη εντός του προϋπολογισμού σας',   ...C, rec:false, retNote, allowanceNote, lifeNote },
   ];
 }
 
@@ -1238,17 +1577,11 @@ function renderResults() {
 
   const s0 = scenarios[0];
 
-  // Pie percentages based on recommended budget allocation (not raw scores)
-  const catBudget = { h: 0, l: 0, r: 0 };
-  s0.products.forEach(p => {
-    if (p.cat === '🏥 Υγεία' || p.cat === '🩺 Εξωνοσ.') catBudget.h += p.gross;
-    else if (p.cat === '💛 Ζωή') catBudget.l += p.gross;
-    else catBudget.r += p.gross; // Κρίσιμες, Αποταμίευση
-  });
-  const catTot = catBudget.h + catBudget.l + catBudget.r || 1;
-  const hP = catBudget.h / catTot * 100;
-  const lP = catBudget.l / catTot * 100;
-  const rP = catBudget.r / catTot * 100;
+  // Πίτα βάσει raw scores — συνεπής με banner και THRESHOLDS
+  const scoreTot = (h + l + r) || 1;
+  const hP = h / scoreTot * 100;
+  const lP = l / scoreTot * 100;
+  const rP = r / scoreTot * 100;
 
   const scenHTML = `
     <div class="scenario-card rec">
@@ -1268,27 +1601,99 @@ function renderResults() {
       <div class="scen-total">
         <div class="total-monthly">€${s0.monthly}<span>/μήνα</span></div>
       </div>
+      ${s0.lifeNote ? `<div class="ret-note" style="border-left-color:#C9A84C">${s0.lifeNote}</div>` : ''}
       ${s0.retNote ? `<div class="ret-note">${s0.retNote}</div>` : ''}
+      ${s0.allowanceNote ? `<div class="ret-note" style="border-left-color:var(--primary)">${s0.allowanceNote}</div>` : ''}
     </div>`;
 
   const proposalText =
     `${s0.title}:\n` +
     s0.products.map(p => `• ${p.name}: €${Math.round(p.gross)}/έτος`).join('\n') +
-    `\nΣύνολο: €${Math.round(s0.total)}/έτος (€${s0.monthly}/μήνα)`;
+    `\nΣύνολο: €${Math.round(s0.total)}/έτος (€${s0.monthly}/μήνα)` +
+    (s0.retNote ? '\n' + s0.retNote : '') +
+    (s0.allowanceNote ? '\n' + s0.allowanceNote : '');
 
   const benefitsText = generateBenefitsText(a, {h,l,r}, scenarios[0]);
 
   const hasHealth = s0.products.some(p => p.cat === '🏥 Υγεία' || p.cat === '🩺 Εξωνοσ.');
   const networkHTML = hasHealth ? buildNetworkHTML() : '';
 
+  // Family discount note (αν έχει εφαρμοστεί στα κύρια προγράμματα υγείας)
+  const famDisc  = getFamilyDiscount(a);
+  const famCount = countInsured(a);
+  const hasMainHealth = s0.products.some(p => p.cat === '🏥 Υγεία');
+  const familyNote = (famDisc > 0 && hasMainHealth)
+    ? `<div class="family-discount-note">👨‍👩‍👧 <strong>Οικογενειακό Πρόγραμμα Υγείας</strong> · ${famCount} ασφαλισμένοι → αυτόματη έκπτωση <strong>-${Math.round(famDisc*100)}%</strong> στο κύριο πρόγραμμα υγείας.<br/><span style="font-size:11px;opacity:.8">Η έκπτωση εφαρμόζεται μόνο στο βασικό πρόγραμμα υγείας — όχι σε ExtraMed/MediPlan/συμπληρωματικά.</span></div>`
+    : '';
+
+  // Savings scenarios (αν ο πελάτης δήλωσε στόχο αποταμίευσης)
+  const targetAmt = (a.target_amount && a.target_amount !== 'none') ? parseInt(a.target_amount) : 0;
+  const targetYrs = parseInt(a.target_years) || 15;
+  const savScenarios = calcSavingsScenarios(targetAmt, targetYrs);
+  const savingsHTML = savScenarios ? `
+    <div class="savings-section">
+      <div class="savings-title">🎯 Στόχος Αποταμίευσης — 3 Σενάρια Προγραμμάτων</div>
+      <div class="savings-sub">Μηνιαία συνεισφορά για να συγκεντρώσετε τον στόχο σας, με βάση 3 επίπεδα απόδοσης (μετά τα έξοδα διαχείρισης).</div>
+      <div class="savings-target">
+        Θέλετε να συγκεντρώσετε <strong>€${targetAmt.toLocaleString('el-GR')}</strong> σε <strong>${targetYrs} χρόνια</strong>
+      </div>
+      <div class="savings-grid">
+        ${savScenarios.map(s => `
+          <div class="savings-card" style="--scen-color:${s.color}">
+            <div class="savings-label">${s.label}</div>
+            <div class="savings-pmt">€${s.monthlyRequired.toLocaleString('el-GR')}<span>/μήνα</span></div>
+            <div class="savings-rate">απόδοση ~${(s.annual*100).toFixed(0)}% ετησίως</div>
+            <div class="savings-desc">${s.desc}</div>
+          </div>`).join('')}
+      </div>
+      <p style="margin-top:14px;font-size:11px;color:var(--text-muted);text-align:center;line-height:1.5">
+        💡 Τα ποσά είναι ενδεικτικά υπολογισμοί με βάση τύπο σύνθετου επιτοκίου. Η πραγματική απόδοση εξαρτάται από τις αγορές και δεν είναι εγγυημένη.
+      </p>
+    </div>` : '';
+
+  const scoreDescH = h>=70?'Υψηλή Ανάγκη':h>=40?'Μέτρια Ανάγκη':'Χαμηλή Ανάγκη';
+  const scoreDescL = l>=70?'Υψηλή Ανάγκη':l>=40?'Μέτρια Ανάγκη':'Χαμηλή Ανάγκη';
+  const scoreDescR = r>=70?'Υψηλή Ανάγκη':r>=40?'Μέτρια Ανάγκη':'Χαμηλή Ανάγκη';
+
   document.getElementById('s6').innerHTML = `
     <div class="step-label">Τα Αποτελέσματά σας</div>
     <h2 class="screen-title">Η Ανάλυσή σας${a.client_name ? ', ' + a.client_name.split(' ')[0] : ''}</h2>
     <p class="screen-sub">Βάσει των απαντήσεών σας δημιουργήθηκε εξατομικευμένη πρόταση κάλυψης.</p>
 
-    <div class="urgency-banner urgency-${urg}">
-      ${urgIcon} Επίπεδο Ανάγκης: <strong>${urg}</strong>
-      <span style="margin-left:auto;font-size:12px;font-weight:400">Υγεία ${h} · Ζωή ${l} · Σύνταξη ${r}</span>
+    <div class="urgency-banner urgency-${urg}" style="padding:18px 22px;margin-bottom:20px;">
+      <div class="urgency-banner-inner">
+        <div class="urgency-icon">${urgIcon}</div>
+        <div>
+          <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;opacity:.7;margin-bottom:3px">Επίπεδο Ανάγκης</div>
+          <div style="font-size:22px;font-weight:700;line-height:1">${urg}</div>
+        </div>
+        <div style="margin-left:auto;text-align:right;font-size:12px;opacity:.8">
+          <div>Υγεία &nbsp;<strong>${h}</strong></div>
+          <div>Ζωή &nbsp;<strong>${l}</strong></div>
+          <div>Σύνταξη &nbsp;<strong>${r}</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="score-summary">
+      <div class="score-pill h">
+        <div class="score-pill-label">Υγεία</div>
+        <div class="score-pill-val">${h}</div>
+        <div class="score-pill-bar"><div class="score-pill-fill" style="width:0%" data-target="${h}%"></div></div>
+        <div class="score-pill-desc">${scoreDescH}</div>
+      </div>
+      <div class="score-pill l">
+        <div class="score-pill-label">Ζωή</div>
+        <div class="score-pill-val">${l}</div>
+        <div class="score-pill-bar"><div class="score-pill-fill" style="width:0%" data-target="${l}%"></div></div>
+        <div class="score-pill-desc">${scoreDescL}</div>
+      </div>
+      <div class="score-pill r">
+        <div class="score-pill-label">Σύνταξη</div>
+        <div class="score-pill-val">${r}</div>
+        <div class="score-pill-bar"><div class="score-pill-fill" style="width:0%" data-target="${r}%"></div></div>
+        <div class="score-pill-desc">${scoreDescR}</div>
+      </div>
     </div>
 
     <div class="benefits-box">
@@ -1302,20 +1707,57 @@ function renderResults() {
     </div>
 
     <div class="section-label">Προτεινόμενη Κάλυψη</div>
+    ${familyNote}
     <div class="scenarios">${scenHTML}</div>
+
+    ${savingsHTML}
 
     ${networkHTML}
 
+    <div class="contact-cta-section">
+      <div class="contact-cta-title">📞 Επικοινωνήστε με τον Σύμβουλό σας</div>
+      <div class="contact-cta-row">
+        <div class="contact-card" onclick="revealContact('phone',this)">
+          <div class="contact-card-icon">📱</div>
+          <div class="contact-card-label">Τηλεφωνική Επικοινωνία</div>
+          <div class="contact-reveal" id="reveal-phone">
+            <a href="tel:${BRAND.phone}">${BRAND.phone}</a>
+          </div>
+          <div class="contact-card-hint">Πατήστε για τον αριθμό</div>
+        </div>
+        <div class="contact-card" onclick="revealContact('email',this)">
+          <div class="contact-card-icon">✉️</div>
+          <div class="contact-card-label">Email</div>
+          <div class="contact-reveal" id="reveal-email">
+            <a href="mailto:${BRAND.email}">${BRAND.email}</a>
+          </div>
+          <div class="contact-card-hint">Πατήστε για το email</div>
+        </div>
+      </div>
+      <p style="text-align:center;margin-top:14px;font-size:11px;color:var(--text-muted)">${BRAND.advisor} — ${BRAND.name}</p>
+    </div>
+
     <div id="email-status" class="email-status">📧 Αποστολή email…</div>
+
+    <div class="indicative-banner">
+      📌 <strong>Σημαντικό:</strong> Η παραπάνω πρόταση είναι <strong>ενδεικτική</strong> και βασίζεται στις απαντήσεις που δώσατε.<br/>
+      Για την <strong>πραγματική προσφορά</strong> προσαρμοσμένη στις λεπτομέρειες σας, παρακαλώ επικοινωνήστε με τον σύμβουλό σας.
+    </div>
 
     <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
       <button class="btn btn-ghost" onclick="resetForm()">🔄 Νέα Αξιολόγηση</button>
       <button class="btn btn-accent" onclick="window.print()">🖨️ Εκτύπωση</button>
     </div>
-    <p style="text-align:center;margin-top:20px;font-size:12px;color:var(--text-muted)">
-      ${BRAND.advisor} · ${BRAND.email} · ${BRAND.phone}<br/>
-      Τα ασφάλιστρα είναι ενδεικτικά και αφορούν Class B. Επικοινωνήστε με τον σύμβουλό σας για προσφορά.
+    <p style="text-align:center;margin-top:16px;font-size:11px;color:var(--text-muted);line-height:1.6">
+      Τα ασφάλιστρα είναι ενδεικτικά (Class B) και ενδέχεται να διαφέρουν στην πραγματική προσφορά ανάλογα με υγεία, επάγγελμα και άλλους παράγοντες αξιολόγησης.
     </p>`;
+
+  // Animate score bars after DOM renders
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.score-pill-fill').forEach(el => {
+      el.style.width = el.dataset.target;
+    });
+  });
 
   setTimeout(() => renderChart(hP, lP, rP), 80);
 
@@ -1332,13 +1774,19 @@ function renderChart(hP, lP, rP) {
   if (chartInst) { chartInst.destroy(); chartInst = null; }
   const canvas = document.getElementById('needs-chart');
   if (!canvas) return;
+  // Φιλτράρισμα — παράλειψη κατηγοριών με μηδενικό score
+  const chartEntries = [
+    { label: 'Υγεία',   pct: hP, color: '#F47920' },
+    { label: 'Ζωή',     pct: lP, color: '#C9A84C' },
+    { label: 'Σύνταξη', pct: rP, color: '#4a9eda' },
+  ].filter(e => e.pct > 0);
   chartInst = new Chart(canvas.getContext('2d'), {
     type: 'doughnut',
     data: {
-      labels: [`Υγεία ${hP.toFixed(0)}%`, `Ζωή ${lP.toFixed(0)}%`, `Σύνταξη ${rP.toFixed(0)}%`],
+      labels: chartEntries.map(e => `${e.label} ${e.pct.toFixed(0)}%`),
       datasets: [{
-        data: [hP, lP, rP],
-        backgroundColor: ['#F47920', '#C9A84C', '#4a9eda'],
+        data: chartEntries.map(e => e.pct),
+        backgroundColor: chartEntries.map(e => e.color),
         borderColor: '#1a2d42',
         borderWidth: 3,
         hoverOffset: 8,
@@ -1386,11 +1834,15 @@ function saveToSheets(data) {
       hospital_mild:    data.hospital_mild     || '',
       hospital_severe:  data.hospital_severe   || '',
       deductible_type:  data.deductible_type   || '',
+      ci_pref:          data.ci_pref           || '',
+      hospital_allowance: data.hospital_allowance || '',
       income_concern:   data.income_concern    || '',
       uncovered_needs:  (data.uncovered_needs  || []).join(', '),
       life_capital:     data.life_capital      || '',
       pension_estimate: data.pension_estimate  || '',
       savings_plan:     data.savings_plan      || '',
+      target_amount:    data.target_amount     || '',
+      target_years:     data.target_years      || '',
       monthly_budget:   data.monthly_budget    || '',
       health_score:     data.health_score      || '',
       life_score:       data.life_score        || '',
@@ -1425,22 +1877,34 @@ function sendEmails(data, scenarios) {
     advisor_phone:     BRAND.phone,
   };
 
-  Promise.allSettled([
-    emailjs.send(SVC.ej_svc, SVC.ej_client, params),
-    emailjs.send(SVC.ej_svc, SVC.ej_agent,  { ...params, to_email: BRAND.email }),
-  ]).then(results => {
-    const ok = results.every(r => r.status === 'fulfilled');
-    if (statusEl) {
-      statusEl.textContent = ok
-        ? '✅ Email στάλθηκε επιτυχώς σε εσάς και τον σύμβουλό σας!'
-        : '⚠️ Τα αποτελέσματα αποθηκεύτηκαν. Επικοινωνήστε με τον σύμβουλό σας για τα email.';
-    }
+  // Στέλνουμε ΕΝΑ μόνο email — TO: πελάτης, BCC: σύμβουλος (configured στο EmailJS template)
+  const sendParams = {
+    ...params,
+    to_email:  params.client_email,   // κύριος παραλήπτης
+    bcc_email: BRAND.email,           // ο σύμβουλος λαμβάνει αντίγραφο
+  };
+  console.log('📧 EmailJS send (single):', {
+    service: SVC.ej_svc,
+    template: SVC.ej_client,
+    to: sendParams.to_email,
+    bcc: sendParams.bcc_email,
   });
+
+  emailjs.send(SVC.ej_svc, SVC.ej_client, sendParams)
+    .then(result => {
+      console.log('📧 EmailJS OK:', result);
+      if (statusEl) statusEl.textContent = '✅ Το email στάλθηκε επιτυχώς σε εσάς και τον σύμβουλό σας!';
+    })
+    .catch(err => {
+      console.error('📧 EmailJS error:', err);
+      if (statusEl) statusEl.textContent = '⚠️ Τα αποτελέσματα αποθηκεύτηκαν. Επικοινωνήστε με τον σύμβουλό σας.';
+    });
 }
 
 function resetForm() {
   answers = { age: 35, monthly_budget: 100 };
-  _emailSent = false;
+  _emailSent  = false;
+  _submitted  = false;
   document.querySelectorAll('.opt.sel').forEach(el => el.classList.remove('sel'));
   document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(inp => inp.checked = false);
   document.querySelectorAll('.form-input').forEach(inp => inp.value = '');
@@ -1485,6 +1949,21 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('spouse-section').style.display =
         r.value === 'married' ? 'block' : 'none';
     });
+  });
+
+  // Target amount → show/hide target_years section
+  document.querySelectorAll('input[name="target_amount"]').forEach(r => {
+    r.addEventListener('change', () => {
+      document.getElementById('target-years-section').style.display =
+        r.value !== 'none' ? 'block' : 'none';
+    });
+  });
+
+  // Target years slider
+  const tyEl = document.getElementById('target-years-slider');
+  if (tyEl) tyEl.addEventListener('input', () => {
+    document.getElementById('target-years-display').textContent = tyEl.value;
+    answers.target_years = parseInt(tyEl.value);
   });
 
   showStep(0);
