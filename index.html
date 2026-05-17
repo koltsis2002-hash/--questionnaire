@@ -1273,8 +1273,12 @@ function grossExtraMed(key, cap, age)   { return interp(P[key], age) * cap * 1.1
 function grossFirstCare()               { return FC_OFC1_NET * 1.15; }
 
 /* ============================================================
-   Family discount — εφαρμόζεται ΜΟΝΟ στα κύρια προγράμματα υγείας
-   (κατηγορία 🏥 Υγεία). Όχι σε ExtraMed/MediPlan/First Care/Life/PA.
+   Family discount — εφαρμόζεται ΜΟΝΟ στα προγράμματα HEALTH
+   (Health €500 και Health €1.500). ΔΕΝ ισχύει για:
+     · Orange Cross Plus / 1 / 2 / 3 / 4
+     · Easy Dunant
+     · First Care (εξωνοσοκομειακά)
+     · ExtraMed (Κρίσιμες) · MediPlan (Επίδομα) · Life · PA Rider · Accelerator+
 
    Πίνακας έκπτωσης (επίσημος NN):
      1 ασφαλισμένος → 0%
@@ -1282,8 +1286,12 @@ function grossFirstCare()               { return FC_OFC1_NET * 1.15; }
      3 ασφαλισμένοι → 15%
      4+ ασφαλισμένοι → 20%
 
-   Έως 2 ενήλικοι + έως 4 ανήλικοι.
+   Έως 2 ενήλικοι + έως 4 ανήλικοι (έως 6 ανήλικοι αν είναι αδέρφια).
    ============================================================ */
+const FAMILY_DISCOUNT_KEYS = new Set(['h500','h1500']);
+function isDiscountEligibleHealth(productKey) {
+  return FAMILY_DISCOUNT_KEYS.has(productKey);
+}
 function countInsured(a) {
   let n = 1; // ο ίδιος ο πελάτης
   if (a.marital_status === 'married') n += 1; // σύζυγος
@@ -1382,17 +1390,22 @@ function buildScenarios(a, scores, annualBudget) {
     const products = [];
     let rem = annualBudget;
 
-    // 1. Health — μόνο αν includeHealth (έκπτωση οικογενείας εφαρμόζεται ΜΟΝΟ εδώ)
+    // 1. Health — μόνο αν includeHealth
+    // ΕΚΠΤΩΣΗ ΟΙΚΟΓΕΝΕΙΑΣ: εφαρμόζεται ΜΟΝΟ σε Health €500 και Health €1.500.
+    // Όχι σε Orange Cross, Easy Dunant ή άλλα προγράμματα.
     let hPicked = null;
     if (includeHealth) {
       for (let i = hTierIdx; i < tiers.length; i++) {
         const t = tiers[i];
-        const g = grossHealth(t.key, age) * familyHealthMult;
+        const isDiscEligible = isDiscountEligibleHealth(t.key);
+        const mult = (isFamily && isDiscEligible) ? familyHealthMult : 1.0;
+        const g = grossHealth(t.key, age) * mult;
         if (g <= rem) {
           hPicked = t;
           const info = PROD_INFO[t.key] || {};
+          const discLabel = (isFamily && isDiscEligible) ? ` · 👨‍👩‍👧 Οικογ. -${familyDiscPct}%` : '';
           products.push({ cat: info.cat||'🏥 Υγεία', name: t.name, gross: g,
-                          detail: t.deductible + (isFamily ? ` · 👨‍👩‍👧 Οικογ. -${familyDiscPct}%` : ''),
+                          detail: t.deductible + discLabel,
                           features: info.features||[] });
           rem -= g; break;
         }
@@ -1656,12 +1669,13 @@ function renderResults() {
   const hasHealth = s0.products.some(p => p.cat === '🏥 Υγεία' || p.cat === '🩺 Εξωνοσ.');
   const networkHTML = hasHealth ? buildNetworkHTML() : '';
 
-  // Family discount note (αν έχει εφαρμοστεί στα κύρια προγράμματα υγείας)
+  // Family discount note — εφαρμόζεται ΜΟΝΟ αν το πρόγραμμα είναι Health €500 ή Health €1.500
   const famDisc  = getFamilyDiscount(a);
   const famCount = countInsured(a);
-  const hasMainHealth = s0.products.some(p => p.cat === '🏥 Υγεία');
-  const familyNote = (famDisc > 0 && hasMainHealth)
-    ? `<div class="family-discount-note">👨‍👩‍👧 <strong>Οικογενειακό Πρόγραμμα Υγείας</strong> · ${famCount} ασφαλισμένοι → αυτόματη έκπτωση <strong>-${Math.round(famDisc*100)}%</strong> στο κύριο πρόγραμμα υγείας.<br/><span style="font-size:11px;opacity:.8">Η έκπτωση εφαρμόζεται μόνο στο βασικό πρόγραμμα υγείας — όχι σε ExtraMed/MediPlan/συμπληρωματικά.</span></div>`
+  const hasEligibleHealth = s0.products.some(p =>
+    p.cat === '🏥 Υγεία' && p.name && /Health\s*€?(500|1[.,]?500)/i.test(p.name));
+  const familyNote = (famDisc > 0 && hasEligibleHealth)
+    ? `<div class="family-discount-note">👨‍👩‍👧 <strong>Οικογενειακή Έκπτωση Health</strong> · ${famCount} ασφαλισμένοι → αυτόματη έκπτωση <strong>-${Math.round(famDisc*100)}%</strong>.<br/><span style="font-size:11px;opacity:.8">Η έκπτωση ισχύει μόνο στα προγράμματα Health €500 / Health €1.500 — όχι σε Orange Cross, Easy Dunant ή συμπληρωματικά (ExtraMed/MediPlan/Life/PA).</span></div>`
     : '';
 
   // Savings scenarios (αν ο πελάτης δήλωσε στόχο αποταμίευσης)
