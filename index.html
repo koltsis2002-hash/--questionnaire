@@ -1386,93 +1386,108 @@ function buildScenarios(a, scores, annualBudget) {
   const isFamily       = familyDisc > 0;
 
   // === PACKAGE BUILDER ===
+  // Σειρά κάλυψης: βάσει αξιολόγησης αναγκών (score-priority order)
+  // 1η ανάγκη = μεγαλύτερο score, 2η = 2ο μεγαλύτερο, 3η = 3ο μεγαλύτερο
+  // Αν δεν χωράει η 2η/3η στο budget, μένει εκτός πρότασης
   function buildPackage(hTierIdx, lifeCaps, emKey, emCap) {
     const products = [];
     let rem = annualBudget;
-
-    // 1. Health — μόνο αν includeHealth
-    // ΕΚΠΤΩΣΗ ΟΙΚΟΓΕΝΕΙΑΣ: εφαρμόζεται ΜΟΝΟ σε Health €500 και Health €1.500.
-    // Όχι σε Orange Cross, Easy Dunant ή άλλα προγράμματα.
     let hPicked = null;
-    if (includeHealth) {
-      for (let i = hTierIdx; i < tiers.length; i++) {
-        const t = tiers[i];
-        const isDiscEligible = isDiscountEligibleHealth(t.key);
-        const mult = (isFamily && isDiscEligible) ? familyHealthMult : 1.0;
-        const g = grossHealth(t.key, age) * mult;
-        if (g <= rem) {
-          hPicked = t;
-          const info = PROD_INFO[t.key] || {};
-          const discLabel = (isFamily && isDiscEligible) ? ` · 👨‍👩‍👧 Οικογ. -${familyDiscPct}%` : '';
-          products.push({ cat: info.cat||'🏥 Υγεία', name: t.name, gross: g,
-                          detail: t.deductible + discLabel,
-                          features: info.features||[] });
-          rem -= g; break;
+    let mdpAdded = false;
+    const accMin = PROD_INFO.acc.minAnnual;
+    const includeRet = scores.r >= THRESHOLDS.ret_note;
+
+    // Ταξινόμηση 3 αναγκών βάσει score (φθίνουσα σειρά)
+    const needPriority = [
+      { id: 'health',     score: scores.h, active: includeHealth },
+      { id: 'life',       score: scores.l, active: includeLife   },
+      { id: 'retirement', score: scores.r, active: includeRet    },
+    ].sort((a, b) => b.score - a.score);
+
+    // Φάση 1: Κύρια προϊόντα με σειρά προτεραιότητας
+    // Retirement: δεσμεύεται θέση με ελάχιστο ποσό, το υπόλοιπο δίνεται στο τέλος
+    let accReservedIdx = -1;
+
+    for (const need of needPriority) {
+      if (!need.active) continue;
+
+      if (need.id === 'health') {
+        // Κύριο πρόγραμμα υγείας
+        // ΕΚΠΤΩΣΗ ΟΙΚΟΓΕΝΕΙΑΣ: ΜΟΝΟ σε Health €500 / Health €1.500
+        for (let i = hTierIdx; i < tiers.length; i++) {
+          const t = tiers[i];
+          const isDiscEligible = isDiscountEligibleHealth(t.key);
+          const mult = (isFamily && isDiscEligible) ? familyHealthMult : 1.0;
+          const g = grossHealth(t.key, age) * mult;
+          if (g <= rem) {
+            hPicked = t;
+            const info = PROD_INFO[t.key] || {};
+            const discLabel = (isFamily && isDiscEligible) ? ` · 👨‍👩‍👧 Οικογ. -${familyDiscPct}%` : '';
+            products.push({ cat: info.cat||'🏥 Υγεία', name: t.name, gross: g,
+                            detail: t.deductible + discLabel, features: info.features||[] });
+            rem -= g; break;
+          }
         }
-      }
-      // First Care — ΧΩΡΙΣ έκπτωση οικογενείας (δεν είναι κύριο πρόγραμμα υγείας)
-      if (hPicked && !hPicked.outpatient) {
-        const g1 = FC_OFC1_NET * 1.15;
-        const g2 = FC_OFC2_NET * 1.15;
-        if (g1 <= rem) {
-          products.push({ cat:'🩺 Εξωνοσ.', name:'First Care OFC1', gross: g1,
-                          features: PROD_INFO.OFC1.features });
-          rem -= g1;
-        } else if (g2 <= rem) {
-          products.push({ cat:'🩺 Εξωνοσ.', name:'First Care OFC2', gross: g2,
-                          features: PROD_INFO.OFC2.features });
-          rem -= g2;
+        // First Care (εξωνοσοκομειακά) — προστίθεται αμέσως μετά το κύριο υγείας
+        if (hPicked && !hPicked.outpatient) {
+          const g1 = FC_OFC1_NET * 1.15, g2 = FC_OFC2_NET * 1.15;
+          if      (g1 <= rem) { products.push({ cat:'🩺 Εξωνοσ.', name:'First Care OFC1', gross: g1, features: PROD_INFO.OFC1.features }); rem -= g1; }
+          else if (g2 <= rem) { products.push({ cat:'🩺 Εξωνοσ.', name:'First Care OFC2', gross: g2, features: PROD_INFO.OFC2.features }); rem -= g2; }
+        }
+
+      } else if (need.id === 'life') {
+        for (const cap of lifeCaps) {
+          const g = grossLife(lifeK, cap, age);
+          if (g <= rem) {
+            const info = PROD_INFO[lifeK];
+            products.push({ cat: info.cat, name:`${info.name} ${cap/1000}k`, gross: g,
+                            detail:`Κεφάλαιο €${cap.toLocaleString('el-GR')}`, features: info.features });
+            rem -= g; break;
+          }
+        }
+
+      } else if (need.id === 'retirement') {
+        // Δεσμεύουμε θέση με ελάχιστο ποσό — το υπόλοιπο budget θα δοθεί στη φάση 3
+        if (rem >= accMin) {
+          accReservedIdx = products.length;
+          products.push({ cat: PROD_INFO.acc.cat, name:'Accelerator+', gross: accMin,
+                          detail:`Συνεισφορά €${Math.round(accMin/12)}/μήνα`, features: PROD_INFO.acc.features });
+          rem -= accMin;
         }
       }
     }
 
-    // 2. Life — μόνο αν includeLife
-    if (includeLife) {
-      for (const cap of lifeCaps) {
-        const g = grossLife(lifeK, cap, age);
-        if (g <= rem) {
-          const info = PROD_INFO[lifeK];
-          products.push({ cat: info.cat, name:`${info.name} ${cap/1000}k`, gross: g,
-                          detail:`Κεφάλαιο €${cap.toLocaleString('el-GR')}`, features: info.features });
-          rem -= g; break;
-        }
-      }
-    }
-
-    // 4. ExtraMed — ΧΩΡΙΣ έκπτωση οικογενείας (δεν είναι κύριο πρόγραμμα υγείας)
+    // Φάση 2: Riders (εξαρτώνται από την ύπαρξη κύριου προγράμματος υγείας)
     if (needsEM && emKey) {
       const g = grossExtraMed(emKey, emCap, age);
       if (g <= rem) {
         const info = PROD_INFO[emKey];
-        products.push({ cat: info.cat, name:`${info.name} ${emCap/1000}k`, gross: g,
-                        features: info.features });
+        products.push({ cat: info.cat, name:`${info.name} ${emCap/1000}k`, gross: g, features: info.features });
         rem -= g;
       }
     }
-
-    // 5. MediPlan — ΧΩΡΙΣ έκπτωση οικογενείας (rider, όχι κύριο πρόγραμμα)
-    let mdpAdded = false;
     if (needsMDP && hPicked) {
       const g = interp(P.mp500, age) * 1.15;
       if (g <= rem) {
-        products.push({ cat:'🏨 Επίδομα', name:'MediPlan (€40/ημέρα)', gross: g,
-                        features: PROD_INFO.mp500.features });
-        rem -= g;
-        mdpAdded = true;
+        products.push({ cat:'🏨 Επίδομα', name:'MediPlan (€40/ημέρα)', gross: g, features: PROD_INFO.mp500.features });
+        rem -= g; mdpAdded = true;
       }
     }
-
-    // 6. PA Rider — αν υπάρχει βασικό πρόγραμμα υγείας κι ο ασφαλισμένος < 65
     if (hPicked && age < 65 && rem >= PA_RIDER_GROSS_30K) {
-      products.push({ cat:'🚨 Ατύχημα', name:'Rider Ατυχήματος €30k', gross: PA_RIDER_GROSS_30K,
-                      features: PROD_INFO.PA.features });
+      products.push({ cat:'🚨 Ατύχημα', name:'Rider Ατυχήματος €30k', gross: PA_RIDER_GROSS_30K, features: PROD_INFO.PA.features });
       rem -= PA_RIDER_GROSS_30K;
     }
 
-    // 7. Accelerator+ — μόνο αν υπάρχει retirement need (r ≥ threshold)
-    //    Χρησιμοποιεί ΟΛΟΚΛΗΡΟ το υπόλοιπο budget για μέγιστη αποταμίευση
-    const accMin = PROD_INFO.acc.minAnnual;
-    if (scores.r >= THRESHOLDS.ret_note && rem >= accMin) {
+    // Φάση 3: Το υπόλοιπο budget πηγαίνει στο Accelerator+
+    if (accReservedIdx >= 0 && rem > 0) {
+      // Ενημέρωση με το τελικό ποσό (minimum + υπόλοιπο)
+      const accFinal   = products[accReservedIdx].gross + rem;
+      const accMonthly = Math.round(accFinal / 12);
+      products[accReservedIdx] = { ...products[accReservedIdx], gross: accFinal,
+                                   detail: `Συνεισφορά €${accMonthly}/μήνα` };
+      rem = 0;
+    } else if (accReservedIdx < 0 && includeRet && rem >= accMin) {
+      // Retirement χαμηλή προτεραιότητα — χώρεσε με το υπόλοιπο budget
       const accGross   = rem;
       const accMonthly = Math.round(accGross / 12);
       products.push({ cat: PROD_INFO.acc.cat, name:'Accelerator+', gross: accGross,
