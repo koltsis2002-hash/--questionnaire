@@ -1902,7 +1902,7 @@ function saveToSheets(data) {
       urgency:          data.urgency           || '',
       proposal:         data.proposal_text     || '',
     });
-    fetch(SVC.sheets_url + '?' + p, { method: 'GET', mode: 'no-cors' }).catch(() => {});
+    fetch(SVC.sheets_url, { method: 'POST', mode: 'no-cors', body: p }).catch(() => {});
   } catch (e) {}
 }
 
