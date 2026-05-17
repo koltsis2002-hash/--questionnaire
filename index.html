@@ -175,9 +175,11 @@ input[type=range]::-moz-range-thumb{
   text-align:center;padding:40px 16px;
 }
 .brand-logo{
-  display:block;margin:0 auto 12px;
-  max-width:220px;width:60%;height:auto;
+  display:block;margin:0 auto 16px;
+  max-width:280px;width:70%;height:auto;
+  background:#ffffff;
   border-radius:16px;
+  padding:18px 22px;
   box-shadow:0 8px 32px rgba(244,121,32,0.25);
 }
 .brand-logo-sm{
@@ -782,8 +784,9 @@ input[type=range]::-moz-range-thumb{
   </div>
 
   <div class="q-block">
-    <div class="q-label">Τηλέφωνο</div>
-    <input type="tel" id="client-phone" class="form-input" placeholder="π.χ. 6912345678"/>
+    <div class="q-label">Τηλέφωνο <span style="color:var(--text-muted);font-weight:400;font-size:13px">(προαιρετικό)</span></div>
+    <div class="q-hint">💡 Συνιστάται για άμεση και πιο αποτελεσματική επικοινωνία με τον σύμβουλό σας. Παραμένει αυστηρά εμπιστευτικό.</div>
+    <input type="tel" id="client-phone" class="form-input" placeholder="π.χ. 6912345678 (προαιρετικό)"/>
   </div>
 
   <p style="font-size:12px;color:var(--text-muted);margin-top:-8px;margin-bottom:16px">
@@ -1186,7 +1189,8 @@ function validateStep(step) {
     const phone = document.getElementById('client-phone')?.value?.trim();
     if (!name)               return ['Εισάγετε το ονοματεπώνυμό σας'];
     if (!email || !email.includes('@')) return ['Εισάγετε έγκυρη διεύθυνση email'];
-    if (!phone || phone.length < 10)    return ['Εισάγετε έγκυρο τηλέφωνο (τουλάχιστον 10 ψηφία)'];
+    // Τηλέφωνο προαιρετικό — αν δηλωθεί, να είναι έγκυρο (≥10 ψηφία)
+    if (phone && phone.length < 10)     return ['Αν θέλετε να δηλώσετε τηλέφωνο, εισάγετε τουλάχιστον 10 ψηφία (ή αφήστε το κενό)'];
     return [];
   }
   return [];
