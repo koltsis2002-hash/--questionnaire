@@ -1929,28 +1929,23 @@ function sendEmails(data, scenarios) {
     advisor_phone:     BRAND.phone,
   };
 
-  // Στέλνουμε ΕΝΑ μόνο email — TO: πελάτης, BCC: σύμβουλος (configured στο EmailJS template)
-  const sendParams = {
-    ...params,
-    to_email:  params.client_email,   // κύριος παραλήπτης
-    bcc_email: BRAND.email,           // ο σύμβουλος λαμβάνει αντίγραφο
-  };
-  console.log('📧 EmailJS send (single):', {
-    service: SVC.ej_svc,
-    template: SVC.ej_client,
-    to: sendParams.to_email,
-    bcc: sendParams.bcc_email,
-  });
+  // Email 1 → πελάτης
+  const clientParams = { ...params, to_email: params.client_email };
+  // Email 2 → σύμβουλος (notification)
+  const advisorParams = { ...params, to_email: BRAND.email };
 
-  emailjs.send(SVC.ej_svc, SVC.ej_client, sendParams)
-    .then(result => {
-      console.log('📧 EmailJS OK:', result);
-      if (statusEl) statusEl.textContent = '✅ Το email στάλθηκε επιτυχώς σε εσάς και τον σύμβουλό σας!';
+  emailjs.send(SVC.ej_svc, SVC.ej_client, clientParams)
+    .then(() => {
+      if (statusEl) statusEl.textContent = '✅ Το email στάλθηκε επιτυχώς!';
     })
     .catch(err => {
-      console.error('📧 EmailJS error:', err);
+      console.error('📧 Client email error:', err);
       if (statusEl) statusEl.textContent = '⚠️ Τα αποτελέσματα αποθηκεύτηκαν. Επικοινωνήστε με τον σύμβουλό σας.';
     });
+
+  emailjs.send(SVC.ej_svc, SVC.ej_agent, advisorParams)
+    .then(() => console.log('📧 Advisor notified'))
+    .catch(err => console.error('📧 Advisor email error:', err));
 }
 
 function resetForm() {
