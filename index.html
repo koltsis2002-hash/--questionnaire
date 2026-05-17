@@ -651,7 +651,7 @@ const SVC = {
   ej_svc:     'service_nfxu98b',
   ej_client:  'template_ky8g7hp',
   ej_agent:   'template_cp85icg',
-  sheets_url: 'https://script.google.com/macros/s/AKfycbxomoBs0TXtvlz8av3bLE08yxCv5C71Jgvguk0ZY2EdKwIB4vSXayfj3KmmvfWiVJ5RYg/exec',
+  sheets_url: 'https://script.google.com/macros/s/AKfycbxeyXOn3_iVydydbu1XDgSH8xd8srECLZSMJ4YycYEVb-4j8HCqtzGnyhYXvIY1H3lwiA/exec',
 };
 
 /* ============================================================
@@ -1385,7 +1385,6 @@ function saveToSheets(data) {
       fund_satisfaction:data.fund_satisfaction || '',
       hospital_mild:    data.hospital_mild     || '',
       hospital_severe:  data.hospital_severe   || '',
-      health_benefits:  (data.health_benefits  || []).join(', '),
       deductible_type:  data.deductible_type   || '',
       income_concern:   data.income_concern    || '',
       uncovered_needs:  (data.uncovered_needs  || []).join(', '),
