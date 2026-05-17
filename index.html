@@ -660,18 +660,18 @@ input[type=range]::-moz-range-thumb{
   </div>
 
   <div class="q-block">
-    <div class="q-label">Ενδιαφέρεστε για κάλυψη Κρίσιμων Ασθενειών (ExtraMed);</div>
-    <div class="q-hint">Εφάπαξ αποζημίωση σε διάγνωση καρκίνου, καρδιακής προσβολής, ΑΕΕ και άλλων σοβαρών παθήσεων.</div>
+    <div class="q-label">Θέλετε προστασία σε περίπτωση σοβαρής ασθένειας;</div>
+    <div class="q-hint">💡 Εφάπαξ χρηματικό ποσό που λαμβάνετε σε διάγνωση καρκίνου, καρδιακής προσβολής, εγκεφαλικού και άλλων σοβαρών παθήσεων — για να καλύψετε ιδιωτικές θεραπείες, χαμένα εισοδήματα ή ό,τι χρειαστείτε.</div>
     <div class="opts" id="opts-ci">
-      <label class="opt" onclick="selOpt(this,'ci_pref','em31')"><input type="radio" name="ci_pref" value="em31"/><div class="opt-dot"></div><span class="opt-text">Ναι — ExtraMed 31 (31 κρίσιμες ασθένειες, πλήρης κάλυψη)</span></label>
-      <label class="opt" onclick="selOpt(this,'ci_pref','em7')"><input type="radio" name="ci_pref" value="em7"/><div class="opt-dot"></div><span class="opt-text">Ναι — ExtraMed 7 (7 κύριες ασθένειες, οικονομική επιλογή)</span></label>
+      <label class="opt" onclick="selOpt(this,'ci_pref','em31')"><input type="radio" name="ci_pref" value="em31"/><div class="opt-dot"></div><span class="opt-text">Ναι — Πλήρης προστασία (καλύπτει το μεγαλύτερο εύρος ασθενειών)</span></label>
+      <label class="opt" onclick="selOpt(this,'ci_pref','em7')"><input type="radio" name="ci_pref" value="em7"/><div class="opt-dot"></div><span class="opt-text">Ναι — Βασική προστασία (κύριες σοβαρές παθήσεις, οικονομικό)</span></label>
       <label class="opt" onclick="selOpt(this,'ci_pref','none')"><input type="radio" name="ci_pref" value="none"/><div class="opt-dot"></div><span class="opt-text">Όχι — δεν με ενδιαφέρει</span></label>
     </div>
   </div>
 
   <div class="q-block">
-    <div class="q-label">Επιθυμείτε ημερήσιο επίδομα νοσηλείας;</div>
-    <div class="q-hint">Πρόσθετη ημερήσια αποζημίωση (MDP Rider) για κάθε ημέρα νοσηλείας σας στο νοσοκομείο.</div>
+    <div class="q-label">Θέλετε ημερήσιο επίδομα για κάθε ημέρα νοσηλείας;</div>
+    <div class="q-hint">💡 Επιπλέον χρηματικό ποσό για κάθε μέρα που βρίσκεστε στο νοσοκομείο, ανεξάρτητα από τα έξοδα — για να καλύψετε καθημερινές υποχρεώσεις (ενοίκιο, λογαριασμοί, χαμένο εισόδημα).</div>
     <div class="opts grid2" id="opts-allowance">
       <label class="opt" onclick="selOpt(this,'hospital_allowance','yes')"><input type="radio" name="hospital_allowance" value="yes"/><div class="opt-dot"></div><span class="opt-text">Ναι — με ενδιαφέρει</span></label>
       <label class="opt" onclick="selOpt(this,'hospital_allowance','no')"><input type="radio" name="hospital_allowance" value="no"/><div class="opt-dot"></div><span class="opt-text">Όχι</span></label>
@@ -768,8 +768,8 @@ input[type=range]::-moz-range-thumb{
     <div class="q-label">⏳ Σε πόσα χρόνια θέλετε να φτάσετε αυτόν τον στόχο;</div>
     <div class="slider-wrap">
       <div class="slider-val"><span id="target-years-display">15</span> χρόνια</div>
-      <input type="range" id="target-years-slider" min="5" max="35" value="15" step="1"/>
-      <div class="slider-labels"><span>5 έτη</span><span>35 έτη</span></div>
+      <input type="range" id="target-years-slider" min="5" max="50" value="15" step="1"/>
+      <div class="slider-labels"><span>5 έτη</span><span>50 έτη</span></div>
     </div>
   </div>
 
@@ -1303,16 +1303,25 @@ function isFamilyClient(a) {
 }
 
 /* ============================================================
-   Savings target — 3 σενάρια απόδοσης (μετά από έξοδα διαχείρισης)
-   FV = PMT × [((1+r)^n − 1) / r],  r = monthly rate, n = months
+   Savings target — 3 ΕΠΙΣΗΜΑ σενάρια NN Accelerator+
+   Βάσει του επίσημου εντύπου NN-E-422/07.2025:
+     • Συντηρητικό (Conservative Multifund Strategy):  2,70%
+     • Ισορροπημένο (Balanced Multifund Strategy):     6,40%
+     • Δυναμικό (Appreciation Multifund Strategy):    10,20%
+   Οι αποδόσεις είναι μετά τα έξοδα διαχείρισης.
+   Παρελθούσες αποδόσεις δεν εγγυώνται μελλοντικές.
+
+   FV = PMT × [((1+r)^n − 1) / r], r = monthly rate, n = months
    ============================================================ */
 function calcSavingsScenarios(targetAmount, years) {
   if (!targetAmount || !years || targetAmount <= 0 || years <= 0) return null;
-  // Καθαρές αποδόσεις μετά τα έξοδα του προγράμματος (~1% management fee)
   const returns = [
-    { label: 'Συντηρητικό',  annual: 0.03, color: '#4a9eda', desc: 'Χαμηλό ρίσκο · μεγαλύτερη σταθερότητα'  },
-    { label: 'Ισορροπημένο', annual: 0.05, color: '#C9A84C', desc: 'Μέτριο ρίσκο · ισορροπία απόδοσης/ασφάλειας' },
-    { label: 'Δυναμικό',     annual: 0.07, color: '#F47920', desc: 'Υψηλότερο ρίσκο · μέγιστη δυνητική απόδοση' },
+    { label: 'Συντηρητικό',  annual: 0.0270, color: '#4a9eda',
+      desc: 'Conservative Multifund · Χαμηλότερο ρίσκο, μεγαλύτερη σταθερότητα' },
+    { label: 'Ισορροπημένο', annual: 0.0640, color: '#C9A84C',
+      desc: 'Balanced Multifund · Ισορροπία ασφάλειας & απόδοσης' },
+    { label: 'Δυναμικό',     annual: 0.1020, color: '#F47920',
+      desc: 'Appreciation Multifund · Υψηλότερο ρίσκο, μεγαλύτερη δυνητική απόδοση' },
   ];
   const months = years * 12;
   return returns.map(s => {
@@ -1661,8 +1670,8 @@ function renderResults() {
   const savScenarios = calcSavingsScenarios(targetAmt, targetYrs);
   const savingsHTML = savScenarios ? `
     <div class="savings-section">
-      <div class="savings-title">🎯 Στόχος Αποταμίευσης — 3 Σενάρια Προγραμμάτων</div>
-      <div class="savings-sub">Μηνιαία συνεισφορά για να συγκεντρώσετε τον στόχο σας, με βάση 3 επίπεδα απόδοσης (μετά τα έξοδα διαχείρισης).</div>
+      <div class="savings-title">🎯 Στόχος Αποταμίευσης — Επίσημα Σενάρια NN Accelerator+</div>
+      <div class="savings-sub">Μηνιαία συνεισφορά για να συγκεντρώσετε τον στόχο σας, με βάση τα 3 επίσημα επενδυτικά σενάρια της NN Hellas (μετά τα έξοδα διαχείρισης).</div>
       <div class="savings-target">
         Θέλετε να συγκεντρώσετε <strong>€${targetAmt.toLocaleString('el-GR')}</strong> σε <strong>${targetYrs} χρόνια</strong>
       </div>
@@ -1671,12 +1680,12 @@ function renderResults() {
           <div class="savings-card" style="--scen-color:${s.color}">
             <div class="savings-label">${s.label}</div>
             <div class="savings-pmt">€${s.monthlyRequired.toLocaleString('el-GR')}<span>/μήνα</span></div>
-            <div class="savings-rate">απόδοση ~${(s.annual*100).toFixed(0)}% ετησίως</div>
+            <div class="savings-rate">απόδοση ${(s.annual*100).toFixed(2)}% ετησίως</div>
             <div class="savings-desc">${s.desc}</div>
           </div>`).join('')}
       </div>
-      <p style="margin-top:14px;font-size:11px;color:var(--text-muted);text-align:center;line-height:1.5">
-        💡 Τα ποσά είναι ενδεικτικά υπολογισμοί με βάση τύπο σύνθετου επιτοκίου. Η πραγματική απόδοση εξαρτάται από τις αγορές και δεν είναι εγγυημένη.
+      <p style="margin-top:14px;font-size:11px;color:var(--text-muted);text-align:center;line-height:1.6">
+        💡 <strong>Επίσημα δεδομένα NN Hellas</strong> (έντυπο NN-E-422/07.2025) με βάση τις 3 επενδυτικές στρατηγικές Multifund. Ελάχιστη ετήσια συνεισφορά €1.000-€5.000. Οι παρελθούσες αποδόσεις δεν εγγυώνται μελλοντικές — η πραγματική απόδοση εξαρτάται από τις αγορές.
       </p>
     </div>` : '';
 
