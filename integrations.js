@@ -42,6 +42,7 @@
         hospital_mild:      data.hospital_mild      || '',
         hospital_severe:    data.hospital_severe    || '',
         deductible_type:    data.deductible_type    || '',
+        deductible_amount:  data.deductible_amount  || '',
         ci_pref:            data.ci_pref            || '',
         hospital_allowance: data.hospital_allowance || '',
         income_concern:     data.income_concern     || '',
@@ -89,6 +90,9 @@
       needs_hierarchy:  data.needs_hierarchy  || '',
       monthly_budget:   data.monthly_budget   || '',
       deductible_pref:  data.deductible_type  || '',
+      deductible_amount:data.deductible_amount|| '',
+      needs_hierarchy_short: data.needs_hierarchy_short || '',
+      podium_html:      data.podium_html      || '',
       proposal_text:    data.proposal_text    || '',
       date:             new Date().toLocaleDateString('el-GR'),
       advisor_name:     data.advisor_name     || '',
@@ -114,8 +118,32 @@
   function reset() { _emailSent = false; }
 
   // ════════════════════════════════════════════════════════════════
+  // RATING — αξιολόγηση ερωτηματολογίου από τον πελάτη
+  // Στέλνεται στο Apps Script με action=rating → γράφει σε ξεχωριστό sheet
+  // ════════════════════════════════════════════════════════════════
+  function saveRating(data) {
+    if (!SVC.sheets_url || SVC.sheets_url.startsWith('REPLACE')) return;
+    try {
+      const p = new URLSearchParams({
+        action:  'rating',
+        date:    data.date    || new Date().toLocaleString('el-GR'),
+        rating:  String(data.rating || ''),
+        comment: data.comment || '',
+        name:    data.client_name  || '',
+        email:   data.client_email || '',
+      });
+      fetch(SVC.sheets_url, {
+        method: 'POST',
+        mode:   'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body:   p.toString(),
+      }).catch(() => {});
+    } catch (e) {}
+  }
+
+  // ════════════════════════════════════════════════════════════════
   // EXPORTS
   // ════════════════════════════════════════════════════════════════
-  window.NN_INTEGRATIONS = { saveToSheets, sendEmails, reset };
+  window.NN_INTEGRATIONS = { saveToSheets, sendEmails, saveRating, reset };
 
 })();

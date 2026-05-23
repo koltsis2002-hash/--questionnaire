@@ -28,6 +28,7 @@
     criticalIllness:   '⚕️ Κρίσιμες',
     hospitalAllowance: '🏨 Επίδομα',
     life:              '💛 Ζωή',
+    savings:           '💰 Αποταμίευση',
   };
 
   // ════════════════════════════════════════════════════════════════
@@ -36,11 +37,12 @@
   const HOSPITAL_NETWORK = {
     premium: {
       label: 'Ειδικά Συμβεβλημένα',
-      perk:  'Απορρόφηση συμμετοχής 15-20% (έως €1.500) με ΕΟΠΥΥ',
+      perk:  'Απορρόφηση συμμετοχής 15–20% (έως €1.500) σε συνδυασμό με δημόσιο φορέα',
       athens: [
-        'ΥΓΕΙΑ', 'ΜΗΤΕΡΑ', 'ΕΡΡΙΚΟΣ ΝΤΥΝΑΝ',
-        'METROPOLITAN Hospital', 'METROPOLITAN General',
-        'ΙΑΤΡΙΚΟ Αθηνών', 'ΙΑΤΡΙΚΟ Ψυχικού', 'ΙΑΤΡΙΚΟ Π. Φαλήρου', 'ΙΑΤΡΙΚΟ Περιστερίου',
+        'ΥΓΕΙΑ', 'ΕΡΡΙΚΟΣ ΝΤΥΝΑΝ',
+        'METROPOLITAN', 'METROPOLITAN General',
+        'ΙΑΤΡΙΚΟ Κέντρο Αθηνών', 'ΙΑΤΡΙΚΟ Ψυχικού',
+        'ΙΑΤΡΙΚΟ Κέντρο Π. Φαλήρου', 'ΙΑΤΡΙΚΟ Περιστερίου',
         'ΕΥΡΩΚΛΙΝΙΚΗ Αθηνών', 'ΕΥΡΩΚΛΙΝΙΚΗ Παίδων',
         'MEDITERRANEO',
       ],
@@ -49,21 +51,26 @@
         'ΓΕΝΕΣΙΣ', 'ΓΕΝΙΚΗ ΚΛΙΝΙΚΗ Θεσσαλονίκης', 'ΚΥΑΝΟΥΣ ΣΤΑΥΡΟΣ',
       ],
       other: [
-        'Γενική Κλινική Κοζάνης', 'Γενική Κλινική Ρόδου',
+        'Γεν. Κλινική Ζωοδόχος Πηγή (Κοζάνη)', 'Γεν. Κλινική Ρόδου',
       ],
     },
     partner: {
       label: 'Συμβεβλημένα',
       athens: [
-        'ΑΘΗΝΑΪΚΗ Κλινική', 'ΒΙΟΚΛΙΝΙΚΗ Αθηνών', 'ΚΕΝΤΡΙΚΗ Κλινική',
-        'ΙΑΣΩ Μαιευτική', 'ΙΑΣΩ Παίδων', 'ΡΕΑ Μαιευτική',
-        'Doctors\' Hospital', 'Therapis General', 'ΩΝΑΣΕΙΟ',
-        'ΙΑΤΡΟΠΟΛΙΣ Χαλανδρίου', 'ΠΕΙΡΑΪΚΟ Θεραπευτήριο',
+        'ΑΘΗΝΑΪΚΗ Κλινική', 'ΒΙΟΚΛΙΝΙΚΗ Αθηνών',
+        'ΙΑΣΩ Μαιευτική', 'ΙΑΣΩ Παίδων',
+        'ΙΑΤΡΟΠΟΛΙΣ Χαλανδρίου', 'ΚΕΝΤΡΙΚΗ Κλινική',
+        'Λευκός Σταυρός', 'ΟΦΘΑΛΜΟΛΟΓΙΚΟ Αθηνών',
+        'ΠΕΙΡΑΪΚΟ Θεραπευτήριο', 'ΕΥΓΕΝΙΔΙΟ Θεραπευτήριο',
+        'ΡΕΑ Μαιευτική', 'ΩΝΑΣΕΙΟ',
+        'ATHENS EYE Hospital', 'ATHENS VISION',
+        'Doctors\' Hospital', 'EYE DAY Clinic',
+        'LASER VISION', 'Therapis General',
       ],
       thessaloniki: ['ΒΙΟΚΛΙΝΙΚΗ Θεσσαλονίκης', 'OPHTHALMICA'],
-      crete: ['Creta Interclinic', 'Μητέρα Κρήτης', 'IASIS Χανίων'],
+      crete: ['Creta Interclinic', 'Creta Interclinic Μητέρα Κρήτης', 'IASIS Χανίων'],
       patras: ['ΟΛΥΜΠΙΟΝ Πατρών'],
-      larisa: ['ΙΑΣΩ Θεσσαλίας', 'Θεσσαλία Γενική Κλινική'],
+      larisa: ['Θεσσαλία Γενική Κλινική', 'ΙΑΣΩ Θεσσαλίας'],
       volos:  ['ΑΝΑΣΣΑ Γενική Κλινική', 'ΕΛΠΙΣ Γενική Κλινική'],
     },
     perks: [
@@ -92,7 +99,6 @@
   let currentStep = 0;
   const TOTAL_STEPS = 6;
   let answers = { age: 35, monthly_budget: 100 };
-  let chartInst = null;
   let _submitted = false;
 
   // ════════════════════════════════════════════════════════════════
@@ -146,6 +152,7 @@
       hospitalSevere:      hospitalMap[a.hospital_severe] || 'localPub',
       desiredBenefits:     a.health_benefits              || [],
       deductibleType:      deductibleMap[a.deductible_type] || 'annual',
+      deductibleAmount:    a.deductible_amount             || '',
       criticalIllnessPref: a.ci_pref                      || 'none',
       hospitalAllowancePref: a.hospital_allowance         || 'no',
       incomeConcern:       a.income_concern               || 'no',
@@ -240,6 +247,19 @@
   // ════════════════════════════════════════════════════════════════
   // DYNAMIC UI
   // ════════════════════════════════════════════════════════════════
+  function toggleDeductibleAmount(type) {
+    const annualBlock = document.getElementById('deductible-amount-annual');
+    const piBlock     = document.getElementById('deductible-amount-perincident');
+    if (annualBlock) annualBlock.style.display = (type === 'annual') ? 'block' : 'none';
+    if (piBlock)     piBlock.style.display     = (type === 'per_incident') ? 'block' : 'none';
+    // Καθαρισμός επιλογής αν αλλάξει ο τύπος
+    if (type === 'none') {
+      answers.deductible_amount = '';
+      document.querySelectorAll('input[name="deductible_amount"]').forEach(r => { r.checked = false; });
+      document.querySelectorAll('#opts-ded-amt-annual .opt, #opts-ded-amt-perinc .opt').forEach(o => o.classList.remove('sel'));
+    }
+  }
+
   function updateKidsAges(count) {
     const section = document.getElementById('kids-section');
     const grid    = document.getElementById('kids-grid');
@@ -273,7 +293,7 @@
     if (spouseInp && spouseInp.value) answers.spouse_age = parseInt(spouseInp.value) || null;
 
     ['marital_status','hospital_mild','hospital_severe','fund_satisfaction',
-     'deductible_type','income_concern','life_capital','pension_estimate',
+     'deductible_type','deductible_amount','income_concern','life_capital','pension_estimate',
      'savings_plan','occupation','children','ci_pref','hospital_allowance','target_amount'
     ].forEach(name => {
       const el = document.querySelector('input[name="' + name + '"]:checked');
@@ -314,6 +334,9 @@
       if (!a.hospital_mild)      return ['Επιλέξτε νοσοκομείο για ήπιο θέμα υγείας'];
       if (!a.hospital_severe)    return ['Επιλέξτε νοσοκομείο για σοβαρό θέμα υγείας'];
       if (!a.deductible_type)    return ['Επιλέξτε τύπο εκπιπτόμενου'];
+      if ((a.deductible_type === 'annual' || a.deductible_type === 'per_incident') && !a.deductible_amount) {
+        return ['Επιλέξτε το ύψος του εκπιπτόμενου ποσού'];
+      }
       if (!a.ci_pref)            return ['Επιλέξτε προτίμηση για Κρίσιμες Ασθένειες'];
       if (!a.hospital_allowance) return ['Επιλέξτε αν επιθυμείτε ημερήσιο επίδομα νοσηλείας'];
       return [];
@@ -349,11 +372,11 @@
     if (!targetAmount || !years || targetAmount <= 0 || years <= 0) return null;
     const returns = [
       { label:'Συντηρητικό',  annual:0.0270, color:'#4a9eda',
-        desc:'Conservative Multifund · Χαμηλότερο ρίσκο, μεγαλύτερη σταθερότητα' },
+        desc:'Χαμηλότερο ρίσκο, μεγαλύτερη σταθερότητα στις αποδόσεις' },
       { label:'Ισορροπημένο', annual:0.0640, color:'#C9A84C',
-        desc:'Balanced Multifund · Ισορροπία ασφάλειας & απόδοσης' },
+        desc:'Ισορροπία ασφάλειας και απόδοσης μεσοπρόθεσμα' },
       { label:'Δυναμικό',     annual:0.1020, color:'#F47920',
-        desc:'Appreciation Multifund · Υψηλότερο ρίσκο, μεγαλύτερη δυνητική απόδοση' },
+        desc:'Υψηλότερο ρίσκο με μεγαλύτερη δυνητική απόδοση' },
     ];
     const months = years * 12;
     return returns.map(s => {
@@ -403,7 +426,7 @@
       'Η ιδιωτική αποταμίευση αποτελεί σήμερα αναγκαίο συμπλήρωμα της κρατικής σύνταξης για αξιοπρεπή διαβίωση.'
     );
     if (scores.health >= 30) parts.push(
-      'Επιπλέον, αποκτάτε πρόσβαση σε <strong>30+ συμβεβλημένα νοσοκομεία</strong> πανελλαδικά (Metropolitan, Υγεία, Ερρίκος Ντυνάν, Ιατρικό, Ευρωκλινική, Mediterraneo κ.ά.) με δωρεάν επείγοντα, εξετάσεις έως €600 και απορρόφηση συμμετοχής έως 20% στα Ειδικά Συμβεβλημένα.'
+      'Επιπλέον, αποκτάτε πρόσβαση σε <strong>45+ συμβεβλημένα νοσοκομεία</strong> πανελλαδικά (Metropolitan, Υγεία, Ερρίκος Ντυνάν, Ιατρικό, Ευρωκλινική, Mediterraneo κ.ά.) με δωρεάν επείγοντα, εξετάσεις έως €600 και απορρόφηση συμμετοχής έως 20% στα Ειδικά Συμβεβλημένα.'
     );
     return parts.join(' ');
   }
@@ -436,7 +459,7 @@
     return `
       <div class="network-section">
         <div class="net-title">🏥 Δίκτυο Συμβεβλημένων Νοσοκομείων NN Hellas</div>
-        <div class="net-sub">30+ ιδιωτικά νοσοκομεία πανελλαδικά με δωρεάν παροχές για ασφαλισμένους</div>
+        <div class="net-sub">45+ ιδιωτικά νοσοκομεία πανελλαδικά με δωρεάν παροχές για ασφαλισμένους</div>
         <div class="net-perks">${perksHTML}</div>
         ${premHTML}${partHTML}
         <p style="margin-top:10px;font-size:11px;color:var(--text-muted);font-style:italic">
@@ -446,29 +469,93 @@
   }
 
   // ════════════════════════════════════════════════════════════════
-  // NEEDS HIERARCHY TEXT — για email πελάτη
+  // RANKED NEEDS — επιστρέφει τις 3 κατηγορίες ταξινομημένες κατά score ↓
   // ════════════════════════════════════════════════════════════════
-  // Κατωφλία: > 65 = Υψηλή Ανάγκη, >= 45 = Απλή Ανάγκη
-  // Σειρά: Υψηλές (κατά score ↓), μετά Απλές (κατά score ↓)
-  function buildNeedsHierarchyText(h, l, r) {
+  function rankNeeds(h, l, r) {
     const cats = [
-      { name: 'Ασφάλεια Υγείας',      score: h },
-      { name: 'Ασφάλεια Ζωής',        score: l },
-      { name: 'Συνταξιοδοτικό Πλάνο', score: r },
+      { key:'health',     name:'Ασφάλεια Υγείας',      short:'Υγεία',   score:h, color:'#F47920' },
+      { key:'life',       name:'Ασφάλεια Ζωής',        short:'Ζωή',     score:l, color:'#C9A84C' },
+      { key:'retirement', name:'Συνταξιοδοτικό Πλάνο', short:'Σύνταξη', score:r, color:'#4a9eda' },
     ];
-    const high  = cats.filter(c => c.score > 65).sort((a, b) => b.score - a.score);
-    const basic = cats.filter(c => c.score >= 45 && c.score <= 65).sort((a, b) => b.score - a.score);
+    return cats.sort((a, b) => b.score - a.score);
+  }
 
-    if (high.length === 0 && basic.length === 0) {
-      return 'Βάσει των απαντήσεών σας δεν εντοπίστηκε άμεση ανάγκη ασφαλιστικής κάλυψης. ' +
-             'Ο σύμβουλός σας μπορεί να σας βοηθήσει να αξιολογήσετε μελλοντικές ανάγκες.';
+  // ════════════════════════════════════════════════════════════════
+  // PODIUM HTML — βάθρο νικητών (1η/2η/3η θέση) χωρίς αριθμούς/ποσοστά
+  // Χρησιμοποιείται και στη σελίδα αποτελεσμάτων και στο email πελάτη
+  // ════════════════════════════════════════════════════════════════
+  function buildPodiumHTML(h, l, r) {
+    const ranked = rankNeeds(h, l, r);
+    // Διάταξη βάθρου: 2η αριστερά, 1η μέση, 3η δεξιά
+    const layout = [
+      { rank: 2, height: 110, color: '#9aa5b1', medal: '🥈' },
+      { rank: 1, height: 150, color: '#F47920', medal: '🥇' },
+      { rank: 3, height: 80,  color: '#b08758', medal: '🥉' },
+    ];
+    const pillars = layout.map(pos => {
+      const cat = ranked[pos.rank - 1];
+      return `
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0">
+          <div style="font-size:28px;margin-bottom:4px">${pos.medal}</div>
+          <div style="font-size:13px;font-weight:700;color:#1a2238;margin-bottom:4px;text-align:center;line-height:1.2">${cat.short}</div>
+          <div style="width:90%;max-width:120px;height:${pos.height}px;background:linear-gradient(180deg,${pos.color},${pos.color}cc);border-radius:8px 8px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:8px;color:#fff;font-weight:800;font-size:18px">${pos.rank}η</div>
+        </div>`;
+    }).join('');
+    return `
+      <div class="podium-section" style="background:#f8f9fc;border-radius:12px;padding:24px 20px;margin:24px 0;border:1px solid #e0e6ed">
+        <h3 style="text-align:center;margin:0 0 8px;font-size:16px;color:#1a2238;font-weight:700">Ιεράρχηση Ασφαλιστικών Αναγκών σας</h3>
+        <p style="text-align:center;margin:0 0 18px;font-size:12px;color:#666">με βάση τις απαντήσεις σας</p>
+        <div style="display:flex;align-items:flex-end;justify-content:center;gap:8px;max-width:420px;margin:0 auto;border-bottom:2px solid #cbd2da;padding-bottom:0">
+          ${pillars}
+        </div>
+      </div>`;
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // NEEDS HIERARCHY TEXT — ενιαίο κείμενο παραγράφου για το email πελάτη
+  // ════════════════════════════════════════════════════════════════
+  function buildNeedsHierarchyText(h, l, r) {
+    const ranked = rankNeeds(h, l, r);
+    const topScore = ranked[0].score;
+
+    // Αν όλες είναι πολύ χαμηλές, μήνυμα ηρεμίας
+    if (topScore < 45) {
+      return 'Με βάση τις απαντήσεις σας, δεν εντοπίστηκε άμεση ανάγκη ασφαλιστικής κάλυψης. ' +
+             'Παρόλα αυτά, ο σύμβουλός σας μπορεί να σας βοηθήσει να αξιολογήσετε μελλοντικές ανάγκες ' +
+             'που μπορεί να προκύψουν με αλλαγές στην οικογενειακή ή επαγγελματική σας κατάσταση.';
     }
 
-    const parts = [];
-    high.forEach((c, i)  => parts.push(`${i + 1}. ${c.name} — Υψηλή Ανάγκη`));
-    basic.forEach((c, i) => parts.push(`${high.length + i + 1}. ${c.name} — Απλή Ανάγκη (εφόσον το budget το επιτρέπει)`));
+    // Δομή: εισαγωγή + 1η/2η/3η ανάγκη με ροή
+    const intro = 'Από την ανάλυση των απαντήσεών σας, οι ασφαλιστικές σας ανάγκες ιεραρχούνται ως εξής:';
 
-    return 'Με βάση τις απαντήσεις σας, η ιεράρχηση των ασφαλιστικών σας αναγκών είναι:\n' + parts.join('\n');
+    const describe = (cat, pos) => {
+      const level = cat.score >= 65 ? 'υψηλή' : cat.score >= 45 ? 'σημαντική' : 'βασική';
+      const prefix = pos === 1 ? 'Πρωταρχικά' : pos === 2 ? 'Παράλληλα' : 'Επιπρόσθετα';
+      switch (cat.key) {
+        case 'health':
+          return `${prefix}, η ${cat.name} αναδεικνύεται ως ${level} προτεραιότητα — η προστασία απέναντι σε νοσηλεία, χειρουργείο και ιατρικές δαπάνες αποτελεί θεμέλιο της οικογενειακής σας ασφάλειας.`;
+        case 'life':
+          return `${prefix}, η ${cat.name} αποτελεί ${level} ανάγκη — η οικονομική προστασία της οικογένειάς σας σε περίπτωση απρόοπτου εξασφαλίζει τη συνέχιση του τρόπου ζωής τους.`;
+        case 'retirement':
+          return `${prefix}, το ${cat.name} εμφανίζεται ως ${level} προτεραιότητα — η ιδιωτική αποταμίευση είναι σήμερα αναγκαία για να διασφαλίσετε αξιοπρεπή σύνταξη και ανεξαρτησία στο μέλλον.`;
+      }
+    };
+
+    const sentences = [intro];
+    ranked.forEach((cat, i) => {
+      if (cat.score >= 45 || i === 0) sentences.push(describe(cat, i + 1));
+    });
+    sentences.push('Ο σύμβουλός σας θα σας προτείνει εξατομικευμένες λύσεις με βάση αυτή την ιεράρχηση και τον προϋπολογισμό σας.');
+    return sentences.join(' ');
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // NEEDS HIERARCHY SHORT — μικρή σύνοψη για email συμβούλου
+  // ════════════════════════════════════════════════════════════════
+  function buildNeedsHierarchyShort(h, l, r) {
+    const ranked = rankNeeds(h, l, r);
+    const order = ranked.map((c, i) => `${i + 1}η ${c.name}`).join(' · ');
+    return `Με βάση τις επιλογές του πελάτη, η ιεράρχηση των αναγκών του είναι: ${order}.`;
   }
 
   // ════════════════════════════════════════════════════════════════
@@ -490,15 +577,31 @@
     const h = scores.health, l = scores.life, r = scores.retirement;
     const avg     = (h + l + r) / 3;
     const urg     = avg >= 70 ? 'ΚΡΙΣΙΜΗ' : avg >= 50 ? 'ΥΨΗΛΗ' : avg >= 30 ? 'ΜΕΤΡΙΑ' : 'ΧΑΜΗΛΗ';
-    const urgIcon = { ΚΡΙΣΙΜΗ:'🔴', ΥΨΗΛΗ:'🟠', ΜΕΤΡΙΑ:'🟡', ΧΑΜΗΛΗ:'🟢' }[urg];
-
-    const scoreTot = (h + l + r) || 1;
-    const hP = h / scoreTot * 100;
-    const lP = l / scoreTot * 100;
-    const rP = r / scoreTot * 100;
 
     const totalMonthly = Math.ceil(proposal.totals.monthly);
     const totalAnnual  = proposal.totals.annual;
+
+    // Ταξινόμηση proposal.lines σύμφωνα με την ιεράρχηση αναγκών
+    const rankedNeeds = rankNeeds(h, l, r);
+    const categoryOrder = {};
+    rankedNeeds.forEach((c, idx) => {
+      // Όλες οι health-related γραμμές μπαίνουν με την προτεραιότητα της Υγείας
+      if (c.key === 'health') {
+        categoryOrder.health = idx;
+        categoryOrder.criticalIllness = idx + 0.1;
+        categoryOrder.hospitalAllowance = idx + 0.2;
+        categoryOrder.primaryCare = idx + 0.3;
+      } else if (c.key === 'life') {
+        categoryOrder.life = idx;
+      } else if (c.key === 'retirement') {
+        categoryOrder.savings = idx;
+      }
+    });
+    proposal.lines.sort((a, b) => {
+      const oa = categoryOrder[a.category] ?? 99;
+      const ob = categoryOrder[b.category] ?? 99;
+      return oa - ob;
+    });
 
     // ── Proposal card lines ──────────────────────────────────────
     const linesHTML = proposal.lines.map(line => {
@@ -555,8 +658,8 @@
     const savScenarios = calcSavingsScenarios(targetAmt, targetYrs);
     const savingsHTML = savScenarios ? `
       <div class="savings-section">
-        <div class="savings-title">🎯 Στόχος Αποταμίευσης — Επίσημα Σενάρια NN Accelerator+</div>
-        <div class="savings-sub">Μηνιαία συνεισφορά για να συγκεντρώσετε τον στόχο σας, με βάση τα 3 επίσημα επενδυτικά σενάρια της NN Hellas (μετά τα έξοδα διαχείρισης).</div>
+        <div class="savings-title">🎯 Σενάρια Αποταμίευσης</div>
+        <div class="savings-sub">Μηνιαία συνεισφορά για να συγκεντρώσετε τον στόχο σας, με βάση 3 διαφορετικές επενδυτικές στρατηγικές.</div>
         <div class="savings-target">
           Θέλετε να συγκεντρώσετε <strong>€${targetAmt.toLocaleString('el-GR')}</strong> σε <strong>${targetYrs} χρόνια</strong>
         </div>
@@ -569,19 +672,11 @@
               <div class="savings-desc">${s.desc}</div>
             </div>`).join('')}
         </div>
-        <p style="margin-top:14px;font-size:11px;color:var(--text-muted);text-align:center;line-height:1.6">
-          💡 <strong>Επίσημα δεδομένα NN Hellas</strong> (έντυπο NN-E-422/07.2025) με βάση τις 3 επενδυτικές στρατηγικές Multifund. Ελάχιστη ετήσια συνεισφορά €1.000–€5.000. Οι παρελθούσες αποδόσεις δεν εγγυώνται μελλοντικές.
-        </p>
       </div>` : '';
 
     // ── Network ──────────────────────────────────────────────────
     const hasHealth = proposal.lines.some(l => l.category === 'health' || l.category === 'primaryCare');
     const networkHTML = hasHealth ? buildNetworkHTML() : '';
-
-    // ── Score descriptions ───────────────────────────────────────
-    const scoreDesc = v => v >= 70 ? 'Υψηλή Ανάγκη' : v >= 40 ? 'Μέτρια Ανάγκη' : 'Χαμηλή Ανάγκη';
-
-    const benefitsText = generateBenefitsText(a, scores, proposal.lines, totalMonthly);
 
     // ── Build proposalText for email/sheets ──────────────────────
     const proposalText =
@@ -598,51 +693,7 @@
       <h2 class="screen-title">Η Ανάλυσή σας${a.client_name ? ', ' + a.client_name.split(' ')[0] : ''}</h2>
       <p class="screen-sub">Βάσει των απαντήσεών σας δημιουργήθηκε εξατομικευμένη πρόταση κάλυψης.</p>
 
-      <div class="urgency-banner urgency-${urg}" style="padding:18px 22px;margin-bottom:20px;">
-        <div class="urgency-banner-inner">
-          <div class="urgency-icon">${urgIcon}</div>
-          <div>
-            <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;opacity:.7;margin-bottom:3px">Επίπεδο Ανάγκης</div>
-            <div style="font-size:22px;font-weight:700;line-height:1">${urg}</div>
-          </div>
-          <div style="margin-left:auto;text-align:right;font-size:12px;opacity:.8">
-            <div>Υγεία &nbsp;<strong>${h}</strong></div>
-            <div>Ζωή &nbsp;<strong>${l}</strong></div>
-            <div>Σύνταξη &nbsp;<strong>${r}</strong></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="score-summary">
-        <div class="score-pill h">
-          <div class="score-pill-label">Υγεία</div>
-          <div class="score-pill-val">${h}</div>
-          <div class="score-pill-bar"><div class="score-pill-fill" style="width:0%" data-target="${h}%"></div></div>
-          <div class="score-pill-desc">${scoreDesc(h)}</div>
-        </div>
-        <div class="score-pill l">
-          <div class="score-pill-label">Ζωή</div>
-          <div class="score-pill-val">${l}</div>
-          <div class="score-pill-bar"><div class="score-pill-fill" style="width:0%" data-target="${l}%"></div></div>
-          <div class="score-pill-desc">${scoreDesc(l)}</div>
-        </div>
-        <div class="score-pill r">
-          <div class="score-pill-label">Σύνταξη</div>
-          <div class="score-pill-val">${r}</div>
-          <div class="score-pill-bar"><div class="score-pill-fill" style="width:0%" data-target="${r}%"></div></div>
-          <div class="score-pill-desc">${scoreDesc(r)}</div>
-        </div>
-      </div>
-
-      <div class="benefits-box">
-        <h4>📋 Κύρια Οφέλη Ασφάλισης για Εσάς</h4>
-        <p>${benefitsText || 'Βάσει του προφίλ σας δεν εντοπίστηκαν έκτακτες ανάγκες. Ο σύμβουλός σας μπορεί να σας βοηθήσει να αξιολογήσετε πιθανές μελλοντικές ανάγκες.'}</p>
-      </div>
-
-      <div class="chart-section">
-        <div class="chart-title">Κατανομή Ασφαλιστικών Αναγκών</div>
-        <div class="chart-wrap"><canvas id="needs-chart" width="280" height="280"></canvas></div>
-      </div>
+      ${buildPodiumHTML(h, l, r)}
 
       <div class="section-label">Προτεινόμενη Κάλυψη</div>
       <div class="scenarios">${scenHTML}</div>
@@ -684,65 +735,88 @@
         Τα ασφάλιστρα είναι ενδεικτικά (Class B) και ενδέχεται να διαφέρουν στην πραγματική προσφορά ανάλογα με υγεία, επάγγελμα και άλλους παράγοντες αξιολόγησης.
       </p>`;
 
-    // Animate score bars
-    requestAnimationFrame(() => {
-      document.querySelectorAll('.score-pill-fill').forEach(el => {
-        el.style.width = el.dataset.target;
-      });
-    });
-    setTimeout(() => renderChart(hP, lP, rP), 80);
-
     // Integrations
     const resultData = {
       ...a,
       health_score:  h, life_score: l, retirement_score: r,
       urgency:       urg, proposal_text: proposalText,
-      needs_hierarchy: buildNeedsHierarchyText(h, l, r),
+      needs_hierarchy:       buildNeedsHierarchyText(h, l, r),
+      needs_hierarchy_short: buildNeedsHierarchyShort(h, l, r),
+      podium_html:           buildPodiumHTML(h, l, r),
       advisor_name:  BRAND.advisor,
       advisor_email: BRAND.email,
       advisor_phone: BRAND.phone,
     };
     window.NN_INTEGRATIONS?.saveToSheets(resultData);
     window.NN_INTEGRATIONS?.sendEmails(resultData);
+
+    // Εμφάνιση rating modal 8 δευτερόλεπτα αφού φορτώσουν τα αποτελέσματα
+    setTimeout(openRatingModal, 8000);
   }
 
   // ════════════════════════════════════════════════════════════════
-  // CHART
+  // RATING MODAL
   // ════════════════════════════════════════════════════════════════
-  function renderChart(hP, lP, rP) {
-    if (chartInst) { chartInst.destroy(); chartInst = null; }
-    const canvas = document.getElementById('needs-chart');
-    if (!canvas) return;
-    const chartEntries = [
-      { label:'Υγεία',   pct: hP, color:'#F47920' },
-      { label:'Ζωή',     pct: lP, color:'#C9A84C' },
-      { label:'Σύνταξη', pct: rP, color:'#4a9eda' },
-    ].filter(e => e.pct > 0);
-    chartInst = new Chart(canvas.getContext('2d'), {
-      type: 'doughnut',
-      data: {
-        labels:   chartEntries.map(e => `${e.label} ${e.pct.toFixed(0)}%`),
-        datasets: [{
-          data:            chartEntries.map(e => e.pct),
-          backgroundColor: chartEntries.map(e => e.color),
-          borderColor: '#1a2d42',
-          borderWidth: 3,
-          hoverOffset: 8,
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        cutout: '65%',
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { color:'#e8edf4', font:{ family:'Nunito Sans', size:13 }, padding:16 },
-          },
-          tooltip: { callbacks: { label: ctx => '  ' + ctx.parsed.toFixed(1) + '%' } },
-        },
-      },
+  let _ratingValue = 0;
+  let _ratingSent  = false;
+  const RATING_LABELS = {
+    1: 'Καθόλου ικανοποιητικό',
+    2: 'Μέτριο',
+    3: 'Καλό',
+    4: 'Πολύ καλό',
+    5: 'Εξαιρετικό!',
+  };
+
+  function openRatingModal() {
+    if (_ratingSent) return;
+    const modal = document.getElementById('rating-modal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    // Setup star click listeners (idempotent)
+    const stars = modal.querySelectorAll('.rating-star');
+    stars.forEach(star => {
+      star.onclick = () => setRating(parseInt(star.dataset.value));
+      star.onmouseenter = () => previewRating(parseInt(star.dataset.value));
     });
+    document.getElementById('rating-stars').onmouseleave = () => previewRating(_ratingValue);
+  }
+
+  function setRating(val) {
+    _ratingValue = val;
+    previewRating(val);
+    document.getElementById('rating-label').textContent = RATING_LABELS[val] || '';
+    document.getElementById('rating-submit').disabled = false;
+  }
+
+  function previewRating(val) {
+    document.querySelectorAll('.rating-star').forEach(s => {
+      const v = parseInt(s.dataset.value);
+      s.classList.toggle('active', v <= val);
+    });
+  }
+
+  function closeRatingModal() {
+    const modal = document.getElementById('rating-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function submitRating() {
+    if (_ratingSent || _ratingValue === 0) return;
+    _ratingSent = true;
+    const comment = (document.getElementById('rating-comment')?.value || '').trim();
+    const payload = {
+      rating: _ratingValue,
+      comment: comment,
+      client_name:  answers.client_name  || '',
+      client_email: answers.client_email || '',
+      date: new Date().toLocaleString('el-GR'),
+    };
+    window.NN_INTEGRATIONS?.saveRating(payload);
+
+    // Δείξε το thank-you screen
+    const thanks = document.getElementById('rating-thanks');
+    if (thanks) thanks.style.display = 'flex';
+    setTimeout(closeRatingModal, 2200);
   }
 
   // ════════════════════════════════════════════════════════════════
@@ -751,6 +825,19 @@
   function resetForm() {
     answers = { age: 35, monthly_budget: 100 };
     _submitted = false;
+    _ratingValue = 0;
+    _ratingSent  = false;
+    const ratingModal = document.getElementById('rating-modal');
+    if (ratingModal) ratingModal.style.display = 'none';
+    const ratingThanks = document.getElementById('rating-thanks');
+    if (ratingThanks) ratingThanks.style.display = 'none';
+    document.querySelectorAll('.rating-star').forEach(s => s.classList.remove('active'));
+    const ratingLabel = document.getElementById('rating-label');
+    if (ratingLabel) ratingLabel.innerHTML = '&nbsp;';
+    const ratingComment = document.getElementById('rating-comment');
+    if (ratingComment) ratingComment.value = '';
+    const ratingSubmit = document.getElementById('rating-submit');
+    if (ratingSubmit) ratingSubmit.disabled = true;
     window.NN_INTEGRATIONS?.reset();
     document.querySelectorAll('.opt.sel').forEach(el => el.classList.remove('sel'));
     document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(inp => inp.checked = false);
@@ -763,7 +850,10 @@
     document.getElementById('spouse-section').style.display = 'none';
     document.getElementById('kids-section').style.display = 'none';
     document.getElementById('kids-grid').innerHTML = '';
-    if (chartInst) { chartInst.destroy(); chartInst = null; }
+    const dedA = document.getElementById('deductible-amount-annual');
+    const dedP = document.getElementById('deductible-amount-perincident');
+    if (dedA) dedA.style.display = 'none';
+    if (dedP) dedP.style.display = 'none';
     showStep(0);
   }
 
@@ -818,6 +908,10 @@
   window.selOpt         = selOpt;
   window.togMulti       = togMulti;
   window.updateKidsAges = updateKidsAges;
+  window.toggleDeductibleAmount = toggleDeductibleAmount;
   window.resetForm      = resetForm;
+  window.openRatingModal  = openRatingModal;
+  window.closeRatingModal = closeRatingModal;
+  window.submitRating     = submitRating;
 
 })();
