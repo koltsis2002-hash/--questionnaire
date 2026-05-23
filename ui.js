@@ -252,8 +252,15 @@
     const piBlock     = document.getElementById('deductible-amount-perincident');
     if (annualBlock) annualBlock.style.display = (type === 'annual') ? 'block' : 'none';
     if (piBlock)     piBlock.style.display     = (type === 'per_incident') ? 'block' : 'none';
-    // Καθαρισμός επιλογής αν αλλάξει ο τύπος
+
     if (type === 'none') {
+      // «Όχι εκπιπτόμενο» → άμεση αντιστοίχιση με CROSS PLUS
+      // (από πρώτο € καλύπτει η εταιρία)
+      answers.deductible_amount = '0';
+      document.querySelectorAll('input[name="deductible_amount"]').forEach(r => { r.checked = false; });
+      document.querySelectorAll('#opts-ded-amt-annual .opt, #opts-ded-amt-perinc .opt').forEach(o => o.classList.remove('sel'));
+    } else {
+      // Αλλαγή τύπου → καθαρισμός προηγούμενης επιλογής ποσού
       answers.deductible_amount = '';
       document.querySelectorAll('input[name="deductible_amount"]').forEach(r => { r.checked = false; });
       document.querySelectorAll('#opts-ded-amt-annual .opt, #opts-ded-amt-perinc .opt').forEach(o => o.classList.remove('sel'));

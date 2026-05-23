@@ -263,16 +263,36 @@
   // 4. ΕΠΙΛΟΓΗ ΠΡΟΪΟΝΤΩΝ
   // ════════════════════════════════════════════════════════════════════
 
-  /** Επιλογή κύριου health program βάσει εκπιπτόμενου + budget. */
+  /** Επιλογή κύριου health program βάσει εκπιπτόμενου + budget.
+   *  Νέα λογική (v3): αν ο πελάτης έχει επιλέξει συγκεκριμένο
+   *  deductibleAmount → άμεση αντιστοίχιση με συγκεκριμένο πρόγραμμα
+   *  (CROSS 1/2/3/4 ή HEALTH 500/1500 ή CROSS PLUS).
+   *  Διαφορετικά: fallback στην παλιά λογική των tiers.
+   */
   function selectHealthProgram(answers, monthlyBudget) {
-    const age = Number(answers.age) || 0;
+    const age        = Number(answers.age) || 0;
     const deductible = answers.deductibleType;
+    const amount     = answers.deductibleAmount;
     if (!deductible) return null;
 
+    // ── ΝΕΟΣ ΤΡΟΠΟΣ: άμεση αντιστοίχιση από επιλεγμένο ποσό ────────
+    if (amount && DATA.deductibleProgramMap && DATA.deductibleProgramMap[deductible]) {
+      const direct = DATA.deductibleProgramMap[deductible][String(amount)];
+      if (direct && DATA.programs[direct]) {
+        const prog = DATA.programs[direct];
+        // Έλεγχος μόνο για ηλικία· τιμά την επιλογή του πελάτη ως προς budget.
+        if (!prog.maxAge || age <= prog.maxAge) {
+          return direct;
+        }
+        // Αν ξεπερνά τη maxAge, αφήνουμε να πέσει στο fallback παρακάτω
+        // (π.χ. για πελάτες >65 ή >70 ετών)
+      }
+    }
+
+    // ── FALLBACK: παλιά λογική (όταν δεν υπάρχει συγκεκριμένο ποσό) ──
     const tier = DATA.healthTiers[deductible];
     if (!tier || tier.length === 0) return null;
 
-    // Πρώτο πέρασμα: φιλτράρω βάσει age (maxAge)
     const candidates = tier.filter(progId => {
       const prog = DATA.programs[progId];
       if (!prog) return false;
@@ -282,9 +302,6 @@
 
     if (candidates.length === 0) return null;
 
-    // Δοκιμή πρώτου candidate, αλλά αν ξεπερνά το budget → προχωρά στο επόμενο
-    // Το health πρόγραμμα δεν πρέπει να ξεπερνά το 70% του monthly budget
-    // (αφήνει χώρο για riders).
     const budgetCap = monthlyBudget * 0.70;
 
     for (const progId of candidates) {
@@ -292,7 +309,7 @@
       if (!p) continue;
       if (p.monthly <= budgetCap) return progId;
     }
-    // Αν κανένα δεν χωράει, επιστρέφω το φθηνότερο
+    // Αν κανένα δεν χωράει στο budget → φθηνότερο
     let cheapest = null;
     let cheapestPrice = Infinity;
     candidates.forEach(progId => {
@@ -478,14 +495,45 @@
       }
     }
 
-    // ─── ΣΥΝΤΑΞΗ — μόνο σημείωση ─────────────────────────────────
+    // ─── ΣΥΝΤΑΞΗ ─────────────────────────────────────────────────
+    // Αν καλύφθηκαν οι ανάγκες Υγείας + Ζωής (ή δεν υπήρχαν) ΚΑΙ
+    // υπάρχει υπολειπόμενο budget ΚΑΙ ο πελάτης έχει συνταξιοδοτική ανάγκη
+    // → προτείνουμε αποταμιευτικό πρόγραμμα ως κανονική γραμμή πρότασης.
+    const remainingForSavings = monthlyBudget - proposal.totals.monthly;
+    const needsAddressed =
+      (!scores.includeHealth || proposal.lines.some(l => l.category === 'health' || l.category === 'primaryCare')) &&
+      (!scores.includeLife   || proposal.lines.some(l => l.category === 'life'));
+
     if (scores.includeSavingsNote) {
-      proposal.notes.push({
-        category: 'savings',
-        message: 'Το συνταξιοδοτικό σας προφίλ δείχνει σημαντική ανάγκη αποταμίευσης. '
-              + 'Προτείνουμε ξεχωριστή συζήτηση για αποταμιευτικά προγράμματα '
-              + '(NN Accelerator+ / NN Single Flex) — η τιμολόγηση εξαρτάται από το ποσό αποταμίευσης.',
-      });
+      if (needsAddressed && remainingForSavings >= 25) {
+        // Υπάρχει χώρος στο budget για αποταμιευτικό πρόγραμμα
+        // Ελάχιστη μηνιαία συνεισφορά: €25 (NN Accelerator+ floor ~€1.000/έτος)
+        // Παίρνουμε όσο επιτρέπει το budget, με ανώτατο €500/μήνα
+        const savingsMonthly = Math.min(Math.floor(remainingForSavings), 500);
+        proposal.lines.push({
+          category: 'savings',
+          kind: 'savings',
+          id: 'savings',
+          label: 'Αποταμιευτικό Πρόγραμμα',
+          price: {
+            monthly: savingsMonthly,
+            annual:  savingsMonthly * 12,
+            net:     savingsMonthly,
+            gross:   savingsMonthly,
+            source:  'savings',
+          },
+        });
+        proposal.totals.monthly += savingsMonthly;
+        proposal.totals.annual  += savingsMonthly * 12;
+      } else {
+        // Δεν υπάρχει χώρος → μόνο σημείωση
+        proposal.notes.push({
+          category: 'savings',
+          message: 'Το συνταξιοδοτικό σας προφίλ δείχνει σημαντική ανάγκη αποταμίευσης. '
+                + 'Μετά την κάλυψη των αναγκών Υγείας και Ζωής, προτείνουμε ξεχωριστή συζήτηση '
+                + 'για αποταμιευτικό πρόγραμμα — το ποσό προσαρμόζεται στις δυνατότητές σας.',
+        });
+      }
     }
 
     // ─── BUDGET WARNING ──────────────────────────────────────────

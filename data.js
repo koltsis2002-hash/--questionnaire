@@ -117,6 +117,27 @@
   };
 
   // ════════════════════════════════════════════════════════════════════
+  // 4b. DEDUCTIBLE AMOUNT → SPECIFIC PROGRAM (1-προς-1 αντιστοίχιση)
+  // Όταν ο πελάτης επιλέγει συγκεκριμένο ποσό εκπιπτόμενου,
+  // ουσιαστικά διαλέγει και το πρόγραμμα.
+  // ────────────────────────────────────────────────────────────────────
+  const DEDUCTIBLE_PROGRAM_MAP = {
+    none: {
+      '0':     'crossPlus',   // CROSS PLUS — χωρίς εκπιπτόμενο
+    },
+    annual: {
+      '300':   'cross1',      // CROSS 1   — €300/έτος (premium)
+      '1500':  'cross2',      // CROSS 2   — €1.500/έτος
+      '3000':  'cross3',      // CROSS 3   — €3.000/έτος
+      '10000': 'cross4',      // CROSS 4   — €10.000/έτος (basic)
+    },
+    perIncident: {
+      '500':   'health500',   // HEALTH 500  — €500/νοσηλεία
+      '1500':  'health1500',  // HEALTH 1500 — €1.500/νοσηλεία
+    },
+  };
+
+  // ════════════════════════════════════════════════════════════════════
   // 5. ΤΙΜΟΛΟΓΙΑ — πίνακας τιμών ανά προϊόν
   // ════════════════════════════════════════════════════════════════════
   // Δομές που υποστηρίζονται από το engine:
@@ -2188,6 +2209,7 @@
     attachments:          ATTACHMENTS,
     attachmentCategories: ATTACHMENT_CATEGORIES,
     healthTiers:          HEALTH_TIERS,
+    deductibleProgramMap: DEDUCTIBLE_PROGRAM_MAP,
     prices:               PRICES,
     legacyPrices:         LEGACY_PRICES_2025_06,
     compatibilityMatrix:  COMPATIBILITY_MATRIX,
