@@ -281,20 +281,6 @@
       answers.coverage_scope = 'self';
       document.querySelectorAll('input[name="coverage_scope"]').forEach(r => { r.checked = false; });
       document.querySelectorAll('#opts-coverage-scope .opt').forEach(o => o.classList.remove('sel'));
-      return;
-    }
-
-    const optSelfChildren = document.getElementById('opt-scope-self-children');
-    const optFamily       = document.getElementById('opt-scope-family');
-    if (optSelfChildren) optSelfChildren.style.display = hasKids ? '' : 'none';
-    if (optFamily)       optFamily.style.display       = hasSpouse ? '' : 'none';
-
-    // Clear selection if no longer valid
-    const cur = answers.coverage_scope;
-    if ((cur === 'self_children' && !hasKids) || (cur === 'family' && !hasSpouse)) {
-      answers.coverage_scope = '';
-      document.querySelectorAll('input[name="coverage_scope"]').forEach(r => { r.checked = false; });
-      document.querySelectorAll('#opts-coverage-scope .opt').forEach(o => o.classList.remove('sel'));
     }
   }
 
