@@ -1931,23 +1931,23 @@
   const SCORING = {
 
     // ─── ΥΓΕΙΑ ─────────────────────────────────────────────────────
-    // Max δυνατό: fund(39)+mild(33)+severe(28) = 100
+    // Max δυνατό: fund(40)+mild(30)+severe(30) = 100
     health: {
-      fundSatisfaction: { none:39, little:28, enough:11, fully:0 },
-      hospitalMild:     { localPub:0, cityPub:7, localPriv:20, bigPriv:33 },
-      hospitalSevere:   { localPub:0, cityPub:7, localPriv:14, bigPriv:24, abroad:28 },
+      fundSatisfaction: { none:40, little:28, enough:11, fully:0 },
+      hospitalMild:     { localPub:0, cityPub:7, localPriv:20, bigPriv:30 },
+      hospitalSevere:   { localPub:0, cityPub:7, localPriv:14, bigPriv:30, abroad:30 },
       // desiredBenefits αφαιρέθηκε — δεν βαθμολογείται πλέον
     },
 
     // ─── ΖΩΗ ───────────────────────────────────────────────────────
-    // Max δυνατό: marital(9)+children(15)+income(32)+uncov(16)+capital(28) = 100
+    // Max δυνατό: marital(9)+children(13)+income(32)+uncov(16)+capital(28) = 98
     life: {
-      maritalStatus:   { single:0, married:4, divorced:0, widowed:9, singleParent:9 },
-      children:        { '0':0, '1':6, '2':9, '3':15 },
+      maritalStatus:   { single:0, married:7, divorced:0, widowed:9, singleParent:9 },
+      children:        { '0':0, '1':6, '2':9, '3':13 },
       incomeConcern:   { yes:32, no:0 },
       uncoveredNeedPerItem: 4,
       uncoveredNeedMax:    16,
-      lifeCapital:     { '50k':9, '100k':17, '150k':23, '200k':28 },
+      lifeCapital:     { '50k':15, '100k':25, '150k':30, '200k':28 },
     },
 
     // ─── ΣΥΝΤΑΞΗ ──────────────────────────────────────────────────

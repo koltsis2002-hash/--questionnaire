@@ -121,8 +121,8 @@
 
     // --- Μέγιστα δυνατά scores (για ποσοστά) ----------------------
     // v3: max = 100 σε κάθε κατηγορία
-    const maxHealth = 39 + 33 + 28;        // fund + mild + severe = 100
-    const maxLife   = 9  + 15 + 32 + 16 + 28; // marital+children+income+uncov+capital = 100
+    const maxHealth = 40 + 30 + 30;        // fund + mild + severe = 100
+    const maxLife   = 9  + 13 + 32 + 16 + 28; // marital+children+income+uncov+capital = 98
     const maxRetire = 59 + 30 + 11;        // pension + savings + age bonus = 100
 
     // --- Checkpoints (auto-include) ------------------------------
@@ -492,8 +492,9 @@
       const childrenAges = Array.isArray(answers.childrenAges)
         ? answers.childrenAges.filter(a => a != null && Number(a) >= 0).map(Number)
         : [];
-      const hasSpouse  = answers.maritalStatus === 'married' && spouseAge >= 18;
-      const numKids    = Math.min(childrenAges.length, fd.maxChildren);
+      const scope      = answers.coverageScope || 'family';
+      const hasSpouse  = answers.maritalStatus === 'married' && spouseAge >= 18 && scope === 'family';
+      const numKids    = scope === 'self' ? 0 : Math.min(childrenAges.length, fd.maxChildren);
 
       // Συνολικός αριθμός ασφαλισμένων = πελάτης + σύζυγος + παιδιά
       const totalMembers = 1 + (hasSpouse ? 1 : 0) + numKids;

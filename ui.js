@@ -161,6 +161,7 @@
       pensionEstimate:     a.pension_estimate             || 'small',
       savingsPlan:         savingsPlanMap[a.savings_plan] || 'no',
       monthlyBudget:       Number(a.monthly_budget)       || 100,
+      coverageScope:       a.coverage_scope               || 'family',
     };
   }
 
@@ -171,6 +172,7 @@
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('s' + n).classList.add('active');
     currentStep = n;
+    if (n === 2) updateCoverageScope();
     const pct = n === 0 ? 0 : Math.round((n / TOTAL_STEPS) * 100);
     document.getElementById('progress-fill').style.width = pct + '%';
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -267,6 +269,35 @@
     }
   }
 
+  function updateCoverageScope() {
+    const block = document.getElementById('coverage-scope-block');
+    if (!block) return;
+    const hasSpouse = answers.marital_status === 'married';
+    const hasKids   = parseInt(answers.children || '0') > 0;
+    const needScope = hasSpouse || hasKids;
+    block.style.display = needScope ? 'block' : 'none';
+
+    if (!needScope) {
+      answers.coverage_scope = 'self';
+      document.querySelectorAll('input[name="coverage_scope"]').forEach(r => { r.checked = false; });
+      document.querySelectorAll('#opts-coverage-scope .opt').forEach(o => o.classList.remove('sel'));
+      return;
+    }
+
+    const optSelfChildren = document.getElementById('opt-scope-self-children');
+    const optFamily       = document.getElementById('opt-scope-family');
+    if (optSelfChildren) optSelfChildren.style.display = hasKids ? '' : 'none';
+    if (optFamily)       optFamily.style.display       = hasSpouse ? '' : 'none';
+
+    // Clear selection if no longer valid
+    const cur = answers.coverage_scope;
+    if ((cur === 'self_children' && !hasKids) || (cur === 'family' && !hasSpouse)) {
+      answers.coverage_scope = '';
+      document.querySelectorAll('input[name="coverage_scope"]').forEach(r => { r.checked = false; });
+      document.querySelectorAll('#opts-coverage-scope .opt').forEach(o => o.classList.remove('sel'));
+    }
+  }
+
   function updateKidsAges(count) {
     const section = document.getElementById('kids-section');
     const grid    = document.getElementById('kids-grid');
@@ -300,8 +331,9 @@
     if (spouseInp && spouseInp.value) answers.spouse_age = parseInt(spouseInp.value) || null;
 
     ['marital_status','hospital_mild','hospital_severe','fund_satisfaction',
-     'deductible_type','deductible_amount','income_concern','life_capital','pension_estimate',
-     'savings_plan','occupation','children','ci_pref','hospital_allowance','target_amount'
+     'deductible_type','deductible_amount','coverage_scope','income_concern','life_capital',
+     'pension_estimate','savings_plan','occupation','children','ci_pref','hospital_allowance',
+     'target_amount'
     ].forEach(name => {
       const el = document.querySelector('input[name="' + name + '"]:checked');
       if (el) answers[name] = el.value;
@@ -343,6 +375,10 @@
       if (!a.deductible_type)    return ['Επιλέξτε τύπο εκπιπτόμενου'];
       if ((a.deductible_type === 'annual' || a.deductible_type === 'per_incident') && !a.deductible_amount) {
         return ['Επιλέξτε το ύψος του εκπιπτόμενου ποσού'];
+      }
+      const scopeBlock = document.getElementById('coverage-scope-block');
+      if (scopeBlock && scopeBlock.style.display !== 'none' && !a.coverage_scope) {
+        return ['Επιλέξτε ποια μέλη θέλετε να συμπεριλάβετε στην πρόταση'];
       }
       if (!a.ci_pref)            return ['Επιλέξτε προτίμηση για Κρίσιμες Ασθένειες'];
       if (!a.hospital_allowance) return ['Επιλέξτε αν επιθυμείτε ημερήσιο επίδομα νοσηλείας'];

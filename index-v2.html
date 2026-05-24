@@ -174,6 +174,16 @@
     </div>
   </div>
 
+  <!-- Κάλυψη οικογένειας — εμφανίζεται μόνο αν υπάρχει σύζυγος ή παιδιά -->
+  <div class="q-block" id="coverage-scope-block" style="display:none">
+    <div class="q-label">Ποια μέλη θέλετε να συμπεριλάβετε στην ασφαλιστική πρόταση;</div>
+    <div class="opts" id="opts-coverage-scope">
+      <label class="opt" onclick="selOpt(this,'coverage_scope','self')"><input type="radio" name="coverage_scope" value="self"/><div class="opt-dot"></div><span class="opt-text">Μόνο εγώ</span></label>
+      <label class="opt" onclick="selOpt(this,'coverage_scope','self_children')" id="opt-scope-self-children" style="display:none"><input type="radio" name="coverage_scope" value="self_children"/><div class="opt-dot"></div><span class="opt-text">Εγώ + τα παιδιά</span></label>
+      <label class="opt" onclick="selOpt(this,'coverage_scope','family')" id="opt-scope-family" style="display:none"><input type="radio" name="coverage_scope" value="family"/><div class="opt-dot"></div><span class="opt-text">Όλη η οικογένεια</span></label>
+    </div>
+  </div>
+
   <div class="q-block">
     <div class="q-label">Θα ήθελες μια έξτρα οικονομική «ένεση» (ένα εφάπαξ ποσό στο χέρι) αν εμφανιστεί κάποια σοβαρή ασθένεια;</div>
     <div class="opts" id="opts-ci">

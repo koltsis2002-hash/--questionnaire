@@ -22,6 +22,65 @@
   let _emailSent = false;
 
   // ════════════════════════════════════════════════════════════════
+  // Q&A SUMMARY — μορφοποιημένη λίστα ερωτήσεων-απαντήσεων + scores
+  // ════════════════════════════════════════════════════════════════
+  function buildQASummary(data) {
+    const MAP = {
+      marital: {
+        single:'Άγαμος/η', married:'Έγγαμος/η',
+        divorced:'Διαζευγμένος/η', widowed:'Χήρος/α', single_parent:'Μονογονέας',
+      },
+      job: {
+        employee:'Ιδ. Υπάλληλος', civil_servant:'Δημ. Υπάλληλος',
+        freelancer:'Ελεύθ. Επαγγ.', retired:'Συνταξιούχος', other:'Άλλο',
+      },
+      satisfaction: { very:'Πολύ', somewhat:'Αρκετά', little:'Λίγο', none:'Καθόλου' },
+      scope:        { self:'Μόνο εγώ', self_children:'Εγώ + παιδιά', family:'Όλη η οικογένεια' },
+      hospital: {
+        local_pub:'Τοπικό Δημόσιο', city_pub:'Δημ. Πόλης',
+        local_priv:'Τοπικό Ιδ.', big_priv:'Μεγάλο Ιδ.', abroad:'Εξωτερικό',
+      },
+      ded:     { none:'Χωρίς', annual:'Ετήσιο', per_incident:'Ανά Περ/τικό' },
+      ci:      { none:'Καμία', em7:'ExtraMed 7', em31:'ExtraMed 31' },
+      cap:     { '50k':'€50.000', '100k':'€100.000', '150k':'€150.000', '200k':'€200.000' },
+      pension: { small:'Χαμηλή', medium:'Μεσαία', high:'Υψηλή', none:'Καμία' },
+      savings: { yes:'Ήδη υπάρχει', soon:'Σύντομα', family:'Οικογ. πλάνο', no:'Όχι' },
+      yn:      { yes:'Ναι', no:'Όχι' },
+    };
+    const d = data;
+    const v = (m, k) => (MAP[m] && MAP[m][k]) || k || '—';
+    const kidsAges = Array.isArray(d.kids_ages) ? d.kids_ages.join(', ') : (d.kids_ages || '');
+    const needs    = Array.isArray(d.uncovered_needs) ? d.uncovered_needs.join(', ') : (d.uncovered_needs || '—');
+    const ded      = v('ded', d.deductible_type) +
+                     (d.deductible_amount && d.deductible_amount !== '0' ? ` / €${d.deductible_amount}` : '');
+    const target   = (d.target_amount && d.target_amount !== 'none')
+      ? `€${Number(d.target_amount).toLocaleString('el-GR')} σε ${d.target_years || '?'} χρόνια`
+      : '—';
+    return [
+      `Ηλικία: ${d.age}`,
+      `Οικογ. κατάσταση: ${v('marital', d.marital_status)}${d.spouse_age ? ' / Σύζ. ' + d.spouse_age + ' ετών' : ''}`,
+      `Παιδιά: ${d.children || 0}${kidsAges ? ' (' + kidsAges + ' ετών)' : ''}`,
+      `Επάγγελμα: ${v('job', d.occupation)}`,
+      `Ικανοπ. ταμείου: ${v('satisfaction', d.fund_satisfaction)}`,
+      `Νοσοκ. ήπιο: ${v('hospital', d.hospital_mild)}`,
+      `Νοσοκ. σοβαρό: ${v('hospital', d.hospital_severe)}`,
+      `Εκπιπτόμενο: ${ded}`,
+      `Κάλυψη: ${v('scope', d.coverage_scope)}`,
+      `Κρίσιμες ασθ.: ${v('ci', d.ci_pref)}`,
+      `Επίδομα νοσηλ.: ${v('yn', d.hospital_allowance)}`,
+      `Ανησυχία εισοδ.: ${v('yn', d.income_concern)}`,
+      `Ανάγκες ζωής: ${needs}`,
+      `Κεφάλαιο ζωής: ${v('cap', d.life_capital)}`,
+      `Εκτίμ. σύνταξης: ${v('pension', d.pension_estimate)}`,
+      `Αποταμίευση: ${v('savings', d.savings_plan)}`,
+      `Στόχος αποταμ.: ${target}`,
+      `Budget: €${d.monthly_budget}/μήνα`,
+      `── Scores ──`,
+      `Υγεία: ${d.health_score} | Ζωή: ${d.life_score} | Σύνταξη: ${d.retirement_score} | ${d.urgency}`,
+    ].join('\n');
+  }
+
+  // ════════════════════════════════════════════════════════════════
   // GOOGLE SHEETS
   // ════════════════════════════════════════════════════════════════
   function saveToSheets(data) {
@@ -57,15 +116,15 @@
         life_score:         data.life_score         || '',
         retirement_score:   data.retirement_score   || '',
         urgency:            data.urgency            || '',
-        proposal:           data.proposal_text      || '',
+        qa_summary:         buildQASummary(data),
+        proposal:           (data.proposal_text     || '').slice(0, 800),
       });
-      // POST + application/x-www-form-urlencoded (simple header, επιτρεπόμενο με no-cors).
-      // doPost(e) στο Apps Script διαβάζει e.parameter.fieldName.
-      fetch(SVC.sheets_url, {
-        method: 'POST',
+      // GET + query params — αποφεύγει το πρόβλημα POST→redirect→GET του Apps Script
+      // όπου ο browser αλλάζει method σε GET και χάνεται το body.
+      // doGet(e) στο Apps Script διαβάζει e.parameter.fieldName.
+      fetch(SVC.sheets_url + '?' + p.toString(), {
+        method: 'GET',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: p.toString(),
       }).catch(() => {});
     } catch (e) {}
   }
@@ -132,11 +191,9 @@
         name:    data.client_name  || '',
         email:   data.client_email || '',
       });
-      fetch(SVC.sheets_url, {
-        method: 'POST',
+      fetch(SVC.sheets_url + '?' + p.toString(), {
+        method: 'GET',
         mode:   'no-cors',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body:   p.toString(),
       }).catch(() => {});
     } catch (e) {}
   }
