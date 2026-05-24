@@ -617,10 +617,18 @@
       const capStr   = line.capital
         ? `<span style="color:var(--text-muted);font-weight:400;font-size:11px"> · Κεφ. €${Math.round(line.capital / 1000)}k</span>`
         : '';
+      // Family member indicator (Εσείς / Σύζυγος / Παιδί N)
+      const memberStr = (line.memberType && line.memberType !== 'client')
+        ? `<span style="color:var(--primary);font-weight:600;font-size:11px"> · ${line.memberLabel}${line.memberAge ? ' (' + line.memberAge + ' ετών)' : ''}</span>`
+        : '';
+      // Discount badge
+      const discStr = (line.price.discountPct && line.price.discountPct > 0)
+        ? `<span style="color:#4caf50;font-weight:600;font-size:11px"> · -${Math.round(line.price.discountPct * 100)}%</span>`
+        : '';
       return `
         <div class="prod-row">
           <span class="prod-cat">${catLabel}</span>
-          <span class="prod-name">${line.label}${capStr}</span>
+          <span class="prod-name">${line.label}${capStr}${memberStr}${discStr}</span>
           <span class="prod-price">€${monthly}/μήνα</span>
         </div>`;
     }).join('');
@@ -686,11 +694,16 @@
     const networkHTML = hasHealth ? buildNetworkHTML() : '';
 
     // ── Build proposalText for email/sheets ──────────────────────
+    const familyNote = proposal.notes.find(n => n.category === 'familyDiscount');
     const proposalText =
-      proposal.lines.map(l =>
-        `• ${l.label}${l.capital ? ' ' + Math.round(l.capital / 1000) + 'k' : ''}: €${l.price.annual}/έτος`
-      ).join('\n') +
+      proposal.lines.map(l => {
+        const member = (l.memberType && l.memberType !== 'client') ? ` [${l.memberLabel}]` : '';
+        const disc   = (l.price.discountPct && l.price.discountPct > 0)
+          ? ` (-${Math.round(l.price.discountPct * 100)}%)` : '';
+        return `• ${l.label}${l.capital ? ' ' + Math.round(l.capital / 1000) + 'k' : ''}${member}${disc}: €${l.price.annual}/έτος`;
+      }).join('\n') +
       `\nΣύνολο: €${totalAnnual}/έτος (€${totalMonthly}/μήνα)` +
+      (familyNote   ? '\n👨‍👩‍👧 ' + familyNote.message : '') +
       (savingsNote   ? '\n📌 ' + savingsNote.message : '') +
       (budgetWarning ? '\n⚠️ ' + budgetWarning.message : '');
 

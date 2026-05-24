@@ -121,6 +121,25 @@
   // Όταν ο πελάτης επιλέγει συγκεκριμένο ποσό εκπιπτόμενου,
   // ουσιαστικά διαλέγει και το πρόγραμμα.
   // ────────────────────────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════════
+  // FAMILY DISCOUNTS — Επίσημη κλιμακωτή έκπτωση NN
+  // Ισχύει ΜΟΝΟ για HEALTH 500 / HEALTH 1500 (ανά περιστατικό)
+  // Η έκπτωση εφαρμόζεται ΣΕ ΟΛΑ τα μέλη εξίσου, βάσει συνολικού αριθμού.
+  // ────────────────────────────────────────────────────────────────────
+  const FAMILY_DISCOUNTS = {
+    eligiblePrograms: ['health500', 'health1500'],
+    // Έκπτωση ανά ασφαλισμένο, ανάλογα με τον συνολικό αριθμό ασφαλισμένων
+    byTotalMembers: {
+      1: 0.00,   // 1 μέλος → καμία έκπτωση
+      2: 0.10,   // 2 μέλη  → 10% έκπτωση
+      3: 0.15,   // 3 μέλη  → 15% έκπτωση
+      4: 0.20,   // 4+ μέλη → 20% έκπτωση
+    },
+    maxAdults:           2,  // πελάτης + σύζυγος
+    maxChildren:         4,  // έως 4 ανήλικοι
+    maxChildrenSiblings: 6,  // έως 6 αν είναι αδέρφια
+  };
+
   const DEDUCTIBLE_PROGRAM_MAP = {
     none: {
       '0':     'crossPlus',   // CROSS PLUS — χωρίς εκπιπτόμενο
@@ -2210,6 +2229,7 @@
     attachmentCategories: ATTACHMENT_CATEGORIES,
     healthTiers:          HEALTH_TIERS,
     deductibleProgramMap: DEDUCTIBLE_PROGRAM_MAP,
+    familyDiscounts:      FAMILY_DISCOUNTS,
     prices:               PRICES,
     legacyPrices:         LEGACY_PRICES_2025_06,
     compatibilityMatrix:  COMPATIBILITY_MATRIX,

@@ -376,8 +376,41 @@
   }
 
   // ════════════════════════════════════════════════════════════════════
+  // 4b. ΥΠΟΛΟΓΙΣΜΟΣ FAMILY DISCOUNT
+  // ════════════════════════════════════════════════════════════════════
+  /** Επιστρέφει το ποσοστό έκπτωσης βάσει συνολικού αριθμού μελών. */
+  function getFamilyDiscountPct(totalMembers, programId) {
+    const fd = DATA.familyDiscounts;
+    if (!fd || !fd.eligiblePrograms.includes(programId)) return 0;
+    const table = fd.byTotalMembers || {};
+    // Αν >= max key → χρησιμοποίησε το max
+    const keys = Object.keys(table).map(Number).sort((a, b) => a - b);
+    if (totalMembers <= 0) return 0;
+    const maxKey = keys[keys.length - 1];
+    const key = totalMembers >= maxKey ? maxKey : totalMembers;
+    return table[key] || 0;
+  }
+
+  /** Εφαρμόζει έκπτωση σε ένα price object. */
+  function applyDiscount(price, pct) {
+    if (!price || pct <= 0) return price;
+    const factor = 1 - pct;
+    return {
+      net:     round2(price.net     * factor),
+      gross:   roundEur(price.gross   * factor),
+      annual:  roundEur(price.annual  * factor),
+      monthly: round2(price.monthly * factor),
+      source:  price.source,
+      discountPct: pct,
+    };
+  }
+
+  // ════════════════════════════════════════════════════════════════════
   // 5. ΣΥΝΘΕΣΗ ΠΡΟΤΑΣΗΣ
   // ════════════════════════════════════════════════════════════════════
+  // Σειρά: 1) ΒΑΣΙΚΟ health πελάτη  2) ΒΑΣΙΚΟ life πελάτη  3) Μέλη οικογένειας
+  //         4) Riders (CI, MediPlan, PrimaryCare) - μόνο αν χωράει budget
+  //         5) Αποταμίευση - μόνο αν χωράει budget
   function buildProposal(answers) {
     const age = Number(answers.age) || 0;
     const monthlyBudget = Number(answers.monthlyBudget) || 80;
@@ -389,127 +422,221 @@
         generatedAt: new Date().toISOString(),
       },
       scores,
-      lines: [],            // λίστα γραμμών πρότασης (program + riders + life)
-      notes: [],            // πληροφοριακές σημειώσεις (π.χ. αποταμίευση)
+      lines: [],            // λίστα γραμμών πρότασης
+      notes: [],
       totals: { monthly: 0, annual: 0 },
-      warnings: [],         // π.χ. ξεπερνά budget
+      warnings: [],
     };
 
-    // ─── ΥΓΕΙΑ (αν περιλαμβάνεται) ───────────────────────────────
+    // Helper: προσθέτει γραμμή στο proposal και ενημερώνει totals
+    function pushLine(line) {
+      proposal.lines.push(line);
+      proposal.totals.monthly += line.price.monthly;
+      proposal.totals.annual  += line.price.annual;
+    }
+    function remainingBudget() {
+      return monthlyBudget - proposal.totals.monthly;
+    }
+
+    // ═══ STAGE 1: ΒΑΣΙΚΟ HEALTH ΠΕΛΑΤΗ ════════════════════════════
+    let healthProgId = null;
     if (scores.includeHealth) {
-      const healthProgId = selectHealthProgram(answers, monthlyBudget);
+      healthProgId = selectHealthProgram(answers, monthlyBudget);
       if (healthProgId) {
         const price = calcPrice(healthProgId, { age });
         if (price) {
-          proposal.lines.push({
+          pushLine({
             category: 'health',
-            kind: 'program',
-            id: healthProgId,
-            label: DATA.programs[healthProgId].label,
+            kind:     'program',
+            id:       healthProgId,
+            label:    DATA.programs[healthProgId].label,
+            memberType: 'client',
+            memberLabel: 'Εσείς',
             price,
           });
-          proposal.totals.monthly += price.monthly;
-          proposal.totals.annual  += price.annual;
-
-          // Critical Illness rider
-          const ciId = selectCriticalIllness(answers, scores);
-          if (ciId && isCompatible(healthProgId, ciId)) {
-            // ExtraMed: rate per 10k — χρειάζεται κεφάλαιο
-            // Default capital από lifeCapital ή 30k για ExtraMed
-            const ciCapital = 30000;
-            const ciPrice = calcPrice(ciId, { age, capital: ciCapital });
-            if (ciPrice) {
-              proposal.lines.push({
-                category: 'criticalIllness',
-                kind: 'attachment',
-                id: ciId,
-                label: DATA.attachments[ciId].label,
-                price: ciPrice,
-                capital: ciCapital,
-              });
-              proposal.totals.monthly += ciPrice.monthly;
-              proposal.totals.annual  += ciPrice.annual;
-            }
-          }
-
-          // Hospital Allowance (MediPlan)
-          const remainingMonthly = monthlyBudget - proposal.totals.monthly;
-          if (remainingMonthly > 0) {
-            const haId = selectHospitalAllowance(answers, remainingMonthly);
-            if (haId && isCompatible(healthProgId, haId)) {
-              const haPrice = calcPrice(haId, { age });
-              if (haPrice) {
-                proposal.lines.push({
-                  category: 'hospitalAllowance',
-                  kind: 'attachment',
-                  id: haId,
-                  label: DATA.attachments[haId].label,
-                  price: haPrice,
-                });
-                proposal.totals.monthly += haPrice.monthly;
-                proposal.totals.annual  += haPrice.annual;
-              }
-            }
-          }
-
-          // Primary Care (αν το πρόγραμμα είναι hospital-only)
-          const pcId = selectPrimaryCare(healthProgId);
-          if (pcId) {
-            const pcPrice = calcPrice(pcId, { age });
-            if (pcPrice) {
-              proposal.lines.push({
-                category: 'primaryCare',
-                kind: 'program',  // firstCare είναι standalone program
-                id: pcId,
-                label: DATA.programs[pcId].label,
-                price: pcPrice,
-              });
-              proposal.totals.monthly += pcPrice.monthly;
-              proposal.totals.annual  += pcPrice.annual;
-            }
-          }
         }
       }
     }
 
-    // ─── ΖΩΗ (αν περιλαμβάνεται) ─────────────────────────────────
+    // ═══ STAGE 2: ΒΑΣΙΚΟ LIFE ΠΕΛΑΤΗ ══════════════════════════════
     if (scores.includeLife) {
       const lifeId = selectLifeProduct(answers);
       if (lifeId) {
-        // Κεφάλαιο: από lifeCapital ('50k','100k','150k','200k')
         const capMap = { '50k': 50000, '100k': 100000, '150k': 150000, '200k': 200000 };
         const lifeCap = capMap[answers.lifeCapital] || 50000;
         const lifePrice = calcPrice(lifeId, { age, capital: lifeCap, isFirstYear: true });
         if (lifePrice) {
-          proposal.lines.push({
+          pushLine({
             category: 'life',
-            kind: 'program',
-            id: lifeId,
-            label: DATA.programs[lifeId].label,
-            price: lifePrice,
-            capital: lifeCap,
+            kind:     'program',
+            id:       lifeId,
+            label:    DATA.programs[lifeId].label,
+            memberType: 'client',
+            memberLabel: 'Εσείς',
+            price:    lifePrice,
+            capital:  lifeCap,
           });
-          proposal.totals.monthly += lifePrice.monthly;
-          proposal.totals.annual  += lifePrice.annual;
         }
       }
     }
 
-    // ─── ΣΥΝΤΑΞΗ ─────────────────────────────────────────────────
+    // ═══ STAGE 3: ΜΕΛΗ ΟΙΚΟΓΕΝΕΙΑΣ (HEALTH 500/1500 μόνο) ══════════
+    // Εφαρμόζεται μόνο αν ο πελάτης έχει επιλέξει "ανά περιστατικό"
+    // και το πρόγραμμα είναι health500 ή health1500.
+    const fd = DATA.familyDiscounts;
+    const familyEligible = healthProgId &&
+                           fd && fd.eligiblePrograms.includes(healthProgId);
+
+    if (familyEligible) {
+      const spouseAge   = Number(answers.spouseAge) || 0;
+      const childrenAges = Array.isArray(answers.childrenAges)
+        ? answers.childrenAges.filter(a => a != null && Number(a) >= 0).map(Number)
+        : [];
+      const hasSpouse  = answers.maritalStatus === 'married' && spouseAge >= 18;
+      const numKids    = Math.min(childrenAges.length, fd.maxChildren);
+
+      // Συνολικός αριθμός ασφαλισμένων = πελάτης + σύζυγος + παιδιά
+      const totalMembers = 1 + (hasSpouse ? 1 : 0) + numKids;
+      const discountPct  = getFamilyDiscountPct(totalMembers, healthProgId);
+
+      // Εφαρμόζουμε αναδρομικά την έκπτωση στη γραμμή του ΠΕΛΑΤΗ
+      if (discountPct > 0) {
+        const clientLine = proposal.lines.find(
+          l => l.category === 'health' && l.memberType === 'client'
+        );
+        if (clientLine) {
+          const oldMonthly = clientLine.price.monthly;
+          const oldAnnual  = clientLine.price.annual;
+          clientLine.price = applyDiscount(clientLine.price, discountPct);
+          proposal.totals.monthly += (clientLine.price.monthly - oldMonthly);
+          proposal.totals.annual  += (clientLine.price.annual  - oldAnnual);
+        }
+      }
+
+      // Σύζυγος
+      if (hasSpouse) {
+        const spousePrice = calcPrice(healthProgId, { age: spouseAge });
+        if (spousePrice) {
+          const discounted = applyDiscount(spousePrice, discountPct);
+          pushLine({
+            category: 'health',
+            kind:     'program',
+            id:       healthProgId,
+            label:    DATA.programs[healthProgId].label,
+            memberType: 'spouse',
+            memberLabel: 'Σύζυγος',
+            memberAge: spouseAge,
+            price:    discounted,
+          });
+        }
+      }
+
+      // Παιδιά
+      for (let i = 0; i < numKids; i++) {
+        const kidAge = childrenAges[i];
+        const kidPrice = calcPrice(healthProgId, { age: kidAge });
+        if (kidPrice) {
+          const discounted = applyDiscount(kidPrice, discountPct);
+          pushLine({
+            category: 'health',
+            kind:     'program',
+            id:       healthProgId,
+            label:    DATA.programs[healthProgId].label,
+            memberType: 'child',
+            memberLabel: `Παιδί ${i + 1}`,
+            memberAge: kidAge,
+            price:    discounted,
+          });
+        }
+      }
+
+      // Σημείωση για την έκπτωση
+      if (discountPct > 0) {
+        proposal.notes.push({
+          category: 'familyDiscount',
+          message: `Εφαρμόστηκε έκπτωση ${Math.round(discountPct * 100)}% σε όλα τα μέλη `
+                + `(${totalMembers} ασφαλισμένοι) σύμφωνα με την πολιτική οικογένειας NN Hellas.`,
+        });
+      }
+    }
+
+    // ═══ STAGE 4: RIDERS (μόνο αν χωράει στο budget) ══════════════
+    if (healthProgId) {
+      // 4.1 Critical Illness rider
+      if (remainingBudget() > 0) {
+        const ciId = selectCriticalIllness(answers, scores);
+        if (ciId && isCompatible(healthProgId, ciId)) {
+          const ciCapital = 30000;
+          const ciPrice = calcPrice(ciId, { age, capital: ciCapital });
+          if (ciPrice && ciPrice.monthly <= remainingBudget()) {
+            pushLine({
+              category: 'criticalIllness',
+              kind:     'attachment',
+              id:       ciId,
+              label:    DATA.attachments[ciId].label,
+              memberType: 'client',
+              memberLabel: 'Εσείς',
+              price:    ciPrice,
+              capital:  ciCapital,
+            });
+          }
+        }
+      }
+
+      // 4.2 Hospital Allowance (MediPlan)
+      if (remainingBudget() > 0) {
+        const haId = selectHospitalAllowance(answers, remainingBudget());
+        if (haId && isCompatible(healthProgId, haId)) {
+          const haPrice = calcPrice(haId, { age });
+          if (haPrice && haPrice.monthly <= remainingBudget()) {
+            pushLine({
+              category: 'hospitalAllowance',
+              kind:     'attachment',
+              id:       haId,
+              label:    DATA.attachments[haId].label,
+              memberType: 'client',
+              memberLabel: 'Εσείς',
+              price:    haPrice,
+            });
+          }
+        }
+      }
+
+      // 4.3 Primary Care (αν το πρόγραμμα είναι hospital-only)
+      if (remainingBudget() > 0) {
+        const pcId = selectPrimaryCare(healthProgId);
+        if (pcId) {
+          const pcPrice = calcPrice(pcId, { age });
+          if (pcPrice && pcPrice.monthly <= remainingBudget()) {
+            pushLine({
+              category: 'primaryCare',
+              kind:     'program',
+              id:       pcId,
+              label:    DATA.programs[pcId].label,
+              memberType: 'client',
+              memberLabel: 'Εσείς',
+              price:    pcPrice,
+            });
+          }
+        }
+      }
+    }
+
+    // ═══ STAGE 5: ΣΥΝΤΑΞΗ — μόνο αν χωράει στο budget ═════════════
     // Αν καλύφθηκαν οι ανάγκες Υγείας + Ζωής (ή δεν υπήρχαν) ΚΑΙ
     // υπάρχει υπολειπόμενο budget ΚΑΙ ο πελάτης έχει συνταξιοδοτική ανάγκη
     // → προτείνουμε αποταμιευτικό πρόγραμμα ως κανονική γραμμή πρότασης.
-    const remainingForSavings = monthlyBudget - proposal.totals.monthly;
+    const remainingForSavings = remainingBudget();
     const needsAddressed =
       (!scores.includeHealth || proposal.lines.some(l => l.category === 'health' || l.category === 'primaryCare')) &&
       (!scores.includeLife   || proposal.lines.some(l => l.category === 'life'));
 
     if (scores.includeSavingsNote) {
-      if (needsAddressed && remainingForSavings >= 25) {
-        // Υπάρχει χώρος στο budget για αποταμιευτικό πρόγραμμα
-        // Ελάχιστη μηνιαία συνεισφορά: €25 (NN Accelerator+ floor ~€1.000/έτος)
-        // Παίρνουμε όσο επιτρέπει το budget, με ανώτατο €500/μήνα
-        const savingsMonthly = Math.min(Math.floor(remainingForSavings), 500);
+      // Ελάχιστο μηνιαίο όριο αποταμιευτικού: €50/μήνα (δεν υπάρχει ανώτατο)
+      const SAVINGS_MIN_MONTHLY = 50;
+      if (needsAddressed && remainingForSavings >= SAVINGS_MIN_MONTHLY) {
+        // Υπάρχει χώρος στο budget — διαθέτουμε ολόκληρο το υπολειπόμενο
+        const savingsMonthly = Math.floor(remainingForSavings);
         proposal.lines.push({
           category: 'savings',
           kind: 'savings',
@@ -530,8 +657,9 @@
         proposal.notes.push({
           category: 'savings',
           message: 'Το συνταξιοδοτικό σας προφίλ δείχνει σημαντική ανάγκη αποταμίευσης. '
-                + 'Μετά την κάλυψη των αναγκών Υγείας και Ζωής, προτείνουμε ξεχωριστή συζήτηση '
-                + 'για αποταμιευτικό πρόγραμμα — το ποσό προσαρμόζεται στις δυνατότητές σας.',
+                + 'Μετά την κάλυψη των αναγκών Υγείας και Ζωής δεν υπολείπεται επαρκές budget '
+                + '(απαιτείται ελάχιστο €50/μήνα). Προτείνουμε ξεχωριστή συζήτηση για '
+                + 'αποταμιευτικό πρόγραμμα προσαρμοσμένο στις δυνατότητές σας.',
         });
       }
     }
