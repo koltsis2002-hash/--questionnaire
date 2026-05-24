@@ -125,8 +125,8 @@
     <div class="q-label">Αν χρειαζόσουν νοσηλεία για ένα ήπιο θέμα υγείας, ποιο περιβάλλον θα σε έκανε να νιώθεις πιο σίγουρος/η;</div>
     <div class="opts" id="opts-hosp-mild">
       <label class="opt" onclick="selOpt(this,'hospital_mild','local_pub')"><input type="radio" name="hospital_mild" value="local_pub"/><div class="opt-dot"></div><span class="opt-text">Κάποιο κοντινό Δημόσιο Νοσοκομείο</span></label>
-      <label class="opt" onclick="selOpt(this,'hospital_mild','city_pub')"><input type="radio" name="hospital_mild" value="city_pub"/><div class="opt-dot"></div><span class="opt-text">Ένα μεγάλο Δημόσιο Νοσοκομείο στο κέντρο</span></label>
-      <label class="opt" onclick="selOpt(this,'hospital_mild','local_priv')"><input type="radio" name="hospital_mild" value="local_priv"/><div class="opt-dot"></div><span class="opt-text">Ένα τοπικό Ιδιωτικό Θεραπευτήριο</span></label>
+      <label class="opt" onclick="selOpt(this,'hospital_mild','city_pub')"><input type="radio" name="hospital_mild" value="city_pub"/><div class="opt-dot"></div><span class="opt-text">Ένα μεγάλο Δημόσιο Νοσοκομείο στην Αθήνα/Θεσσαλονίκη</span></label>
+      <label class="opt" onclick="selOpt(this,'hospital_mild','local_priv')"><input type="radio" name="hospital_mild" value="local_priv"/><div class="opt-dot"></div><span class="opt-text">Ένα τοπικό Ιδιωτικό Νοσοκομείο</span></label>
       <label class="opt" onclick="selOpt(this,'hospital_mild','big_priv')"><input type="radio" name="hospital_mild" value="big_priv"/><div class="opt-dot"></div><span class="opt-text">Ένα μεγάλο Ιδιωτικό Νοσοκομείο (π.χ. Υγεία, Metropolitan)</span></label>
     </div>
   </div>
@@ -135,8 +135,8 @@
     <div class="q-label">Αν χρειαζόσουν νοσηλεία για ένα σοβαρό πρόβλημα υγείας, ποιο περιβάλλον θα σε έκανε να νιώθεις πιο σίγουρος/η;</div>
     <div class="opts" id="opts-hosp-severe">
       <label class="opt" onclick="selOpt(this,'hospital_severe','local_pub')"><input type="radio" name="hospital_severe" value="local_pub"/><div class="opt-dot"></div><span class="opt-text">Κάποιο κοντινό Δημόσιο Νοσοκομείο</span></label>
-      <label class="opt" onclick="selOpt(this,'hospital_severe','city_pub')"><input type="radio" name="hospital_severe" value="city_pub"/><div class="opt-dot"></div><span class="opt-text">Ένα μεγάλο Δημόσιο Νοσοκομείο στο κέντρο</span></label>
-      <label class="opt" onclick="selOpt(this,'hospital_severe','local_priv')"><input type="radio" name="hospital_severe" value="local_priv"/><div class="opt-dot"></div><span class="opt-text">Ένα τοπικό Ιδιωτικό Θεραπευτήριο</span></label>
+      <label class="opt" onclick="selOpt(this,'hospital_severe','city_pub')"><input type="radio" name="hospital_severe" value="city_pub"/><div class="opt-dot"></div><span class="opt-text">Ένα μεγάλο Δημόσιο Νοσοκομείο στην Αθήνα/Θεσσαλονίκη</span></label>
+      <label class="opt" onclick="selOpt(this,'hospital_severe','local_priv')"><input type="radio" name="hospital_severe" value="local_priv"/><div class="opt-dot"></div><span class="opt-text">Ένα τοπικό Ιδιωτικό Νοσοκομείο</span></label>
       <label class="opt" onclick="selOpt(this,'hospital_severe','big_priv')"><input type="radio" name="hospital_severe" value="big_priv"/><div class="opt-dot"></div><span class="opt-text">Ένα μεγάλο Ιδιωτικό Νοσοκομείο</span></label>
       <label class="opt" onclick="selOpt(this,'hospital_severe','abroad')"><input type="radio" name="hospital_severe" value="abroad"/><div class="opt-dot"></div><span class="opt-text">Σε εξειδικευμένο κέντρο στο Εξωτερικό</span></label>
     </div>
@@ -217,14 +217,14 @@
     <div class="opts" id="opts-needs">
       <label class="opt" onclick="togMulti(event,this,'uncovered_needs','mortgage')"><input type="checkbox" name="uncovered_needs" value="mortgage"/><div class="opt-check"></div><span class="opt-text">Το στεγαστικό δάνειο ή το ενοίκιο</span></label>
       <label class="opt" onclick="togMulti(event,this,'uncovered_needs','education')"><input type="checkbox" name="uncovered_needs" value="education"/><div class="opt-check"></div><span class="opt-text">Οι σπουδές των παιδιών</span></label>
-      <label class="opt" onclick="togMulti(event,this,'uncovered_needs','spouse_income')"><input type="checkbox" name="uncovered_needs" value="spouse_income"/><div class="opt-check"></div><span class="opt-text">Η καθημερινή επιβίωση του/της συζύγου μου</span></label>
-      <label class="opt" onclick="togMulti(event,this,'uncovered_needs','debts')"><input type="checkbox" name="uncovered_needs" value="debts"/><div class="opt-check"></div><span class="opt-text">Άλλα χρέη και δάνεια</span></label>
+      <label class="opt" onclick="togMulti(event,this,'uncovered_needs','spouse_income')"><input type="checkbox" name="uncovered_needs" value="spouse_income"/><div class="opt-check"></div><span class="opt-text">Η καθημερινή επιβίωση της οικογένειας μου</span></label>
+      <label class="opt" onclick="togMulti(event,this,'uncovered_needs','debts')"><input type="checkbox" name="uncovered_needs" value="debts"/><div class="opt-check"></div><span class="opt-text">Άλλες οικονομικές υποχρεώσεις</span></label>
     </div>
   </div>
 
   <div class="q-block">
     <div class="q-label">Τι Κεφάλαιο Ζωής πιστεύεις ότι θα χρειαζόταν η οικογένειά σου;</div>
-    <div class="q-hint-explain">Το Κεφάλαιο Ζωής είναι το συνολικό χρηματικό ποσό που θα πάρουν στα χέρια τους οι αγαπημένοι σου σε περίπτωση απώλειάς σου, για να συνεχίσουν τη ζωή τους χωρίς οικονομικό άγχος.</div>
+    <div class="q-hint-explain">Το Κεφάλαιο Ζωής είναι το συνολικό χρηματικό ποσό που θα πάρουν στα χέρια τους οι αγαπημένοι σου σε περίπτωση απώλειάς σου ή ανικανότητάς σου να εργαστείς, για να συνεχίσουν τη ζωή τους χωρίς οικονομικό άγχος.</div>
     <div class="opts" id="opts-capital">
       <label class="opt" onclick="selOpt(this,'life_capital','50k')"><input type="radio" name="life_capital" value="50k"/><div class="opt-dot"></div><span class="opt-text">50.000€ (Βασική στήριξη)</span></label>
       <label class="opt" onclick="selOpt(this,'life_capital','100k')"><input type="radio" name="life_capital" value="100k"/><div class="opt-dot"></div><span class="opt-text">100.000€ (Ισορροπημένη προστασία)</span></label>
@@ -250,7 +250,7 @@
     <div class="q-label">Πώς φαντάζεσαι ότι θα είναι τα οικονομικά σου όταν πάρεις την κρατική σου σύνταξη;</div>
     <div class="opts" id="opts-pension">
       <label class="opt" onclick="selOpt(this,'pension_estimate','none')"><input type="radio" name="pension_estimate" value="none"/><div class="opt-dot"></div><span class="opt-text">Πολύ δύσκολα – δεν περιμένω καν να πάρω κρατική σύνταξη.</span></label>
-      <label class="opt" onclick="selOpt(this,'pension_estimate','small')"><input type="radio" name="pension_estimate" value="small"/><div class="opt-dot"></div><span class="opt-text">Σφιχτά – δεν θα μου φτάνουν για μια άνετη ζωή.</span></label>
+      <label class="opt" onclick="selOpt(this,'pension_estimate','small')"><input type="radio" name="pension_estimate" value="small"/><div class="opt-dot"></div><span class="opt-text">Άσχημα– δεν θα μου φτάνουν για μια άνετη ζωή.</span></label>
       <label class="opt" onclick="selOpt(this,'pension_estimate','adequate')"><input type="radio" name="pension_estimate" value="adequate"/><div class="opt-dot"></div><span class="opt-text">Ικανοποιητικά – πιστεύω θα καλύπτω τις βασικές μου ανάγκες.</span></label>
       <label class="opt" onclick="selOpt(this,'pension_estimate','big')"><input type="radio" name="pension_estimate" value="big"/><div class="opt-dot"></div><span class="opt-text">Πολύ καλά – υπολογίζω ότι θα ζω άνετα.</span></label>
     </div>
@@ -259,7 +259,7 @@
   <div class="q-block">
     <div class="q-label">Βάζεις ήδη κάποια χρήματα στην άκρη για το μέλλον σου;</div>
     <div class="opts" id="opts-savings">
-      <label class="opt" onclick="selOpt(this,'savings_plan','yes')"><input type="radio" name="savings_plan" value="yes"/><div class="opt-dot"></div><span class="opt-text">Ναι, έχω ήδη το δικό μου ιδιωτικό πρόγραμμα.</span></label>
+      <label class="opt" onclick="selOpt(this,'savings_plan','yes')"><input type="radio" name="savings_plan" value="yes"/><div class="opt-dot"></div><span class="opt-text">Ναι, έχω ήδη το δικό μου ιδιωτικό αποταμιευτικό πρόγραμμα.</span></label>
       <label class="opt" onclick="selOpt(this,'savings_plan','soon')"><input type="radio" name="savings_plan" value="soon"/><div class="opt-dot"></div><span class="opt-text">Όχι ακόμα, αλλά θέλω να ξεκινήσω άμεσα.</span></label>
       <label class="opt" onclick="selOpt(this,'savings_plan','family')"><input type="radio" name="savings_plan" value="family"/><div class="opt-dot"></div><span class="opt-text">Βασίζομαι περισσότερο στην οικογένεια ή σε άλλα εισοδήματα (π.χ. ενοίκια).</span></label>
       <label class="opt" onclick="selOpt(this,'savings_plan','no')"><input type="radio" name="savings_plan" value="no"/><div class="opt-dot"></div><span class="opt-text">Όχι, δεν έχω κάνει κανένα πλάνο προς το παρόν.</span></label>
