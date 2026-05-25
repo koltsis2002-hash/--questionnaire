@@ -119,12 +119,13 @@
         qa_summary:         buildQASummary(data),
         proposal:           (data.proposal_text     || '').slice(0, 800),
       });
-      // GET + query params — αποφεύγει το πρόβλημα POST→redirect→GET του Apps Script
-      // όπου ο browser αλλάζει method σε GET και χάνεται το body.
-      // doGet(e) στο Apps Script διαβάζει e.parameter.fieldName.
-      fetch(SVC.sheets_url + '?' + p.toString(), {
-        method: 'GET',
-        mode: 'no-cors',
+      // POST με URLSearchParams body — αποφεύγει το URL length limit
+      // που σπάει σε mobile networks (Greek qa_summary URL-encoded > 2KB).
+      // Apps Script doPost(e) διαβάζει το ίδιο e.parameter όπως και doGet.
+      fetch(SVC.sheets_url, {
+        method: 'POST',
+        mode:   'no-cors',
+        body:   p,  // application/x-www-form-urlencoded αυτόματα
       }).catch(() => {});
     } catch (e) {}
   }
