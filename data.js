@@ -1954,7 +1954,8 @@
     // Max δυνατό: pension(59)+savings(30)+ageBonus(11) = 100
     retirement: {
       pensionEstimate: { none:59, small:41, adequate:19, big:4 },
-      savingsPlan:     { no:30, soon:30, smallStart:0, family:13, investing:0, already:0 },
+      savingsPlan:     { no:30, soon:30, smallStart:20, family:13, investing:0, already:0 },
+      // smallStart:20 — έχει ξεκινήσει αλλά χρειάζεται περισσότερο (μεταξύ "σύντομα"=30 και "οικογένεια"=13)
       ageOverBonus:    { age:40, bonus:11 },   // age > 40 ⇒ +11
     },
 

@@ -110,7 +110,7 @@
       single:        'single',
       married:       'married',
       divorced:      'single',      // treated as single for engine
-      widowed:       'single',
+      widowed:       'widowed',     // fix: χήρος/α → score 9 (υψηλή ανάγκη Ζωής)
       single_parent: 'singleParent',
     };
     const occupationMap = {
