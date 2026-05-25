@@ -1,23 +1,31 @@
 /* ════════════════════════════════════════════════════════════════
- * NN Hellas — PWA Single-Question Mode
- * Ενεργοποιείται ΜΟΝΟ όταν το ερωτηματολόγιο εκτελείται ως PWA
- * (εγκατεστημένη εφαρμογή κινητού/tablet). Σε browser mode, οι κανόνες
- * αυτοί ΔΕΝ ενεργοποιούνται και ο πελάτης βλέπει την κανονική
- * διάταξη με όλες τις ερωτήσεις κάθε βήματος μαζί.
+ * NN Hellas — PWA Single-Question Mode (REDESIGN v2)
  *
- * Σχεδιασμός για:
- *   • iPhone (375–428px)
- *   • iPad portrait (~768px)
- *   • iPad landscape & iPad Pro (~1024–1366px)
+ * Σχεδιαστική φιλοσοφία: Typeform meets Apple HIG
+ *   • Ένα ερώτημα ανά οθόνη με ηρωική τυπογραφία
+ *   • Κάθε επιλογή ως «card» με γράμμα-πρόθεμα (A, B, C…)
+ *   • Floating κυκλικό κουμπί «Επόμενο» (FAB) κάτω-δεξιά
+ *   • Διακριτικό προοδευτικό gradient background
+ *   • Smooth animations με spring easing
+ *
+ * Ενεργοποιείται ΜΟΝΟ σε standalone PWA mode.
+ * Σε browser ο πελάτης βλέπει την κανονική διάταξη.
  * ════════════════════════════════════════════════════════════════ */
 
-/* ── iOS PWA tap behavior (αφαιρεί μπλε flash & long-press menu) ── */
+
+/* ════════════════════════════════════════════════════════════════
+ *  1.  BASE PWA BEHAVIOR (iOS quirks, tap, safe areas)
+ * ════════════════════════════════════════════════════════════════ */
+
 body.pwa-mode {
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
-  /* Επιτρέπουμε επιλογή σε text/email/phone inputs μόνο */
+  background: linear-gradient(180deg, #FFF8F1 0%, #FFFDFB 35%, #FFFFFF 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 body.pwa-mode input,
 body.pwa-mode textarea {
@@ -25,55 +33,441 @@ body.pwa-mode textarea {
   user-select: text;
   -webkit-touch-callout: default;
 }
-
-/* iOS safe areas (notch, home indicator) */
 body.pwa-mode {
-  padding-top: env(safe-area-inset-top);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
+  padding-top:    env(safe-area-inset-top);
+  padding-left:   env(safe-area-inset-left);
+  padding-right:  env(safe-area-inset-right);
 }
 
-/* ── Hide q-blocks individually only in PWA mode ───────────── */
-body.pwa-mode .screen.active .q-block.pwa-q-hidden {
-  display: none !important;
+/* Prevent iOS zoom on input focus */
+body.pwa-mode input[type="text"],
+body.pwa-mode input[type="email"],
+body.pwa-mode input[type="tel"],
+body.pwa-mode input[type="number"],
+body.pwa-mode textarea,
+body.pwa-mode select { font-size: 16px; }
+
+
+/* ════════════════════════════════════════════════════════════════
+ *  2.  SINGLE-QUESTION VISIBILITY CONTROL
+ * ════════════════════════════════════════════════════════════════ */
+
+body.pwa-mode .screen.active .q-block.pwa-q-hidden { display: none !important; }
+body.pwa-mode .screen.active .nav-row              { display: none !important; }
+
+/* Welcome (s0) & Results (s6) — όχι single-mode */
+body.pwa-mode .screen#s0 .q-block,
+body.pwa-mode .screen#s6 .q-block { display: block !important; }
+
+
+/* ════════════════════════════════════════════════════════════════
+ *  3.  TOP THIN PROGRESS BAR (διακριτικό, σαν Typeform)
+ * ════════════════════════════════════════════════════════════════ */
+
+body.pwa-mode #progress-track {
+  height: 3px;
+  background: rgba(232,119,34,0.08);
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+}
+body.pwa-mode #progress-fill {
+  background: linear-gradient(90deg, #E87722 0%, #FFA552 100%);
+  box-shadow: 0 0 12px rgba(232,119,34,0.4);
+  height: 100%;
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── Hide original per-screen nav in PWA mode ──────────────── */
-body.pwa-mode .screen.active .nav-row {
-  display: none !important;
+
+/* ════════════════════════════════════════════════════════════════
+ *  4.  MINI PROGRESS DOTS (ερωτήσεις εντός βήματος)
+ * ════════════════════════════════════════════════════════════════ */
+
+.pwa-mini-progress { display: none; }
+
+body.pwa-mode .pwa-mini-progress {
+  display: flex;
+  gap: 5px;
+  padding: 24px 24px 0;
+  max-width: 640px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 5;
+}
+body.pwa-mode .pwa-mini-progress .dot {
+  flex: 1;
+  height: 4px;
+  background: rgba(0,0,0,0.06);
+  border-radius: 4px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+body.pwa-mode .pwa-mini-progress .dot.done {
+  background: #E87722;
+}
+body.pwa-mode .pwa-mini-progress .dot.current {
+  background: linear-gradient(90deg, #E87722 0%, #FFA552 100%);
+  box-shadow: 0 0 8px rgba(232,119,34,0.35);
 }
 
-/* ── PWA-only floating bottom navigation bar ───────────────── */
+
+/* ════════════════════════════════════════════════════════════════
+ *  5.  MAIN APP CONTAINER & QUESTION CARD
+ * ════════════════════════════════════════════════════════════════ */
+
+body.pwa-mode .app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px 20px 140px;
+  position: relative;
+}
+
+body.pwa-mode .screen.active {
+  animation: pwa-screen-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Screen-level header (step + title) — appears above question card */
+body.pwa-mode .screen.active .step-label {
+  display: inline-block;
+  padding: 7px 14px;
+  background: rgba(232,119,34,0.1);
+  color: #C0591A;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  margin: 24px 0 10px;
+}
+body.pwa-mode .screen.active .screen-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1F2937;
+  margin-bottom: 4px;
+  letter-spacing: -0.4px;
+}
+body.pwa-mode .screen.active .screen-sub {
+  font-size: 14px;
+  color: #6B7280;
+  margin-bottom: 20px;
+  display: none; /* εξοικονόμηση χώρου — δείχνεται σε iPad */
+}
+
+/* Error message */
+body.pwa-mode .error-msg:not(:empty) {
+  background: #FEF2F2;
+  color: #991B1B;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  border-left: 4px solid #DC2626;
+}
+
+/* The active question — hero card treatment */
+body.pwa-mode .screen.active .q-block.pwa-q-current {
+  background: #FFFFFF;
+  border-radius: 20px;
+  padding: 28px 24px;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 8px 32px rgba(232,119,34,0.06),
+    0 1px 0 rgba(255,255,255,0.9) inset;
+  border: 1px solid rgba(232,119,34,0.08);
+  margin-bottom: 16px;
+}
+
+/* Hero question text */
+body.pwa-mode .screen.active .q-block.pwa-q-current .q-label {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #111827;
+  margin-bottom: 22px;
+  letter-spacing: -0.4px;
+  font-family: 'Lora', Georgia, serif;
+}
+
+/* Hint text */
+body.pwa-mode .screen.active .q-block.pwa-q-current .q-hint {
+  font-size: 13px;
+  color: #6B7280;
+  background: #F9FAFB;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: -8px 0 16px;
+  border-left: 3px solid #FFA552;
+}
+body.pwa-mode .screen.active .q-block.pwa-q-current .q-hint-explain {
+  font-size: 13.5px;
+  color: #4B5563;
+  line-height: 1.6;
+  background: linear-gradient(135deg, #FFF8F1, #FFFDFB);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: -6px 0 18px;
+  border: 1px solid rgba(232,119,34,0.12);
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+ *  6.  OPTION CARDS με γράμματα προθέματα (A, B, C, D…)
+ * ════════════════════════════════════════════════════════════════ */
+
+body.pwa-mode .opts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  counter-reset: opt-letter;
+}
+
+body.pwa-mode .opts.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+body.pwa-mode .opt {
+  counter-increment: opt-letter;
+  background: #FFFFFF;
+  border: 2px solid #E5E7EB;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  min-height: 56px;
+  position: relative;
+}
+
+/* Letter badge before option text */
+body.pwa-mode .opt::before {
+  content: counter(opt-letter, upper-alpha);
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: #F3F4F6;
+  color: #6B7280;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  font-family: 'Nunito Sans', sans-serif;
+  transition: all 0.18s ease;
+  order: -1;
+}
+
+/* Hide original dot/check (we use letter prefix instead) */
+body.pwa-mode .opt .opt-dot,
+body.pwa-mode .opt .opt-check { display: none !important; }
+
+body.pwa-mode .opt .opt-text {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  color: #374151;
+  line-height: 1.4;
+}
+
+body.pwa-mode .opt:hover {
+  border-color: #FFA552;
+  background: #FFFAF5;
+}
+
+/* Selected state — modern :has() selector */
+body.pwa-mode .opt:has(input:checked) {
+  border-color: #E87722;
+  background: linear-gradient(135deg, #FFF3E8 0%, #FFFAF5 100%);
+  box-shadow: 0 4px 16px rgba(232,119,34,0.18);
+}
+body.pwa-mode .opt:has(input:checked)::before {
+  background: linear-gradient(135deg, #E87722, #FF9248);
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(232,119,34,0.4);
+}
+body.pwa-mode .opt:has(input:checked) .opt-text {
+  color: #1F2937;
+  font-weight: 700;
+}
+
+/* Active/press feedback */
+body.pwa-mode .opt:active { transform: scale(0.98); }
+
+
+/* ════════════════════════════════════════════════════════════════
+ *  7.  FORM INPUTS (name, email, phone, spouse age)
+ * ════════════════════════════════════════════════════════════════ */
+
+body.pwa-mode .form-input {
+  width: 100%;
+  background: #FFFFFF;
+  border: 2px solid #E5E7EB;
+  border-radius: 14px;
+  padding: 16px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1F2937;
+  transition: all 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+body.pwa-mode .form-input:focus {
+  outline: none;
+  border-color: #E87722;
+  background: #FFFAF5;
+  box-shadow: 0 0 0 4px rgba(232,119,34,0.12);
+}
+body.pwa-mode .form-input::placeholder {
+  color: #9CA3AF;
+  font-weight: 500;
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+ *  8.  SLIDERS (ηλικία, budget, χρόνια στόχου)
+ * ════════════════════════════════════════════════════════════════ */
+
+body.pwa-mode .slider-wrap {
+  background: linear-gradient(135deg, #FFF8F1 0%, #FFFFFF 100%);
+  border-radius: 16px;
+  padding: 24px 20px;
+  border: 1px solid rgba(232,119,34,0.12);
+}
+body.pwa-mode .slider-val {
+  font-size: 36px;
+  font-weight: 800;
+  color: #E87722;
+  text-align: center;
+  margin-bottom: 16px;
+  font-family: 'Lora', Georgia, serif;
+  letter-spacing: -1px;
+}
+body.pwa-mode .slider-wrap input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: #FFE4D2;
+  border-radius: 3px;
+  outline: none;
+}
+body.pwa-mode .slider-wrap input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, #E87722, #FF9248);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(232,119,34,0.4);
+  border: 3px solid white;
+}
+body.pwa-mode .slider-wrap input[type="range"]::-moz-range-thumb {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, #E87722, #FF9248);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(232,119,34,0.4);
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+ *  9.  FLOATING NAVIGATION BAR (Typeform-style FAB)
+ * ════════════════════════════════════════════════════════════════ */
+
 .pwa-nav { display: none; }
 
 body.pwa-mode .pwa-nav {
   display: block;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  background: #FFFFFF;
-  padding: 12px 16px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid #E5E7EB;
-  box-shadow: 0 -2px 16px rgba(0,0,0,0.08);
+  padding: 16px 20px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to top, #FFFDFB 60%, rgba(255,253,251,0));
   z-index: 100;
+  pointer-events: none;
 }
 
 body.pwa-mode .pwa-nav-row {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 640px;
+  margin: 0 auto;
+  pointer-events: auto;
 }
 
-/* ── Auto-advance hint (slow progress bar) ─────────────── */
+body.pwa-mode .pwa-nav button {
+  font-family: inherit;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+body.pwa-mode .pwa-nav button:active { transform: scale(0.95); }
+
+/* Back button — secondary, ghost */
+body.pwa-mode .pwa-btn-prev {
+  background: #FFFFFF;
+  color: #6B7280;
+  padding: 14px 20px;
+  border-radius: 14px;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  border: 1px solid #E5E7EB;
+  flex: 0 0 auto;
+  min-width: 90px;
+}
+body.pwa-mode .pwa-btn-prev:hover { background: #F9FAFB; color: #1F2937; }
+
+/* Next button — primary, gradient FAB */
+body.pwa-mode .pwa-btn-next {
+  background: linear-gradient(135deg, #E87722 0%, #FF9248 100%);
+  color: #FFFFFF;
+  padding: 16px 28px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 800;
+  box-shadow:
+    0 8px 24px rgba(232,119,34,0.4),
+    0 2px 4px rgba(232,119,34,0.2);
+  flex: 1;
+  letter-spacing: 0.2px;
+}
+body.pwa-mode .pwa-btn-next:hover {
+  background: linear-gradient(135deg, #C0591A 0%, #E87722 100%);
+  box-shadow: 0 12px 28px rgba(232,119,34,0.5);
+}
+body.pwa-mode .pwa-btn-next:disabled {
+  background: #E5E7EB;
+  color: #9CA3AF;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+ * 10.  AUTO-ADVANCE HINT (progress bar above nav)
+ * ════════════════════════════════════════════════════════════════ */
+
 body.pwa-mode .pwa-auto-hint {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 0 4px 10px;
+  padding: 0 4px 12px;
+  max-width: 640px;
+  margin: 0 auto;
   opacity: 0;
   height: 0;
   overflow: hidden;
-  transition: opacity 0.2s ease, height 0.2s ease;
+  transition: opacity 0.25s ease, height 0.25s ease;
+  pointer-events: auto;
 }
 body.pwa-mode .pwa-auto-hint.visible {
   opacity: 1;
@@ -82,7 +476,7 @@ body.pwa-mode .pwa-auto-hint.visible {
 body.pwa-mode .pwa-auto-hint-bar {
   width: 100%;
   height: 3px;
-  background: #F3F4F6;
+  background: rgba(232,119,34,0.12);
   border-radius: 2px;
   overflow: hidden;
   position: relative;
@@ -95,6 +489,7 @@ body.pwa-mode .pwa-auto-hint.visible .pwa-auto-hint-bar::after {
   border-radius: 2px;
   animation: pwa-auto-fill 2.2s linear forwards;
   transform-origin: left center;
+  box-shadow: 0 0 8px rgba(232,119,34,0.4);
 }
 @keyframes pwa-auto-fill {
   from { transform: scaleX(0); }
@@ -102,256 +497,233 @@ body.pwa-mode .pwa-auto-hint.visible .pwa-auto-hint-bar::after {
 }
 body.pwa-mode .pwa-auto-hint-text {
   font-size: 11px;
+  font-weight: 600;
   color: #9CA3AF;
-  letter-spacing: 0.3px;
-}
-
-body.pwa-mode .pwa-nav button {
-  flex: 1;
-  padding: 16px 20px;
-  border-radius: 14px;
-  font-size: 16px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: transform .08s ease, background .15s ease;
-  font-family: inherit;
-}
-body.pwa-mode .pwa-nav button:active { transform: scale(0.97); }
-
-body.pwa-mode .pwa-nav .pwa-btn-prev {
-  background: #F3F4F6;
-  color: #374151;
-  flex: 0 0 38%;
-}
-body.pwa-mode .pwa-nav .pwa-btn-prev:hover { background: #E5E7EB; }
-
-body.pwa-mode .pwa-nav .pwa-btn-next {
-  background: #E87722;
-  color: #FFFFFF;
-}
-body.pwa-mode .pwa-nav .pwa-btn-next:hover { background: #C0591A; }
-
-body.pwa-mode .pwa-nav .pwa-btn-next:disabled,
-body.pwa-mode .pwa-nav .pwa-btn-prev:disabled {
-  background: #E5E7EB;
-  color: #9CA3AF;
-  cursor: not-allowed;
-}
-
-/* ── Mini progress dots: questions within the current screen ── */
-.pwa-mini-progress { display: none; }
-
-body.pwa-mode .pwa-mini-progress {
-  display: flex;
-  gap: 6px;
-  padding: 14px 20px 0;
-  max-width: 600px;
-  margin: 0 auto;
-}
-body.pwa-mode .pwa-mini-progress .dot {
-  flex: 1;
-  height: 4px;
-  background: #E5E7EB;
-  border-radius: 2px;
-  transition: background .25s ease, transform .25s ease;
-}
-body.pwa-mode .pwa-mini-progress .dot.done    { background: #E87722; }
-body.pwa-mode .pwa-mini-progress .dot.current {
-  background: linear-gradient(90deg, #E87722 0%, #FFA552 100%);
-  transform: scaleY(1.5);
-}
-
-/* ── Reserve bottom space so content isn't hidden by fixed nav ── */
-body.pwa-mode .app {
-  padding-bottom: 110px;
-}
-
-/* ── Welcome (s0) & Results (s6) stay normal in PWA ───────── */
-body.pwa-mode .screen#s0 .q-block,
-body.pwa-mode .screen#s6 .q-block {
-  display: block !important;
-}
-
-/* ── Smooth slide-in animation on question change ─────────── */
-body.pwa-mode .screen.active .q-block.pwa-q-current {
-  animation: pwa-slide-in 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes pwa-slide-in {
-  from { opacity: 0; transform: translateX(20px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-/* ── Larger question label in PWA mode for readability ────── */
-body.pwa-mode .screen.active .q-block.pwa-q-current .q-label {
-  font-size: 19px;
-  line-height: 1.45;
-  margin-bottom: 16px;
-}
-
-/* ── Step label & screen title styling for PWA (compact) ──── */
-body.pwa-mode .screen.active .step-label {
-  font-size: 12px;
-  margin-bottom: 4px;
-}
-body.pwa-mode .screen.active .screen-title {
-  font-size: 22px;
-  margin-bottom: 4px;
-}
-body.pwa-mode .screen.active .screen-sub {
-  font-size: 13px;
-  margin-bottom: 16px;
-  display: none; /* save vertical space - sub is contextual, can be hidden */
-}
-
-/* ── Visual feedback when option selected (pre-advance) ──── */
-body.pwa-mode .opt input:checked + .opt-dot,
-body.pwa-mode .opt input:checked ~ .opt-dot {
-  /* Already styled by main CSS — just ensure visible */
-}
-
-/* ── Hide the top progress track bar in PWA (we use mini) ── */
-body.pwa-mode #progress-track {
-  height: 3px;
-  opacity: 0.6;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
 }
 
 
 /* ════════════════════════════════════════════════════════════════
- * ╔═══════════════════════════════════════════════════════════╗
- * ║                  TABLET / iPad RULES                       ║
- * ╚═══════════════════════════════════════════════════════════╝
- * Ισχύουν για iPad portrait (≥768px) και iPad landscape/Pro (≥1024px).
+ * 11.  ANIMATIONS
+ * ════════════════════════════════════════════════════════════════ */
+
+body.pwa-mode .screen.active .q-block.pwa-q-current {
+  animation: pwa-q-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+body.pwa-mode .screen.active .q-block.pwa-q-current .opt {
+  animation: pwa-opt-enter 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+body.pwa-mode .screen.active .q-block.pwa-q-current .opt:nth-child(1) { animation-delay: 0.05s; }
+body.pwa-mode .screen.active .q-block.pwa-q-current .opt:nth-child(2) { animation-delay: 0.10s; }
+body.pwa-mode .screen.active .q-block.pwa-q-current .opt:nth-child(3) { animation-delay: 0.15s; }
+body.pwa-mode .screen.active .q-block.pwa-q-current .opt:nth-child(4) { animation-delay: 0.20s; }
+body.pwa-mode .screen.active .q-block.pwa-q-current .opt:nth-child(5) { animation-delay: 0.25s; }
+body.pwa-mode .screen.active .q-block.pwa-q-current .opt:nth-child(n+6) { animation-delay: 0.30s; }
+
+@keyframes pwa-q-enter {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pwa-opt-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pwa-screen-enter {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+ * 12.  TABLET / iPad (≥768px) — generous spacing, big typography
  * ════════════════════════════════════════════════════════════════ */
 
 @media (min-width: 768px) {
-  /* ── Container centering ────────────────────────────────── */
+
   body.pwa-mode .app {
     max-width: 720px;
-    margin: 0 auto;
-    padding: 32px 40px 130px;
+    padding: 32px 48px 160px;
   }
 
-  /* ── Progress dots: μεγαλύτερο για iPad ─────────────────── */
   body.pwa-mode .pwa-mini-progress {
     max-width: 720px;
-    padding: 20px 40px 0;
-    gap: 8px;
+    padding: 32px 48px 0;
+    gap: 7px;
   }
-  body.pwa-mode .pwa-mini-progress .dot {
-    height: 6px;
-    border-radius: 3px;
-  }
+  body.pwa-mode .pwa-mini-progress .dot { height: 5px; }
 
-  /* ── Typography larger για iPad reading distance ───────── */
   body.pwa-mode .screen.active .step-label {
-    font-size: 14px;
-    margin-bottom: 6px;
+    font-size: 12px;
+    padding: 8px 18px;
+    margin-top: 32px;
+    margin-bottom: 14px;
   }
   body.pwa-mode .screen.active .screen-title {
-    font-size: 28px;
-    margin-bottom: 8px;
+    font-size: 30px;
+    margin-bottom: 6px;
+  }
+  body.pwa-mode .screen.active .screen-sub {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 28px;
+  }
+
+  body.pwa-mode .screen.active .q-block.pwa-q-current {
+    padding: 44px 40px;
+    border-radius: 28px;
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.04),
+      0 16px 48px rgba(232,119,34,0.08),
+      0 1px 0 rgba(255,255,255,0.9) inset;
   }
   body.pwa-mode .screen.active .q-block.pwa-q-current .q-label {
-    font-size: 22px;
-    line-height: 1.5;
-    margin-bottom: 24px;
+    font-size: 30px;
+    margin-bottom: 32px;
+    line-height: 1.3;
   }
   body.pwa-mode .screen.active .q-block.pwa-q-current .q-hint,
   body.pwa-mode .screen.active .q-block.pwa-q-current .q-hint-explain {
     font-size: 15px;
-    line-height: 1.55;
+    padding: 16px 20px;
   }
 
-  /* ── Options: μεγαλύτερα touch targets ──────────────────── */
+  /* Options — bigger, more spacing */
+  body.pwa-mode .opts { gap: 12px; }
   body.pwa-mode .opt {
-    padding: 18px 22px;
+    padding: 22px 24px;
+    border-radius: 18px;
+    min-height: 72px;
+    gap: 18px;
+  }
+  body.pwa-mode .opt::before {
+    width: 40px; height: 40px;
     font-size: 16px;
-    min-height: 60px;
+    border-radius: 10px;
   }
   body.pwa-mode .opt .opt-text {
-    font-size: 16px;
-    line-height: 1.4;
+    font-size: 17px;
+    line-height: 1.45;
   }
 
-  /* ── Form inputs (name, email, phone, spouse age) ───────── */
+  /* Form inputs */
   body.pwa-mode .form-input {
     font-size: 18px;
-    padding: 14px 18px;
-    min-height: 54px;
+    padding: 20px 22px;
+    border-radius: 16px;
   }
 
-  /* ── Sliders ──────────────────────────────────────────── */
+  /* Sliders */
+  body.pwa-mode .slider-wrap {
+    padding: 32px 28px;
+    border-radius: 20px;
+  }
   body.pwa-mode .slider-val {
-    font-size: 28px;
+    font-size: 48px;
+    margin-bottom: 20px;
   }
-  body.pwa-mode .slider-wrap input[type="range"] {
-    height: 8px;
+  body.pwa-mode .slider-wrap input[type="range"] { height: 8px; }
+  body.pwa-mode .slider-wrap input[type="range"]::-webkit-slider-thumb {
+    width: 36px; height: 36px;
+  }
+  body.pwa-mode .slider-wrap input[type="range"]::-moz-range-thumb {
+    width: 36px; height: 36px;
   }
 
-  /* ── Floating nav: centered & wider on iPad ────────────── */
+  /* Floating nav — centered, more padding */
   body.pwa-mode .pwa-nav {
+    padding: 24px 48px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+  body.pwa-mode .pwa-nav-row {
     max-width: 720px;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    border-radius: 20px 20px 0 0;
-    padding: 16px 24px;
-    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    gap: 16px;
   }
-  body.pwa-mode .pwa-nav button {
-    padding: 18px 24px;
+  body.pwa-mode .pwa-btn-prev {
+    padding: 18px 28px;
+    font-size: 16px;
+    min-width: 130px;
+    border-radius: 16px;
+  }
+  body.pwa-mode .pwa-btn-next {
+    padding: 20px 36px;
     font-size: 17px;
-    min-height: 56px;
+    border-radius: 16px;
+    box-shadow:
+      0 12px 32px rgba(232,119,34,0.45),
+      0 4px 8px rgba(232,119,34,0.2);
   }
-  body.pwa-mode .pwa-auto-hint-text {
-    font-size: 12px;
+  body.pwa-mode .pwa-auto-hint {
+    max-width: 720px;
+    padding: 0 8px 14px;
   }
-
-  /* ── Show screen-sub on iPad (room for it) ─────────────── */
-  body.pwa-mode .screen.active .screen-sub {
-    display: block;
-    font-size: 15px;
-    margin-bottom: 24px;
-  }
+  body.pwa-mode .pwa-auto-hint.visible { height: 36px; }
 }
 
-/* ── iPad landscape & iPad Pro ─────────────────────────────── */
+
+/* ════════════════════════════════════════════════════════════════
+ * 13.  iPad landscape & iPad Pro (≥1024px)
+ * ════════════════════════════════════════════════════════════════ */
+
 @media (min-width: 1024px) {
+
   body.pwa-mode .app {
-    max-width: 800px;
-    padding: 40px 48px 140px;
+    max-width: 760px;
+    padding: 48px 56px 180px;
   }
   body.pwa-mode .pwa-mini-progress {
-    max-width: 800px;
-    padding: 24px 48px 0;
+    max-width: 760px;
+    padding: 40px 56px 0;
   }
-  body.pwa-mode .pwa-nav {
-    max-width: 800px;
+  body.pwa-mode .pwa-nav-row { max-width: 760px; }
+
+  body.pwa-mode .screen.active .screen-title {
+    font-size: 34px;
   }
   body.pwa-mode .screen.active .q-block.pwa-q-current .q-label {
-    font-size: 24px;
+    font-size: 32px;
+    line-height: 1.28;
+  }
+  body.pwa-mode .screen.active .q-block.pwa-q-current {
+    padding: 52px 48px;
   }
 }
 
-/* ── iPad landscape: 2-column option grids look better ─── */
-@media (min-width: 768px) and (orientation: landscape) {
+
+/* ════════════════════════════════════════════════════════════════
+ * 14.  Landscape orientation tweak: 2-col για non-grid2 opts
+ * ════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 900px) and (orientation: landscape) {
   body.pwa-mode .opts:not(.grid2) {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
-  body.pwa-mode .opts.grid2 {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
 }
 
-/* ── Special: prevent iOS zoom on input focus (16px+ font) ── */
-body.pwa-mode input[type="text"],
-body.pwa-mode input[type="email"],
-body.pwa-mode input[type="tel"],
-body.pwa-mode input[type="number"],
-body.pwa-mode textarea,
-body.pwa-mode select {
-  font-size: 16px;   /* < 16px προκαλεί zoom στο iOS */
+
+/* ════════════════════════════════════════════════════════════════
+ * 15.  WELCOME SCREEN (s0) — beautified for PWA
+ * ════════════════════════════════════════════════════════════════ */
+
+body.pwa-mode .screen#s0.active {
+  text-align: center;
+}
+body.pwa-mode .screen#s0 .welcome-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 8px 32px rgba(232,119,34,0.06);
+  border: 1px solid rgba(232,119,34,0.08);
+  margin: 20px 0;
+  text-align: left;
+}
+@media (min-width: 768px) {
+  body.pwa-mode .screen#s0 .welcome-card {
+    padding: 36px;
+    border-radius: 28px;
+  }
 }
