@@ -1,0 +1,143 @@
+/* ════════════════════════════════════════════════════════════════
+ * NN Hellas — PWA Single-Question Mode
+ * Ενεργοποιείται ΜΟΝΟ όταν το ερωτηματολόγιο εκτελείται ως PWA
+ * (εγκατεστημένη εφαρμογή κινητού). Σε browser mode, οι κανόνες
+ * αυτοί ΔΕΝ ενεργοποιούνται και ο πελάτης βλέπει την κανονική
+ * διάταξη με όλες τις ερωτήσεις κάθε βήματος μαζί.
+ * ════════════════════════════════════════════════════════════════ */
+
+/* ── Hide q-blocks individually only in PWA mode ───────────── */
+body.pwa-mode .screen.active .q-block.pwa-q-hidden {
+  display: none !important;
+}
+
+/* ── Hide original per-screen nav in PWA mode ──────────────── */
+body.pwa-mode .screen.active .nav-row {
+  display: none !important;
+}
+
+/* ── PWA-only floating bottom navigation bar ───────────────── */
+.pwa-nav { display: none; }
+
+body.pwa-mode .pwa-nav {
+  display: flex;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #FFFFFF;
+  padding: 12px 16px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid #E5E7EB;
+  box-shadow: 0 -2px 16px rgba(0,0,0,0.08);
+  gap: 10px;
+  z-index: 100;
+}
+
+body.pwa-mode .pwa-nav button {
+  flex: 1;
+  padding: 16px 20px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: transform .08s ease, background .15s ease;
+  font-family: inherit;
+}
+body.pwa-mode .pwa-nav button:active { transform: scale(0.97); }
+
+body.pwa-mode .pwa-nav .pwa-btn-prev {
+  background: #F3F4F6;
+  color: #374151;
+  flex: 0 0 38%;
+}
+body.pwa-mode .pwa-nav .pwa-btn-prev:hover { background: #E5E7EB; }
+
+body.pwa-mode .pwa-nav .pwa-btn-next {
+  background: #E87722;
+  color: #FFFFFF;
+}
+body.pwa-mode .pwa-nav .pwa-btn-next:hover { background: #C0591A; }
+
+body.pwa-mode .pwa-nav .pwa-btn-next:disabled,
+body.pwa-mode .pwa-nav .pwa-btn-prev:disabled {
+  background: #E5E7EB;
+  color: #9CA3AF;
+  cursor: not-allowed;
+}
+
+/* ── Mini progress dots: questions within the current screen ── */
+.pwa-mini-progress { display: none; }
+
+body.pwa-mode .pwa-mini-progress {
+  display: flex;
+  gap: 6px;
+  padding: 14px 20px 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+body.pwa-mode .pwa-mini-progress .dot {
+  flex: 1;
+  height: 4px;
+  background: #E5E7EB;
+  border-radius: 2px;
+  transition: background .25s ease, transform .25s ease;
+}
+body.pwa-mode .pwa-mini-progress .dot.done    { background: #E87722; }
+body.pwa-mode .pwa-mini-progress .dot.current {
+  background: linear-gradient(90deg, #E87722 0%, #FFA552 100%);
+  transform: scaleY(1.5);
+}
+
+/* ── Reserve bottom space so content isn't hidden by fixed nav ── */
+body.pwa-mode .app {
+  padding-bottom: 110px;
+}
+
+/* ── Welcome (s0) & Results (s6) stay normal in PWA ───────── */
+body.pwa-mode .screen#s0 .q-block,
+body.pwa-mode .screen#s6 .q-block {
+  display: block !important;
+}
+
+/* ── Smooth slide-in animation on question change ─────────── */
+body.pwa-mode .screen.active .q-block.pwa-q-current {
+  animation: pwa-slide-in 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes pwa-slide-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Larger question label in PWA mode for readability ────── */
+body.pwa-mode .screen.active .q-block.pwa-q-current .q-label {
+  font-size: 19px;
+  line-height: 1.45;
+  margin-bottom: 16px;
+}
+
+/* ── Step label & screen title styling for PWA (compact) ──── */
+body.pwa-mode .screen.active .step-label {
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+body.pwa-mode .screen.active .screen-title {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+body.pwa-mode .screen.active .screen-sub {
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none; /* save vertical space - sub is contextual, can be hidden */
+}
+
+/* ── Visual feedback when option selected (pre-advance) ──── */
+body.pwa-mode .opt input:checked + .opt-dot,
+body.pwa-mode .opt input:checked ~ .opt-dot {
+  /* Already styled by main CSS — just ensure visible */
+}
+
+/* ── Hide the top progress track bar in PWA (we use mini) ── */
+body.pwa-mode #progress-track {
+  height: 3px;
+  opacity: 0.6;
+}

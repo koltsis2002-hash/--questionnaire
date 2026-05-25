@@ -9,18 +9,20 @@
  * Όταν αλλάζεις κώδικα, ΑΛΛΑΞΕ το CACHE_VERSION για να φορτώσουν τα νέα αρχεία.
  */
 
-const CACHE_VERSION = 'nn-questionnaire-v1';
-const RUNTIME_CACHE = 'nn-runtime-v1';
+const CACHE_VERSION = 'nn-questionnaire-v2';
+const RUNTIME_CACHE = 'nn-runtime-v2';
 
 // Αρχεία που φορτώνουν αμέσως όταν εγκατασταθεί η εφαρμογή
 const APP_SHELL = [
   './',
   './index.html',
   './styles.css',
+  './pwa-mode.css',
   './data.js',
   './engine.js',
   './ui.js',
   './integrations.js',
+  './pwa-mode.js',
   './manifest.json',
   './logo.png',
   './icons/icon-32.png',
