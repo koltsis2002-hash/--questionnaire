@@ -127,7 +127,7 @@
       <label class="opt" onclick="selOpt(this,'hospital_mild','local_pub')"><input type="radio" name="hospital_mild" value="local_pub"/><div class="opt-dot"></div><span class="opt-text">Κάποιο κοντινό Δημόσιο Νοσοκομείο</span></label>
       <label class="opt" onclick="selOpt(this,'hospital_mild','city_pub')"><input type="radio" name="hospital_mild" value="city_pub"/><div class="opt-dot"></div><span class="opt-text">Ένα μεγάλο Δημόσιο Νοσοκομείο στην Αθήνα/Θεσσαλονίκη</span></label>
       <label class="opt" onclick="selOpt(this,'hospital_mild','local_priv')"><input type="radio" name="hospital_mild" value="local_priv"/><div class="opt-dot"></div><span class="opt-text">Ένα τοπικό Ιδιωτικό Νοσοκομείο</span></label>
-      <label class="opt" onclick="selOpt(this,'hospital_mild','big_priv')"><input type="radio" name="hospital_mild" value="big_priv"/><div class="opt-dot"></div><span class="opt-text">Ένα μεγάλο Ιδιωτικό Νοσοκομείο (π.χ. Υγεία, Metropolitan)</span></label>
+      <label class="opt" onclick="selOpt(this,'hospital_mild','big_priv')"><input type="radio" name="hospital_mild" value="big_priv"/><div class="opt-dot"></div><span class="opt-text">Ένα μεγάλο Ιδιωτικό Νοσοκομείο (π.χ. Υγεία, Διαβαλκανικό)</span></label>
     </div>
   </div>
 
@@ -137,7 +137,7 @@
       <label class="opt" onclick="selOpt(this,'hospital_severe','local_pub')"><input type="radio" name="hospital_severe" value="local_pub"/><div class="opt-dot"></div><span class="opt-text">Κάποιο κοντινό Δημόσιο Νοσοκομείο</span></label>
       <label class="opt" onclick="selOpt(this,'hospital_severe','city_pub')"><input type="radio" name="hospital_severe" value="city_pub"/><div class="opt-dot"></div><span class="opt-text">Ένα μεγάλο Δημόσιο Νοσοκομείο στην Αθήνα/Θεσσαλονίκη</span></label>
       <label class="opt" onclick="selOpt(this,'hospital_severe','local_priv')"><input type="radio" name="hospital_severe" value="local_priv"/><div class="opt-dot"></div><span class="opt-text">Ένα τοπικό Ιδιωτικό Νοσοκομείο</span></label>
-      <label class="opt" onclick="selOpt(this,'hospital_severe','big_priv')"><input type="radio" name="hospital_severe" value="big_priv"/><div class="opt-dot"></div><span class="opt-text">Ένα μεγάλο Ιδιωτικό Νοσοκομείο</span></label>
+      <label class="opt" onclick="selOpt(this,'hospital_severe','big_priv')"><input type="radio" name="hospital_severe" value="big_priv"/><div class="opt-dot"></div><span class="opt-text">Ένα μεγάλο Ιδιωτικό Νοσοκομείο στην Αθήνα/Θεσσαλονίκη (π.χ. Υγεία, Διαβαλκανικό)</span></label>
       <label class="opt" onclick="selOpt(this,'hospital_severe','abroad')"><input type="radio" name="hospital_severe" value="abroad"/><div class="opt-dot"></div><span class="opt-text">Σε εξειδικευμένο κέντρο στο Εξωτερικό</span></label>
     </div>
   </div>
@@ -171,6 +171,16 @@
     <div class="opts grid2" id="opts-ded-amt-perinc">
       <label class="opt" onclick="selOpt(this,'deductible_amount','500')"><input type="radio" name="deductible_amount" value="500"/><div class="opt-dot"></div><span class="opt-text">€500</span></label>
       <label class="opt" onclick="selOpt(this,'deductible_amount','1500')"><input type="radio" name="deductible_amount" value="1500"/><div class="opt-dot"></div><span class="opt-text">€1.500</span></label>
+    </div>
+  </div>
+
+  <!-- Κάλυψη οικογένειας — εμφανίζεται για όλους τους τύπους εκπιπτόμενου (none/annual/per_incident) αν υπάρχει σύζυγος ή παιδιά -->
+  <div class="q-block" id="coverage-scope-block" style="display:none">
+    <div class="q-label">Ποια μέλη θέλετε να συμπεριλάβετε στην ασφαλιστική πρόταση;</div>
+    <div class="q-hint">Η ίδια επιλογή εκπιπτόμενου θα ισχύσει και για τα υπόλοιπα μέλη της οικογένειάς σας.</div>
+    <div class="opts" id="opts-coverage-scope">
+      <label class="opt" onclick="selOpt(this,'coverage_scope','self')"><input type="radio" name="coverage_scope" value="self"/><div class="opt-dot"></div><span class="opt-text">Μόνο εγώ</span></label>
+      <label class="opt" onclick="selOpt(this,'coverage_scope','family')"><input type="radio" name="coverage_scope" value="family"/><div class="opt-dot"></div><span class="opt-text">Όλη η οικογένεια (εγώ + σύζυγος + παιδιά)</span></label>
     </div>
   </div>
 
@@ -217,14 +227,14 @@
     <div class="opts" id="opts-needs">
       <label class="opt" onclick="togMulti(event,this,'uncovered_needs','mortgage')"><input type="checkbox" name="uncovered_needs" value="mortgage"/><div class="opt-check"></div><span class="opt-text">Το στεγαστικό δάνειο ή το ενοίκιο</span></label>
       <label class="opt" onclick="togMulti(event,this,'uncovered_needs','education')"><input type="checkbox" name="uncovered_needs" value="education"/><div class="opt-check"></div><span class="opt-text">Οι σπουδές των παιδιών</span></label>
-      <label class="opt" onclick="togMulti(event,this,'uncovered_needs','spouse_income')"><input type="checkbox" name="uncovered_needs" value="spouse_income"/><div class="opt-check"></div><span class="opt-text">Η καθημερινή επιβίωση της οικογένειας μου</span></label>
+      <label class="opt" onclick="togMulti(event,this,'uncovered_needs','spouse_income')"><input type="checkbox" name="uncovered_needs" value="spouse_income"/><div class="opt-check"></div><span class="opt-text">Η καθημερινή επιβίωση της οικογένειάς μου</span></label>
       <label class="opt" onclick="togMulti(event,this,'uncovered_needs','debts')"><input type="checkbox" name="uncovered_needs" value="debts"/><div class="opt-check"></div><span class="opt-text">Άλλες οικονομικές υποχρεώσεις</span></label>
     </div>
   </div>
 
   <div class="q-block">
     <div class="q-label">Τι Κεφάλαιο Ζωής πιστεύεις ότι θα χρειαζόταν η οικογένειά σου;</div>
-    <div class="q-hint-explain">Το Κεφάλαιο Ζωής είναι το συνολικό χρηματικό ποσό που θα πάρουν στα χέρια τους οι αγαπημένοι σου σε περίπτωση απώλειάς σου ή ανικανότητάς σου να εργαστείς, για να συνεχίσουν τη ζωή τους χωρίς οικονομικό άγχος.</div>
+    <div class="q-hint-explain">Το Κεφάλαιο Ζωής είναι το συνολικό χρηματικό ποσό που θα πάρουν στα χέρια τους οι αγαπημένοι σου σε περίπτωση απώλειάς σου ή ανικανότητας να εργαστείς, για να συνεχίσουν τη ζωή τους χωρίς οικονομικό άγχος.</div>
     <div class="opts" id="opts-capital">
       <label class="opt" onclick="selOpt(this,'life_capital','50k')"><input type="radio" name="life_capital" value="50k"/><div class="opt-dot"></div><span class="opt-text">50.000€ (Βασική στήριξη)</span></label>
       <label class="opt" onclick="selOpt(this,'life_capital','100k')"><input type="radio" name="life_capital" value="100k"/><div class="opt-dot"></div><span class="opt-text">100.000€ (Ισορροπημένη προστασία)</span></label>
@@ -250,7 +260,7 @@
     <div class="q-label">Πώς φαντάζεσαι ότι θα είναι τα οικονομικά σου όταν πάρεις την κρατική σου σύνταξη;</div>
     <div class="opts" id="opts-pension">
       <label class="opt" onclick="selOpt(this,'pension_estimate','none')"><input type="radio" name="pension_estimate" value="none"/><div class="opt-dot"></div><span class="opt-text">Πολύ δύσκολα – δεν περιμένω καν να πάρω κρατική σύνταξη.</span></label>
-      <label class="opt" onclick="selOpt(this,'pension_estimate','small')"><input type="radio" name="pension_estimate" value="small"/><div class="opt-dot"></div><span class="opt-text">Άσχημα– δεν θα μου φτάνουν για μια άνετη ζωή.</span></label>
+      <label class="opt" onclick="selOpt(this,'pension_estimate','small')"><input type="radio" name="pension_estimate" value="small"/><div class="opt-dot"></div><span class="opt-text">Όχι καλά – δεν θα μου φτάνουν για μια άνετη ζωή.</span></label>
       <label class="opt" onclick="selOpt(this,'pension_estimate','adequate')"><input type="radio" name="pension_estimate" value="adequate"/><div class="opt-dot"></div><span class="opt-text">Ικανοποιητικά – πιστεύω θα καλύπτω τις βασικές μου ανάγκες.</span></label>
       <label class="opt" onclick="selOpt(this,'pension_estimate','big')"><input type="radio" name="pension_estimate" value="big"/><div class="opt-dot"></div><span class="opt-text">Πολύ καλά – υπολογίζω ότι θα ζω άνετα.</span></label>
     </div>
@@ -305,8 +315,8 @@
     <div class="q-hint-explain">Ασφάλιστρο είναι η μηνιαία σου εισφορά. Δηλαδή, το ποσό που επιλέγεις να βάζεις στην άκρη κάθε μήνα χωρίς να πιέζεσαι, για να χτίσεις την προστασία σου.</div>
     <div class="slider-wrap">
       <div class="slider-val">€<span id="budget-display">100</span><span style="font-size:16px;color:var(--text-muted)">/μήνα</span></div>
-      <input type="range" id="budget-slider" min="30" max="1000" value="100" step="5"/>
-      <div class="slider-labels"><span>€30</span><span>€1.000</span></div>
+      <input type="range" id="budget-slider" min="30" max="2000" value="100" step="10"/>
+      <div class="slider-labels"><span>€30</span><span>€2.000</span></div>
     </div>
     <p style="font-size:12px;color:var(--text-muted);margin-top:8px;text-align:center">Ετήσιο ισοδύναμο: €<span id="annual-display">1.200</span></p>
   </div>
@@ -381,5 +391,8 @@
 <script src="engine.js"></script>
 <script src="ui.js"></script>
 <script src="integrations.js"></script>
+<!-- Επικύρωση R1/R2/R3 μέσω επίσημου πίνακα συνδυασμών NN Hellas -->
+<script src="_erotimatologio_extracted/nn_products.js"></script>
+<script src="nn-bridge.js"></script>
 </body>
 </html>

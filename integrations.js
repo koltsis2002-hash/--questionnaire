@@ -35,7 +35,7 @@
         freelancer:'Ελεύθ. Επαγγ.', retired:'Συνταξιούχος', other:'Άλλο',
       },
       satisfaction: { very:'Πολύ', somewhat:'Αρκετά', little:'Λίγο', none:'Καθόλου' },
-      scope:        { self:'Μόνο εγώ', self_children:'Εγώ + παιδιά', family:'Όλη η οικογένεια' },
+      scope:        { self:'Μόνο εγώ', family:'Όλη η οικογένεια' },
       hospital: {
         local_pub:'Τοπικό Δημόσιο', city_pub:'Δημ. Πόλης',
         local_priv:'Τοπικό Ιδ.', big_priv:'Μεγάλο Ιδ.', abroad:'Εξωτερικό',
