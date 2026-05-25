@@ -2,8 +2,22 @@
 <html lang="el">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>NN Hellas — Ανάλυση Ασφαλιστικών Αναγκών</title>
+
+<!-- ════════ PWA META ════════ -->
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#E87722"/>
+<meta name="description" content="Εξατομικευμένη ανάλυση ασφαλιστικών αναγκών σε 5 βήματα — Κόλτσης Χρήστος, NN Hellas"/>
+
+<!-- iOS / Safari PWA support -->
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="NN Ανάλυση"/>
+<link rel="apple-touch-icon" href="icons/icon-180.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"/>
+
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Nunito+Sans:wght@300;400;600;700&display=swap" rel="stylesheet"/>
@@ -391,5 +405,16 @@
 <script src="engine.js"></script>
 <script src="ui.js"></script>
 <script src="integrations.js"></script>
+
+<!-- ════════ PWA: Service Worker registration ════════ -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(function (reg) { console.log('[PWA] Service worker registered:', reg.scope); })
+        .catch(function (err) { console.warn('[PWA] SW registration failed:', err); });
+    });
+  }
+</script>
 </body>
 </html>
