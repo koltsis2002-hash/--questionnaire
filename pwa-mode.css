@@ -337,21 +337,24 @@ body.pwa-mode .opt:hover {
   background: #2D2A28;
 }
 
-/* Selected state */
-body.pwa-mode .opt:has(input:checked) {
+/* Selected state — for radios (input:checked) AND checkboxes (.sel class via togMulti) */
+body.pwa-mode .opt:has(input:checked),
+body.pwa-mode .opt.sel {
   border-color: #FF9248;
   background: linear-gradient(135deg, rgba(232,119,34,0.18) 0%, rgba(255,146,72,0.08) 100%);
   box-shadow:
     0 0 0 4px rgba(255,146,72,0.08),
     0 8px 24px rgba(232,119,34,0.25);
 }
-body.pwa-mode .opt:has(input:checked)::before {
+body.pwa-mode .opt:has(input:checked)::before,
+body.pwa-mode .opt.sel::before {
   background: linear-gradient(135deg, #E87722, #FFA552);
   color: #18181B;
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(255,146,72,0.5);
 }
-body.pwa-mode .opt:has(input:checked) .opt-text {
+body.pwa-mode .opt:has(input:checked) .opt-text,
+body.pwa-mode .opt.sel .opt-text {
   color: #FFFFFF;
   font-weight: 700;
 }

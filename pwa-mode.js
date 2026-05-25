@@ -79,10 +79,13 @@
     if (radios.length > 0) {
       return Array.from(radios).some(r => r.checked);
     }
-    // Checkboxes → τουλάχιστον ένα checked
+    // Checkboxes (multi-select) → η ui.js χειρίζεται custom μέσω της κλάσης .sel
+    // στο <label class="opt">, οπότε ελέγχουμε ΚΑΙ τα δύο σήματα.
     const checkboxes = qb.querySelectorAll('input[type="checkbox"]');
     if (checkboxes.length > 0) {
-      return Array.from(checkboxes).some(c => c.checked);
+      const anyChecked  = Array.from(checkboxes).some(c => c.checked);
+      const anySelLabel = qb.querySelector('.opt.sel') !== null;
+      return anyChecked || anySelLabel;
     }
     // Text/Email/Tel/Number → όλα πρέπει να έχουν τιμή
     const textInputs = qb.querySelectorAll(
@@ -354,6 +357,20 @@
       updateNextButtonState();
     }
   });
+
+  // Listen σε clicks πάνω σε .opt (πιάνει checkboxes που χειρίζεται η togMulti)
+  // Η togMulti κάνει preventDefault, οπότε το «change» event ΔΕΝ φιρράζει για checkboxes.
+  // Πρέπει να ανανεώσουμε το button state μετά το click μόλις τρέξει η togMulti.
+  document.addEventListener('click', function (e) {
+    if (!document.documentElement.classList.contains('pwa-mode')) return;
+    const screen = getActiveScreen();
+    if (!shouldUseSingleMode(screen)) return;
+    const opt = e.target.closest && e.target.closest('.opt');
+    if (opt && opt.querySelector('input[type="checkbox"]')) {
+      // Περίμενε ένα frame για να ολοκληρωθεί η togMulti που τοποθετεί το .sel class
+      setTimeout(updateNextButtonState, 0);
+    }
+  }, true);
 
   // ─── Observe screen changes (.active toggle) ─────────
   function onScreenChange() {
