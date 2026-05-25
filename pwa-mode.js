@@ -70,6 +70,80 @@
       .filter(qb => qb.style.display !== 'none');
   }
 
+  // ─── Validation: είναι απαντημένο το q-block; ──────
+  function isQBlockAnswered(qb) {
+    if (!qb) return true;
+
+    // Radios → χρειάζεται τουλάχιστον ένα checked
+    const radios = qb.querySelectorAll('input[type="radio"]');
+    if (radios.length > 0) {
+      return Array.from(radios).some(r => r.checked);
+    }
+    // Checkboxes → τουλάχιστον ένα checked
+    const checkboxes = qb.querySelectorAll('input[type="checkbox"]');
+    if (checkboxes.length > 0) {
+      return Array.from(checkboxes).some(c => c.checked);
+    }
+    // Text/Email/Tel/Number → όλα πρέπει να έχουν τιμή
+    const textInputs = qb.querySelectorAll(
+      'input[type="text"], input[type="email"], input[type="tel"], input[type="number"]'
+    );
+    if (textInputs.length > 0) {
+      return Array.from(textInputs).every(inp => inp.value && inp.value.trim() !== '');
+    }
+    // Sliders ή q-block χωρίς inputs → πάντα ΟΚ
+    return true;
+  }
+
+  function shakeCurrentBlock() {
+    const screen = getActiveScreen();
+    if (!screen) return;
+    const current = screen.querySelector('.q-block.pwa-q-current');
+    if (!current) return;
+
+    // Add inline required hint if not already present
+    if (!current.querySelector('.pwa-required-hint')) {
+      const hint = document.createElement('div');
+      hint.className = 'pwa-required-hint';
+      hint.textContent = 'Παρακαλώ επιλέξτε μία απάντηση για να συνεχίσετε.';
+      // Customize message based on input type
+      const textInputs = current.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"]');
+      const checkboxes = current.querySelectorAll('input[type="checkbox"]');
+      if (textInputs.length > 0)      hint.textContent = 'Παρακαλώ συμπληρώστε το πεδίο για να συνεχίσετε.';
+      else if (checkboxes.length > 0) hint.textContent = 'Παρακαλώ επιλέξτε τουλάχιστον μία επιλογή για να συνεχίσετε.';
+      current.appendChild(hint);
+    }
+
+    current.classList.add('pwa-shake', 'pwa-show-required');
+
+    // Remove shake animation after it finishes (allow re-trigger)
+    setTimeout(() => current.classList.remove('pwa-shake'), 600);
+  }
+
+  function clearRequiredHint(qb) {
+    if (!qb) return;
+    qb.classList.remove('pwa-show-required', 'pwa-shake');
+  }
+
+  // Update Next button enabled/disabled based on current q-block answered state
+  function updateNextButtonState() {
+    const nextBtn = document.getElementById('pwa-btn-next');
+    if (!nextBtn) return;
+    const screen = getActiveScreen();
+    if (!screen || !shouldUseSingleMode(screen)) {
+      nextBtn.disabled = false;
+      nextBtn.classList.remove('pwa-disabled');
+      return;
+    }
+    const current = screen.querySelector('.q-block.pwa-q-current');
+    const answered = isQBlockAnswered(current);
+    nextBtn.disabled = !answered;
+    nextBtn.classList.toggle('pwa-disabled', !answered);
+
+    // Αν έχει απαντηθεί, καθαρίζουμε τυχόν error UI
+    if (answered) clearRequiredHint(current);
+  }
+
   function shouldUseSingleMode(screen) {
     if (!screen) return false;
     const id = screen.id;
@@ -120,6 +194,7 @@
     showPwaNav();
     updateMiniProgress(applicable.length, idx);
     updateNavButtons(idx, applicable.length);
+    updateNextButtonState();  // disabled/enabled με βάση το αν είναι απαντημένη
 
     // Scroll to top of question with a slight delay (for animation)
     setTimeout(() => {
@@ -136,9 +211,15 @@
     const screen = getActiveScreen();
     if (!screen || !shouldUseSingleMode(screen)) return;
 
-    // Re-evaluate applicable q-blocks (conditional may have changed)
-    const applicable   = getApplicableQBlocks(screen);
+    // ═══ ΕΛΕΓΧΟΣ: η τρέχουσα ερώτηση πρέπει να έχει απάντηση ═══
     const currentBlock = screen.querySelector('.q-block.pwa-q-current');
+    if (!isQBlockAnswered(currentBlock)) {
+      shakeCurrentBlock();
+      return;
+    }
+
+    // Re-evaluate applicable q-blocks (conditional may have changed)
+    const applicable = getApplicableQBlocks(screen);
     let idx = currentBlock ? applicable.indexOf(currentBlock) : -1;
     if (idx === -1) idx = state.qIndex;
     showQuestion(idx + 1);
@@ -246,12 +327,13 @@
     const screen = getActiveScreen();
     if (!shouldUseSingleMode(screen)) return;
 
+    // Σε ΚΑΘΕ αλλαγή, ενημέρωσε το next-button state
+    updateNextButtonState();
+
     if (e.target && e.target.type === 'radio') {
-      // Ακύρωσε προηγούμενο timer (αν ο χρήστης αλλάξει επιλογή, ο νέος
-      // χρόνος μετρά από την αρχή).
+      // Ακύρωσε προηγούμενο timer
       cancelAutoAdvance();
 
-      // Δείξε διακριτικό hint ότι θα προχωρήσει αυτόματα
       const hint = document.getElementById('pwa-auto-hint');
       if (hint) hint.classList.add('visible');
 
@@ -263,9 +345,15 @@
     }
   });
 
-  // Αν ο χρήστης scroll-άρει ή πατήσει οπουδήποτε (εκτός από το ίδιο
-  // το radio που μόλις επέλεξε), ΜΗΝ ακυρώνεις — αυτό θα ήταν annoying.
-  // Το auto-advance ακυρώνεται μόνο σε επανεπιλογή ή σε manual nav.
+  // Listen σε text/email/tel/number inputs (για live activation του Next button)
+  document.addEventListener('input', function (e) {
+    if (!document.documentElement.classList.contains('pwa-mode')) return;
+    const screen = getActiveScreen();
+    if (!shouldUseSingleMode(screen)) return;
+    if (e.target && ['text','email','tel','number'].includes(e.target.type)) {
+      updateNextButtonState();
+    }
+  });
 
   // ─── Observe screen changes (.active toggle) ─────────
   function onScreenChange() {

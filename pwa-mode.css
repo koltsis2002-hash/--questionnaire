@@ -1,20 +1,38 @@
 /* ════════════════════════════════════════════════════════════════
- * NN Hellas — PWA Single-Question Mode (REDESIGN v2)
+ * NN Hellas — PWA Single-Question Mode (DARK MODE v3)
  *
- * Σχεδιαστική φιλοσοφία: Typeform meets Apple HIG
- *   • Ένα ερώτημα ανά οθόνη με ηρωική τυπογραφία
+ * Σχεδιαστική φιλοσοφία: Typeform-dark meets Apple HIG dark theme
+ *   • Premium σκούρο φόντο με υποδεικτικό gradient
+ *   • Πορτοκαλί accents (NN brand) που λάμπουν σε σκούρο φόντο
  *   • Κάθε επιλογή ως «card» με γράμμα-πρόθεμα (A, B, C…)
- *   • Floating κυκλικό κουμπί «Επόμενο» (FAB) κάτω-δεξιά
- *   • Διακριτικό προοδευτικό gradient background
- *   • Smooth animations με spring easing
+ *   • Required answer per question — δεν επιτρέπει skipping
  *
  * Ενεργοποιείται ΜΟΝΟ σε standalone PWA mode.
- * Σε browser ο πελάτης βλέπει την κανονική διάταξη.
+ * Σε browser ο πελάτης βλέπει την κανονική (light) διάταξη.
  * ════════════════════════════════════════════════════════════════ */
 
 
 /* ════════════════════════════════════════════════════════════════
- *  1.  BASE PWA BEHAVIOR (iOS quirks, tap, safe areas)
+ *  COLOR PALETTE — Dark Theme
+ *
+ *  --bg-base        #0E0E10  /* base background */
+ *  --bg-elev-1      #18181B  /* elevated surface */
+ *  --bg-elev-2      #1F1F23  /* card */
+ *  --bg-elev-3      #27272A  /* badges, secondary surfaces */
+ *  --border-1       #2A2A2E
+ *  --border-2       #3F3F46
+ *  --text-primary   #FAFAFA
+ *  --text-secondary #D4D4D8
+ *  --text-muted     #A1A1AA
+ *  --text-faint     #71717A
+ *  --orange         #FF9248  /* slightly lighter for dark mode contrast */
+ *  --orange-bright  #FFA552
+ *  --orange-deep    #E87722
+ * ════════════════════════════════════════════════════════════════ */
+
+
+/* ════════════════════════════════════════════════════════════════
+ *  1.  BASE PWA BEHAVIOR (iOS quirks, dark theme, safe areas)
  * ════════════════════════════════════════════════════════════════ */
 
 body.pwa-mode {
@@ -22,8 +40,11 @@ body.pwa-mode {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
-  background: linear-gradient(180deg, #FFF8F1 0%, #FFFDFB 35%, #FFFFFF 100%);
+  background:
+    radial-gradient(ellipse at top, rgba(232,119,34,0.08) 0%, transparent 50%),
+    linear-gradient(180deg, #0E0E10 0%, #161618 100%);
   background-attachment: fixed;
+  color: #FAFAFA;
   min-height: 100vh;
   min-height: 100dvh;
 }
@@ -61,19 +82,19 @@ body.pwa-mode .screen#s6 .q-block { display: block !important; }
 
 
 /* ════════════════════════════════════════════════════════════════
- *  3.  TOP THIN PROGRESS BAR (διακριτικό, σαν Typeform)
+ *  3.  TOP THIN PROGRESS BAR
  * ════════════════════════════════════════════════════════════════ */
 
 body.pwa-mode #progress-track {
   height: 3px;
-  background: rgba(232,119,34,0.08);
+  background: rgba(255,255,255,0.05);
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 200;
 }
 body.pwa-mode #progress-fill {
   background: linear-gradient(90deg, #E87722 0%, #FFA552 100%);
-  box-shadow: 0 0 12px rgba(232,119,34,0.4);
+  box-shadow: 0 0 12px rgba(255,165,82,0.55);
   height: 100%;
   transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -97,16 +118,17 @@ body.pwa-mode .pwa-mini-progress {
 body.pwa-mode .pwa-mini-progress .dot {
   flex: 1;
   height: 4px;
-  background: rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.08);
   border-radius: 4px;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 body.pwa-mode .pwa-mini-progress .dot.done {
   background: #E87722;
+  opacity: 0.85;
 }
 body.pwa-mode .pwa-mini-progress .dot.current {
   background: linear-gradient(90deg, #E87722 0%, #FFA552 100%);
-  box-shadow: 0 0 8px rgba(232,119,34,0.35);
+  box-shadow: 0 0 10px rgba(255,165,82,0.6);
 }
 
 
@@ -119,18 +141,20 @@ body.pwa-mode .app {
   margin: 0 auto;
   padding: 16px 20px 140px;
   position: relative;
+  color: #FAFAFA;
 }
 
 body.pwa-mode .screen.active {
   animation: pwa-screen-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Screen-level header (step + title) — appears above question card */
+/* Screen-level header (step + title) */
 body.pwa-mode .screen.active .step-label {
   display: inline-block;
   padding: 7px 14px;
-  background: rgba(232,119,34,0.1);
-  color: #C0591A;
+  background: rgba(255,165,82,0.12);
+  color: #FFA552;
+  border: 1px solid rgba(255,165,82,0.2);
   border-radius: 100px;
   font-size: 11px;
   font-weight: 800;
@@ -141,39 +165,75 @@ body.pwa-mode .screen.active .step-label {
 body.pwa-mode .screen.active .screen-title {
   font-size: 24px;
   font-weight: 800;
-  color: #1F2937;
+  color: #FAFAFA;
   margin-bottom: 4px;
   letter-spacing: -0.4px;
 }
 body.pwa-mode .screen.active .screen-sub {
   font-size: 14px;
-  color: #6B7280;
+  color: #A1A1AA;
   margin-bottom: 20px;
-  display: none; /* εξοικονόμηση χώρου — δείχνεται σε iPad */
+  display: none;
 }
 
 /* Error message */
 body.pwa-mode .error-msg:not(:empty) {
-  background: #FEF2F2;
-  color: #991B1B;
+  background: rgba(220,38,38,0.12);
+  color: #FCA5A5;
   border-radius: 12px;
   padding: 12px 16px;
   margin-bottom: 16px;
   font-size: 14px;
-  border-left: 4px solid #DC2626;
+  border-left: 4px solid #EF4444;
 }
 
 /* The active question — hero card treatment */
 body.pwa-mode .screen.active .q-block.pwa-q-current {
-  background: #FFFFFF;
+  background: linear-gradient(180deg, #1F1F23 0%, #18181B 100%);
   border-radius: 20px;
   padding: 28px 24px;
   box-shadow:
-    0 1px 2px rgba(0,0,0,0.04),
-    0 8px 32px rgba(232,119,34,0.06),
-    0 1px 0 rgba(255,255,255,0.9) inset;
-  border: 1px solid rgba(232,119,34,0.08);
+    0 1px 0 rgba(255,255,255,0.05) inset,
+    0 10px 32px rgba(0,0,0,0.45),
+    0 4px 16px rgba(232,119,34,0.06);
+  border: 1px solid rgba(255,255,255,0.06);
   margin-bottom: 16px;
+}
+
+/* Shake animation when user tries to proceed without answer */
+body.pwa-mode .screen.active .q-block.pwa-q-current.pwa-shake {
+  animation: pwa-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  border-color: rgba(239,68,68,0.5);
+  box-shadow:
+    0 0 0 4px rgba(239,68,68,0.12),
+    0 10px 32px rgba(0,0,0,0.45);
+}
+@keyframes pwa-shake {
+  10%, 90% { transform: translateX(-3px); }
+  20%, 80% { transform: translateX(5px); }
+  30%, 50%, 70% { transform: translateX(-8px); }
+  40%, 60% { transform: translateX(8px); }
+}
+
+/* Inline required-answer hint */
+body.pwa-mode .pwa-required-hint {
+  display: none;
+  color: #FCA5A5;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 14px;
+  padding: 8px 12px;
+  background: rgba(239,68,68,0.1);
+  border-radius: 8px;
+  border-left: 3px solid #EF4444;
+}
+body.pwa-mode .q-block.pwa-q-current.pwa-show-required .pwa-required-hint {
+  display: block;
+  animation: pwa-fade-in 0.3s ease;
+}
+@keyframes pwa-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Hero question text */
@@ -181,7 +241,7 @@ body.pwa-mode .screen.active .q-block.pwa-q-current .q-label {
   font-size: 22px;
   font-weight: 700;
   line-height: 1.35;
-  color: #111827;
+  color: #FAFAFA;
   margin-bottom: 22px;
   letter-spacing: -0.4px;
   font-family: 'Lora', Georgia, serif;
@@ -190,8 +250,8 @@ body.pwa-mode .screen.active .q-block.pwa-q-current .q-label {
 /* Hint text */
 body.pwa-mode .screen.active .q-block.pwa-q-current .q-hint {
   font-size: 13px;
-  color: #6B7280;
-  background: #F9FAFB;
+  color: #A1A1AA;
+  background: rgba(255,255,255,0.03);
   border-radius: 10px;
   padding: 10px 14px;
   margin: -8px 0 16px;
@@ -199,13 +259,13 @@ body.pwa-mode .screen.active .q-block.pwa-q-current .q-hint {
 }
 body.pwa-mode .screen.active .q-block.pwa-q-current .q-hint-explain {
   font-size: 13.5px;
-  color: #4B5563;
+  color: #D4D4D8;
   line-height: 1.6;
-  background: linear-gradient(135deg, #FFF8F1, #FFFDFB);
+  background: rgba(255,165,82,0.06);
   border-radius: 12px;
   padding: 14px 16px;
   margin: -6px 0 18px;
-  border: 1px solid rgba(232,119,34,0.12);
+  border: 1px solid rgba(255,165,82,0.15);
 }
 
 
@@ -228,8 +288,8 @@ body.pwa-mode .opts.grid2 {
 
 body.pwa-mode .opt {
   counter-increment: opt-letter;
-  background: #FFFFFF;
-  border: 2px solid #E5E7EB;
+  background: #27272A;
+  border: 2px solid rgba(255,255,255,0.08);
   border-radius: 14px;
   padding: 16px 18px;
   display: flex;
@@ -247,8 +307,8 @@ body.pwa-mode .opt::before {
   flex-shrink: 0;
   width: 32px;
   height: 32px;
-  background: #F3F4F6;
-  color: #6B7280;
+  background: rgba(255,255,255,0.08);
+  color: #D4D4D8;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
@@ -260,7 +320,7 @@ body.pwa-mode .opt::before {
   order: -1;
 }
 
-/* Hide original dot/check (we use letter prefix instead) */
+/* Hide original dot/check */
 body.pwa-mode .opt .opt-dot,
 body.pwa-mode .opt .opt-check { display: none !important; }
 
@@ -268,33 +328,34 @@ body.pwa-mode .opt .opt-text {
   flex: 1;
   font-size: 15px;
   font-weight: 600;
-  color: #374151;
+  color: #E4E4E7;
   line-height: 1.4;
 }
 
 body.pwa-mode .opt:hover {
-  border-color: #FFA552;
-  background: #FFFAF5;
+  border-color: rgba(255,165,82,0.4);
+  background: #2D2A28;
 }
 
-/* Selected state — modern :has() selector */
+/* Selected state */
 body.pwa-mode .opt:has(input:checked) {
-  border-color: #E87722;
-  background: linear-gradient(135deg, #FFF3E8 0%, #FFFAF5 100%);
-  box-shadow: 0 4px 16px rgba(232,119,34,0.18);
+  border-color: #FF9248;
+  background: linear-gradient(135deg, rgba(232,119,34,0.18) 0%, rgba(255,146,72,0.08) 100%);
+  box-shadow:
+    0 0 0 4px rgba(255,146,72,0.08),
+    0 8px 24px rgba(232,119,34,0.25);
 }
 body.pwa-mode .opt:has(input:checked)::before {
-  background: linear-gradient(135deg, #E87722, #FF9248);
-  color: white;
+  background: linear-gradient(135deg, #E87722, #FFA552);
+  color: #18181B;
   transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(232,119,34,0.4);
+  box-shadow: 0 4px 12px rgba(255,146,72,0.5);
 }
 body.pwa-mode .opt:has(input:checked) .opt-text {
-  color: #1F2937;
+  color: #FFFFFF;
   font-weight: 700;
 }
 
-/* Active/press feedback */
 body.pwa-mode .opt:active { transform: scale(0.98); }
 
 
@@ -304,54 +365,55 @@ body.pwa-mode .opt:active { transform: scale(0.98); }
 
 body.pwa-mode .form-input {
   width: 100%;
-  background: #FFFFFF;
-  border: 2px solid #E5E7EB;
+  background: #27272A;
+  border: 2px solid rgba(255,255,255,0.08);
   border-radius: 14px;
   padding: 16px 18px;
   font-size: 16px;
   font-weight: 600;
-  color: #1F2937;
+  color: #FAFAFA;
   transition: all 0.2s ease;
   -webkit-appearance: none;
   appearance: none;
 }
 body.pwa-mode .form-input:focus {
   outline: none;
-  border-color: #E87722;
-  background: #FFFAF5;
-  box-shadow: 0 0 0 4px rgba(232,119,34,0.12);
+  border-color: #FF9248;
+  background: #2A2724;
+  box-shadow: 0 0 0 4px rgba(255,146,72,0.12);
 }
 body.pwa-mode .form-input::placeholder {
-  color: #9CA3AF;
+  color: #71717A;
   font-weight: 500;
 }
 
 
 /* ════════════════════════════════════════════════════════════════
- *  8.  SLIDERS (ηλικία, budget, χρόνια στόχου)
+ *  8.  SLIDERS
  * ════════════════════════════════════════════════════════════════ */
 
 body.pwa-mode .slider-wrap {
-  background: linear-gradient(135deg, #FFF8F1 0%, #FFFFFF 100%);
+  background: linear-gradient(135deg, rgba(232,119,34,0.08) 0%, rgba(255,255,255,0.02) 100%);
   border-radius: 16px;
   padding: 24px 20px;
-  border: 1px solid rgba(232,119,34,0.12);
+  border: 1px solid rgba(255,165,82,0.15);
 }
 body.pwa-mode .slider-val {
   font-size: 36px;
   font-weight: 800;
-  color: #E87722;
+  color: #FFA552;
   text-align: center;
   margin-bottom: 16px;
   font-family: 'Lora', Georgia, serif;
   letter-spacing: -1px;
+  text-shadow: 0 0 24px rgba(255,165,82,0.3);
 }
 body.pwa-mode .slider-wrap input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
   height: 6px;
-  background: #FFE4D2;
+  background: rgba(255,255,255,0.08);
   border-radius: 3px;
   outline: none;
 }
@@ -359,24 +421,27 @@ body.pwa-mode .slider-wrap input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 28px; height: 28px;
-  background: linear-gradient(135deg, #E87722, #FF9248);
+  background: linear-gradient(135deg, #E87722, #FFA552);
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(232,119,34,0.4);
-  border: 3px solid white;
+  box-shadow: 0 4px 16px rgba(255,146,72,0.5);
+  border: 3px solid #18181B;
 }
 body.pwa-mode .slider-wrap input[type="range"]::-moz-range-thumb {
   width: 28px; height: 28px;
-  background: linear-gradient(135deg, #E87722, #FF9248);
+  background: linear-gradient(135deg, #E87722, #FFA552);
   border-radius: 50%;
   cursor: pointer;
-  border: 3px solid white;
-  box-shadow: 0 4px 12px rgba(232,119,34,0.4);
+  border: 3px solid #18181B;
+  box-shadow: 0 4px 16px rgba(255,146,72,0.5);
+}
+body.pwa-mode .slider-labels {
+  color: #71717A;
 }
 
 
 /* ════════════════════════════════════════════════════════════════
- *  9.  FLOATING NAVIGATION BAR (Typeform-style FAB)
+ *  9.  FLOATING NAVIGATION BAR
  * ════════════════════════════════════════════════════════════════ */
 
 .pwa-nav { display: none; }
@@ -387,7 +452,7 @@ body.pwa-mode .pwa-nav {
   bottom: 0; left: 0; right: 0;
   padding: 16px 20px;
   padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(to top, #FFFDFB 60%, rgba(255,253,251,0));
+  background: linear-gradient(to top, #0E0E10 50%, rgba(14,14,16,0));
   z-index: 100;
   pointer-events: none;
 }
@@ -409,26 +474,28 @@ body.pwa-mode .pwa-nav button {
   cursor: pointer;
   transition: all 0.2s ease;
 }
-body.pwa-mode .pwa-nav button:active { transform: scale(0.95); }
+body.pwa-mode .pwa-nav button:active:not(:disabled) { transform: scale(0.95); }
 
-/* Back button — secondary, ghost */
+/* Back button */
 body.pwa-mode .pwa-btn-prev {
-  background: #FFFFFF;
-  color: #6B7280;
+  background: rgba(255,255,255,0.06);
+  color: #A1A1AA;
   padding: 14px 20px;
   border-radius: 14px;
   font-size: 14px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  border: 1px solid #E5E7EB;
+  border: 1px solid rgba(255,255,255,0.08);
   flex: 0 0 auto;
   min-width: 90px;
 }
-body.pwa-mode .pwa-btn-prev:hover { background: #F9FAFB; color: #1F2937; }
+body.pwa-mode .pwa-btn-prev:hover {
+  background: rgba(255,255,255,0.1);
+  color: #FAFAFA;
+}
 
-/* Next button — primary, gradient FAB */
+/* Next button — gradient FAB */
 body.pwa-mode .pwa-btn-next {
-  background: linear-gradient(135deg, #E87722 0%, #FF9248 100%);
-  color: #FFFFFF;
+  background: linear-gradient(135deg, #E87722 0%, #FFA552 100%);
+  color: #18181B;
   padding: 16px 28px;
   border-radius: 14px;
   font-size: 15px;
@@ -439,20 +506,23 @@ body.pwa-mode .pwa-btn-next {
   flex: 1;
   letter-spacing: 0.2px;
 }
-body.pwa-mode .pwa-btn-next:hover {
-  background: linear-gradient(135deg, #C0591A 0%, #E87722 100%);
-  box-shadow: 0 12px 28px rgba(232,119,34,0.5);
+body.pwa-mode .pwa-btn-next:hover:not(:disabled) {
+  background: linear-gradient(135deg, #FFA552 0%, #FFB776 100%);
+  box-shadow: 0 12px 32px rgba(255,165,82,0.5);
 }
-body.pwa-mode .pwa-btn-next:disabled {
-  background: #E5E7EB;
-  color: #9CA3AF;
+
+/* Disabled — when current question hasn't been answered */
+body.pwa-mode .pwa-btn-next:disabled,
+body.pwa-mode .pwa-btn-next.pwa-disabled {
+  background: rgba(255,255,255,0.08);
+  color: #71717A;
   box-shadow: none;
   cursor: not-allowed;
 }
 
 
 /* ════════════════════════════════════════════════════════════════
- * 10.  AUTO-ADVANCE HINT (progress bar above nav)
+ * 10.  AUTO-ADVANCE HINT
  * ════════════════════════════════════════════════════════════════ */
 
 body.pwa-mode .pwa-auto-hint {
@@ -476,7 +546,7 @@ body.pwa-mode .pwa-auto-hint.visible {
 body.pwa-mode .pwa-auto-hint-bar {
   width: 100%;
   height: 3px;
-  background: rgba(232,119,34,0.12);
+  background: rgba(255,165,82,0.12);
   border-radius: 2px;
   overflow: hidden;
   position: relative;
@@ -485,11 +555,11 @@ body.pwa-mode .pwa-auto-hint.visible .pwa-auto-hint-bar::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, #FFA552 0%, #E87722 100%);
+  background: linear-gradient(90deg, #E87722 0%, #FFA552 100%);
   border-radius: 2px;
   animation: pwa-auto-fill 2.2s linear forwards;
   transform-origin: left center;
-  box-shadow: 0 0 8px rgba(232,119,34,0.4);
+  box-shadow: 0 0 8px rgba(255,165,82,0.6);
 }
 @keyframes pwa-auto-fill {
   from { transform: scaleX(0); }
@@ -498,7 +568,7 @@ body.pwa-mode .pwa-auto-hint.visible .pwa-auto-hint-bar::after {
 body.pwa-mode .pwa-auto-hint-text {
   font-size: 11px;
   font-weight: 600;
-  color: #9CA3AF;
+  color: #71717A;
   letter-spacing: 0.4px;
   text-transform: uppercase;
 }
@@ -573,9 +643,9 @@ body.pwa-mode .screen.active .q-block.pwa-q-current .opt:nth-child(n+6) { animat
     padding: 44px 40px;
     border-radius: 28px;
     box-shadow:
-      0 1px 2px rgba(0,0,0,0.04),
-      0 16px 48px rgba(232,119,34,0.08),
-      0 1px 0 rgba(255,255,255,0.9) inset;
+      0 1px 0 rgba(255,255,255,0.05) inset,
+      0 20px 48px rgba(0,0,0,0.5),
+      0 8px 24px rgba(232,119,34,0.08);
   }
   body.pwa-mode .screen.active .q-block.pwa-q-current .q-label {
     font-size: 30px;
@@ -588,7 +658,6 @@ body.pwa-mode .screen.active .q-block.pwa-q-current .opt:nth-child(n+6) { animat
     padding: 16px 20px;
   }
 
-  /* Options — bigger, more spacing */
   body.pwa-mode .opts { gap: 12px; }
   body.pwa-mode .opt {
     padding: 22px 24px;
@@ -606,14 +675,12 @@ body.pwa-mode .screen.active .q-block.pwa-q-current .opt:nth-child(n+6) { animat
     line-height: 1.45;
   }
 
-  /* Form inputs */
   body.pwa-mode .form-input {
     font-size: 18px;
     padding: 20px 22px;
     border-radius: 16px;
   }
 
-  /* Sliders */
   body.pwa-mode .slider-wrap {
     padding: 32px 28px;
     border-radius: 20px;
@@ -630,7 +697,6 @@ body.pwa-mode .screen.active .q-block.pwa-q-current .opt:nth-child(n+6) { animat
     width: 36px; height: 36px;
   }
 
-  /* Floating nav — centered, more padding */
   body.pwa-mode .pwa-nav {
     padding: 24px 48px;
     padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
@@ -650,7 +716,7 @@ body.pwa-mode .screen.active .q-block.pwa-q-current .opt:nth-child(n+6) { animat
     font-size: 17px;
     border-radius: 16px;
     box-shadow:
-      0 12px 32px rgba(232,119,34,0.45),
+      0 12px 32px rgba(232,119,34,0.5),
       0 4px 8px rgba(232,119,34,0.2);
   }
   body.pwa-mode .pwa-auto-hint {
@@ -691,7 +757,7 @@ body.pwa-mode .screen.active .q-block.pwa-q-current .opt:nth-child(n+6) { animat
 
 
 /* ════════════════════════════════════════════════════════════════
- * 14.  Landscape orientation tweak: 2-col για non-grid2 opts
+ * 14.  Landscape orientation: 2-col για non-grid2 opts
  * ════════════════════════════════════════════════════════════════ */
 
 @media (min-width: 900px) and (orientation: landscape) {
@@ -704,23 +770,54 @@ body.pwa-mode .screen.active .q-block.pwa-q-current .opt:nth-child(n+6) { animat
 
 
 /* ════════════════════════════════════════════════════════════════
- * 15.  WELCOME SCREEN (s0) — beautified for PWA
+ * 15.  WELCOME SCREEN (s0) — dark beautified
  * ════════════════════════════════════════════════════════════════ */
 
 body.pwa-mode .screen#s0.active {
   text-align: center;
 }
 body.pwa-mode .screen#s0 .welcome-card {
-  background: white;
+  background: linear-gradient(180deg, #1F1F23 0%, #18181B 100%);
   border-radius: 20px;
   padding: 24px;
   box-shadow:
-    0 1px 2px rgba(0,0,0,0.04),
-    0 8px 32px rgba(232,119,34,0.06);
-  border: 1px solid rgba(232,119,34,0.08);
+    0 1px 0 rgba(255,255,255,0.05) inset,
+    0 10px 32px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.06);
   margin: 20px 0;
   text-align: left;
 }
+body.pwa-mode .screen#s0 h2 { color: #FAFAFA; }
+body.pwa-mode .screen#s0 p { color: #D4D4D8; }
+body.pwa-mode .screen#s0 .step-item {
+  color: #E4E4E7;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  margin-bottom: 6px;
+}
+body.pwa-mode .screen#s0 .step-num {
+  background: linear-gradient(135deg, #E87722, #FFA552);
+  color: #18181B;
+}
+body.pwa-mode .screen#s0 .advisor-badge {
+  background: rgba(255,165,82,0.1);
+  color: #FFA552;
+  border: 1px solid rgba(255,165,82,0.2);
+}
+body.pwa-mode .screen#s0 .nn-logo {
+  color: #FFA552;
+}
+body.pwa-mode .screen#s0 .nn-sub {
+  color: #D4D4D8;
+}
+
+/* Primary button on welcome */
+body.pwa-mode .btn-primary {
+  background: linear-gradient(135deg, #E87722 0%, #FFA552 100%);
+  color: #18181B;
+  box-shadow: 0 8px 24px rgba(232,119,34,0.4);
+}
+
 @media (min-width: 768px) {
   body.pwa-mode .screen#s0 .welcome-card {
     padding: 36px;
