@@ -35,12 +35,29 @@
   // Mark mode early so CSS can react ASAP
   document.documentElement.classList.add('pwa-mode');
 
+  // ─── Config ──────────────────────────────────────────
+  // Καθυστέρηση αυτόματης μετάβασης μετά από radio selection.
+  // Δίνει χρόνο στον χρήστη να δει την επιλογή του, να μετανιώσει,
+  // ή να την αλλάξει πριν προχωρήσει. Αν πατήσει «Επόμενο» ο ίδιος,
+  // το auto-advance ακυρώνεται.
+  const AUTO_ADVANCE_DELAY_MS = 2200;
+
   // ─── State ───────────────────────────────────────────
   const state = {
     qIndex:       0,
     screenId:     null,
     lastDirection:'forward',   // 'forward' | 'backward' — αποφασίζει αν το νέο screen θα ξεκινήσει από την 1η ή την τελευταία ερώτηση
+    autoTimer:    null,        // setTimeout handle για auto-advance
   };
+
+  function cancelAutoAdvance() {
+    if (state.autoTimer) {
+      clearTimeout(state.autoTimer);
+      state.autoTimer = null;
+      const hint = document.getElementById('pwa-auto-hint');
+      if (hint) hint.classList.remove('visible');
+    }
+  }
 
   // ─── Helpers ─────────────────────────────────────────
   function getActiveScreen() {
@@ -115,6 +132,7 @@
 
   // ─── Navigation actions ──────────────────────────────
   function nextQ() {
+    cancelAutoAdvance();   // ο χρήστης πάτησε χειροκίνητα — ακυρώνεται το auto
     const screen = getActiveScreen();
     if (!screen || !shouldUseSingleMode(screen)) return;
 
@@ -127,6 +145,7 @@
   }
 
   function prevQ() {
+    cancelAutoAdvance();
     const screen = getActiveScreen();
     if (!screen) return;
     if (!shouldUseSingleMode(screen)) {
@@ -156,13 +175,19 @@
   function ensureNav() {
     if (document.getElementById('pwa-nav')) return;
 
-    // Floating bottom nav
+    // Floating bottom nav (με auto-advance progress bar)
     const nav = document.createElement('div');
     nav.className = 'pwa-nav';
     nav.id        = 'pwa-nav';
     nav.innerHTML = `
-      <button class="pwa-btn-prev" id="pwa-btn-prev" type="button">← Πίσω</button>
-      <button class="pwa-btn-next" id="pwa-btn-next" type="button">Επόμενο →</button>
+      <div class="pwa-auto-hint" id="pwa-auto-hint">
+        <div class="pwa-auto-hint-bar"></div>
+        <div class="pwa-auto-hint-text">Αυτόματη μετάβαση…</div>
+      </div>
+      <div class="pwa-nav-row">
+        <button class="pwa-btn-prev" id="pwa-btn-prev" type="button">← Πίσω</button>
+        <button class="pwa-btn-next" id="pwa-btn-next" type="button">Επόμενο →</button>
+      </div>
     `;
     document.body.appendChild(nav);
     document.getElementById('pwa-btn-prev').addEventListener('click', prevQ);
@@ -215,21 +240,36 @@
     }
   }
 
-  // ─── Auto-advance on radio selection ────────────────
+  // ─── Auto-advance on radio selection (slow, last-resort) ──
   document.addEventListener('change', function (e) {
     if (!document.documentElement.classList.contains('pwa-mode')) return;
     const screen = getActiveScreen();
     if (!shouldUseSingleMode(screen)) return;
 
     if (e.target && e.target.type === 'radio') {
-      // Καθυστέρηση 350ms: ο χρήστης βλέπει την επιλογή του, και η
-      // app logic προλαβαίνει να εμφανίσει conditional q-blocks αν χρειάζεται.
-      setTimeout(nextQ, 350);
+      // Ακύρωσε προηγούμενο timer (αν ο χρήστης αλλάξει επιλογή, ο νέος
+      // χρόνος μετρά από την αρχή).
+      cancelAutoAdvance();
+
+      // Δείξε διακριτικό hint ότι θα προχωρήσει αυτόματα
+      const hint = document.getElementById('pwa-auto-hint');
+      if (hint) hint.classList.add('visible');
+
+      state.autoTimer = setTimeout(function () {
+        state.autoTimer = null;
+        if (hint) hint.classList.remove('visible');
+        nextQ();
+      }, AUTO_ADVANCE_DELAY_MS);
     }
   });
 
+  // Αν ο χρήστης scroll-άρει ή πατήσει οπουδήποτε (εκτός από το ίδιο
+  // το radio που μόλις επέλεξε), ΜΗΝ ακυρώνεις — αυτό θα ήταν annoying.
+  // Το auto-advance ακυρώνεται μόνο σε επανεπιλογή ή σε manual nav.
+
   // ─── Observe screen changes (.active toggle) ─────────
   function onScreenChange() {
+    cancelAutoAdvance();   // καθάρισε τυχόν εκκρεμές timer από προηγούμενο screen
     const screen = getActiveScreen();
     if (!screen) return;
     if (state.screenId === screen.id) return;

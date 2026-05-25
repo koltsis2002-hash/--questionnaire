@@ -1,10 +1,37 @@
 /* ════════════════════════════════════════════════════════════════
  * NN Hellas — PWA Single-Question Mode
  * Ενεργοποιείται ΜΟΝΟ όταν το ερωτηματολόγιο εκτελείται ως PWA
- * (εγκατεστημένη εφαρμογή κινητού). Σε browser mode, οι κανόνες
+ * (εγκατεστημένη εφαρμογή κινητού/tablet). Σε browser mode, οι κανόνες
  * αυτοί ΔΕΝ ενεργοποιούνται και ο πελάτης βλέπει την κανονική
  * διάταξη με όλες τις ερωτήσεις κάθε βήματος μαζί.
+ *
+ * Σχεδιασμός για:
+ *   • iPhone (375–428px)
+ *   • iPad portrait (~768px)
+ *   • iPad landscape & iPad Pro (~1024–1366px)
  * ════════════════════════════════════════════════════════════════ */
+
+/* ── iOS PWA tap behavior (αφαιρεί μπλε flash & long-press menu) ── */
+body.pwa-mode {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* Επιτρέπουμε επιλογή σε text/email/phone inputs μόνο */
+}
+body.pwa-mode input,
+body.pwa-mode textarea {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
+/* iOS safe areas (notch, home indicator) */
+body.pwa-mode {
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
 
 /* ── Hide q-blocks individually only in PWA mode ───────────── */
 body.pwa-mode .screen.active .q-block.pwa-q-hidden {
@@ -20,7 +47,7 @@ body.pwa-mode .screen.active .nav-row {
 .pwa-nav { display: none; }
 
 body.pwa-mode .pwa-nav {
-  display: flex;
+  display: block;
   position: fixed;
   bottom: 0; left: 0; right: 0;
   background: #FFFFFF;
@@ -28,8 +55,55 @@ body.pwa-mode .pwa-nav {
   padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid #E5E7EB;
   box-shadow: 0 -2px 16px rgba(0,0,0,0.08);
-  gap: 10px;
   z-index: 100;
+}
+
+body.pwa-mode .pwa-nav-row {
+  display: flex;
+  gap: 10px;
+}
+
+/* ── Auto-advance hint (slow progress bar) ─────────────── */
+body.pwa-mode .pwa-auto-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px 10px;
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  transition: opacity 0.2s ease, height 0.2s ease;
+}
+body.pwa-mode .pwa-auto-hint.visible {
+  opacity: 1;
+  height: 32px;
+}
+body.pwa-mode .pwa-auto-hint-bar {
+  width: 100%;
+  height: 3px;
+  background: #F3F4F6;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+body.pwa-mode .pwa-auto-hint.visible .pwa-auto-hint-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #FFA552 0%, #E87722 100%);
+  border-radius: 2px;
+  animation: pwa-auto-fill 2.2s linear forwards;
+  transform-origin: left center;
+}
+@keyframes pwa-auto-fill {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+body.pwa-mode .pwa-auto-hint-text {
+  font-size: 11px;
+  color: #9CA3AF;
+  letter-spacing: 0.3px;
 }
 
 body.pwa-mode .pwa-nav button {
@@ -140,4 +214,144 @@ body.pwa-mode .opt input:checked ~ .opt-dot {
 body.pwa-mode #progress-track {
   height: 3px;
   opacity: 0.6;
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+ * ╔═══════════════════════════════════════════════════════════╗
+ * ║                  TABLET / iPad RULES                       ║
+ * ╚═══════════════════════════════════════════════════════════╝
+ * Ισχύουν για iPad portrait (≥768px) και iPad landscape/Pro (≥1024px).
+ * ════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) {
+  /* ── Container centering ────────────────────────────────── */
+  body.pwa-mode .app {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 40px 130px;
+  }
+
+  /* ── Progress dots: μεγαλύτερο για iPad ─────────────────── */
+  body.pwa-mode .pwa-mini-progress {
+    max-width: 720px;
+    padding: 20px 40px 0;
+    gap: 8px;
+  }
+  body.pwa-mode .pwa-mini-progress .dot {
+    height: 6px;
+    border-radius: 3px;
+  }
+
+  /* ── Typography larger για iPad reading distance ───────── */
+  body.pwa-mode .screen.active .step-label {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  body.pwa-mode .screen.active .screen-title {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+  body.pwa-mode .screen.active .q-block.pwa-q-current .q-label {
+    font-size: 22px;
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+  body.pwa-mode .screen.active .q-block.pwa-q-current .q-hint,
+  body.pwa-mode .screen.active .q-block.pwa-q-current .q-hint-explain {
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  /* ── Options: μεγαλύτερα touch targets ──────────────────── */
+  body.pwa-mode .opt {
+    padding: 18px 22px;
+    font-size: 16px;
+    min-height: 60px;
+  }
+  body.pwa-mode .opt .opt-text {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  /* ── Form inputs (name, email, phone, spouse age) ───────── */
+  body.pwa-mode .form-input {
+    font-size: 18px;
+    padding: 14px 18px;
+    min-height: 54px;
+  }
+
+  /* ── Sliders ──────────────────────────────────────────── */
+  body.pwa-mode .slider-val {
+    font-size: 28px;
+  }
+  body.pwa-mode .slider-wrap input[type="range"] {
+    height: 8px;
+  }
+
+  /* ── Floating nav: centered & wider on iPad ────────────── */
+  body.pwa-mode .pwa-nav {
+    max-width: 720px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    border-radius: 20px 20px 0 0;
+    padding: 16px 24px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  body.pwa-mode .pwa-nav button {
+    padding: 18px 24px;
+    font-size: 17px;
+    min-height: 56px;
+  }
+  body.pwa-mode .pwa-auto-hint-text {
+    font-size: 12px;
+  }
+
+  /* ── Show screen-sub on iPad (room for it) ─────────────── */
+  body.pwa-mode .screen.active .screen-sub {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+}
+
+/* ── iPad landscape & iPad Pro ─────────────────────────────── */
+@media (min-width: 1024px) {
+  body.pwa-mode .app {
+    max-width: 800px;
+    padding: 40px 48px 140px;
+  }
+  body.pwa-mode .pwa-mini-progress {
+    max-width: 800px;
+    padding: 24px 48px 0;
+  }
+  body.pwa-mode .pwa-nav {
+    max-width: 800px;
+  }
+  body.pwa-mode .screen.active .q-block.pwa-q-current .q-label {
+    font-size: 24px;
+  }
+}
+
+/* ── iPad landscape: 2-column option grids look better ─── */
+@media (min-width: 768px) and (orientation: landscape) {
+  body.pwa-mode .opts:not(.grid2) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  body.pwa-mode .opts.grid2 {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+
+/* ── Special: prevent iOS zoom on input focus (16px+ font) ── */
+body.pwa-mode input[type="text"],
+body.pwa-mode input[type="email"],
+body.pwa-mode input[type="tel"],
+body.pwa-mode input[type="number"],
+body.pwa-mode textarea,
+body.pwa-mode select {
+  font-size: 16px;   /* < 16px προκαλεί zoom στο iOS */
 }
