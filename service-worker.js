@@ -9,8 +9,8 @@
  * Όταν αλλάζεις κώδικα, ΑΛΛΑΞΕ το CACHE_VERSION για να φορτώσουν τα νέα αρχεία.
  */
 
-const CACHE_VERSION = 'nn-questionnaire-v7';
-const RUNTIME_CACHE = 'nn-runtime-v7';
+const CACHE_VERSION = 'nn-questionnaire-v8';
+const RUNTIME_CACHE = 'nn-runtime-v8';
 
 // Αρχεία που φορτώνουν αμέσως όταν εγκατασταθεί η εφαρμογή
 const APP_SHELL = [

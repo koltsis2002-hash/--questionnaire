@@ -179,7 +179,13 @@
     if (idx >= applicable.length) {
       // Done with this screen — try to advance
       state.lastDirection = 'forward';
-      if (typeof window.nextStep === 'function') window.nextStep();
+      // ΣΗΜΑΝΤΙΚΟ: Στην s5 (τελευταία οθόνη) το κουμπί καλεί submitForm()
+      // και ΟΧΙ nextStep(). Πρέπει να καλέσουμε τη σωστή συνάρτηση.
+      if (screen.id === 's5' && typeof window.submitForm === 'function') {
+        window.submitForm();
+      } else if (typeof window.nextStep === 'function') {
+        window.nextStep();
+      }
       return;
     }
 
