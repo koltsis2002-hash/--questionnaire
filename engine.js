@@ -338,19 +338,15 @@
   function selectHospitalAllowance(answers, remainingMonthlyBudget) {
     if (answers.hospitalAllowancePref !== 'yes') return null;
     const age = Number(answers.age) || 0;
-    // Ξεκινώ από το χαμηλότερο tier και ανεβαίνω όσο χωράει στο budget
-    const tiers = ['mediPlan500','mediPlan1000','mediPlan1500','mediPlan2000','mediPlan2500'];
-    let chosen = null;
+    // Προτείνουμε ΠΑΝΤΑ το μεγαλύτερο επίδομα· αν δεν χωράει στο budget,
+    // κατεβαίνουμε στο αμέσως φθηνότερο (2500 > 2000 > 1500 > 1000 > 500).
+    const tiers = ['mediPlan2500','mediPlan2000','mediPlan1500','mediPlan1000','mediPlan500'];
     for (const tierId of tiers) {
       const p = calcPrice(tierId, { age });
       if (!p) continue;
-      if (p.monthly <= remainingMonthlyBudget) {
-        chosen = tierId;
-      } else {
-        break; // δεν συμπληρώνεται από τα επόμενα (αυξάνουν)
-      }
+      if (p.monthly <= remainingMonthlyBudget) return tierId;
     }
-    return chosen;
+    return null;
   }
 
   /** Επιλογή Primary Care όταν το health πρόγραμμα είναι hospital-only. */
@@ -480,9 +476,9 @@
       }
     }
 
-    // ═══ STAGE 3: ΜΕΛΗ ΟΙΚΟΓΕΝΕΙΑΣ (HEALTH 500/1500 μόνο) ══════════
-    // Εφαρμόζεται μόνο αν ο πελάτης έχει επιλέξει "ανά περιστατικό"
-    // και το πρόγραμμα είναι health500 ή health1500.
+    // ═══ STAGE 3: ΜΕΛΗ ΟΙΚΟΓΕΝΕΙΑΣ ════════════════════════════════
+    // 3a: HEALTH 500/1500 (ανά περιστατικό) — με οικογενειακή έκπτωση
+    // 3b: CROSS / CROSS PLUS (ετήσιο / χωρίς) — ίδιο πρόγραμμα, τιμή ανά ηλικία
     const fd = DATA.familyDiscounts;
     const familyEligible = healthProgId &&
                            fd && fd.eligiblePrograms.includes(healthProgId);
@@ -558,6 +554,45 @@
           message: `Εφαρμόστηκε έκπτωση ${Math.round(discountPct * 100)}% σε όλα τα μέλη `
                 + `(${totalMembers} ασφαλισμένοι) σύμφωνα με την πολιτική οικογένειας NN Hellas.`,
         });
+      }
+    }
+
+    // ═══ STAGE 3b: ΜΕΛΗ ΟΙΚΟΓΕΝΕΙΑΣ (CROSS / ετήσιο ή χωρίς εκπιπτόμενο) ═══
+    // Για προγράμματα εκτός HEALTH 500/1500: ίδιο πρόγραμμα, τιμή ανά ηλικία
+    if (healthProgId && !familyEligible) {
+      const scope3b = answers.coverageScope || 'family';
+      if (scope3b !== 'self') {
+        const spouseAge3b = Number(answers.spouseAge) || 0;
+        const childrenAges3b = Array.isArray(answers.childrenAges)
+          ? answers.childrenAges.filter(a => a != null && Number(a) >= 0).map(Number)
+          : [];
+        const hasSpouse3b = answers.maritalStatus === 'married' && spouseAge3b >= 18 && scope3b === 'family';
+        const numKids3b   = Math.min(childrenAges3b.length, 4);
+
+        if (hasSpouse3b) {
+          const spousePrice = calcPrice(healthProgId, { age: spouseAge3b });
+          if (spousePrice) {
+            pushLine({
+              category: 'health', kind: 'program',
+              id: healthProgId, label: DATA.programs[healthProgId].label,
+              memberType: 'spouse', memberLabel: 'Σύζυγος',
+              memberAge: spouseAge3b, price: spousePrice,
+            });
+          }
+        }
+
+        for (let i = 0; i < numKids3b; i++) {
+          const kidAge = childrenAges3b[i];
+          const kidPrice = calcPrice(healthProgId, { age: kidAge });
+          if (kidPrice) {
+            pushLine({
+              category: 'health', kind: 'program',
+              id: healthProgId, label: DATA.programs[healthProgId].label,
+              memberType: 'child', memberLabel: `Παιδί ${i + 1}`,
+              memberAge: kidAge, price: kidPrice,
+            });
+          }
+        }
       }
     }
 

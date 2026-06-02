@@ -32,68 +32,6 @@
   };
 
   // ════════════════════════════════════════════════════════════════
-  // HOSPITAL NETWORK (display only)
-  // ════════════════════════════════════════════════════════════════
-  const HOSPITAL_NETWORK = {
-    premium: {
-      label: 'Ειδικά Συμβεβλημένα',
-      perk:  'Απορρόφηση συμμετοχής 15–20% (έως €1.500) σε συνδυασμό με δημόσιο φορέα',
-      athens: [
-        'ΥΓΕΙΑ', 'ΕΡΡΙΚΟΣ ΝΤΥΝΑΝ',
-        'METROPOLITAN', 'METROPOLITAN General',
-        'ΙΑΤΡΙΚΟ Κέντρο Αθηνών', 'ΙΑΤΡΙΚΟ Ψυχικού',
-        'ΙΑΤΡΙΚΟ Κέντρο Π. Φαλήρου', 'ΙΑΤΡΙΚΟ Περιστερίου',
-        'ΕΥΡΩΚΛΙΝΙΚΗ Αθηνών', 'ΕΥΡΩΚΛΙΝΙΚΗ Παίδων',
-        'MEDITERRANEO',
-      ],
-      thessaloniki: [
-        'ΙΑΤΡΙΚΟ ΔΙΑΒΑΛΚΑΝΙΚΟ', 'ΑΓΙΟΣ ΛΟΥΚΑΣ',
-        'ΓΕΝΕΣΙΣ', 'ΓΕΝΙΚΗ ΚΛΙΝΙΚΗ Θεσσαλονίκης', 'ΚΥΑΝΟΥΣ ΣΤΑΥΡΟΣ',
-      ],
-      other: [
-        'Γεν. Κλινική Ζωοδόχος Πηγή (Κοζάνη)', 'Γεν. Κλινική Ρόδου',
-      ],
-    },
-    partner: {
-      label: 'Συμβεβλημένα',
-      athens: [
-        'ΑΘΗΝΑΪΚΗ Κλινική', 'ΒΙΟΚΛΙΝΙΚΗ Αθηνών',
-        'ΙΑΣΩ Μαιευτική', 'ΙΑΣΩ Παίδων',
-        'ΙΑΤΡΟΠΟΛΙΣ Χαλανδρίου', 'ΚΕΝΤΡΙΚΗ Κλινική',
-        'Λευκός Σταυρός', 'ΟΦΘΑΛΜΟΛΟΓΙΚΟ Αθηνών',
-        'ΠΕΙΡΑΪΚΟ Θεραπευτήριο', 'ΕΥΓΕΝΙΔΙΟ Θεραπευτήριο',
-        'ΡΕΑ Μαιευτική', 'ΩΝΑΣΕΙΟ',
-        'ATHENS EYE Hospital', 'ATHENS VISION',
-        'Doctors\' Hospital', 'EYE DAY Clinic',
-        'LASER VISION', 'Therapis General',
-      ],
-      thessaloniki: ['ΒΙΟΚΛΙΝΙΚΗ Θεσσαλονίκης', 'OPHTHALMICA'],
-      crete: ['Creta Interclinic', 'Creta Interclinic Μητέρα Κρήτης', 'IASIS Χανίων'],
-      patras: ['ΟΛΥΜΠΙΟΝ Πατρών'],
-      larisa: ['Θεσσαλία Γενική Κλινική', 'ΙΑΣΩ Θεσσαλίας'],
-      volos:  ['ΑΝΑΣΣΑ Γενική Κλινική', 'ΕΛΠΙΣ Γενική Κλινική'],
-    },
-    perks: [
-      { icon:'🚨', title:'Επείγοντα Περιστατικά',
-        desc:'Δωρεάν εξετάσεις €200-€600/περιστατικό + επισκέψεις παθολόγου/καρδιολόγου/χειρουργού/ορθοπεδικού στα €10' },
-      { icon:'🚑', title:'Δωρεάν Ασθενοφόρο',
-        desc:'Μεταφορά εντός Αττικής/Θεσσαλονίκης 24/7 σε περίπτωση εισαγωγής' },
-      { icon:'🩺', title:'Τακτικά Εξωτερικά Ιατρεία',
-        desc:'Δωρεάν ή €20 προγραμματισμένες επισκέψεις σε όλες τις βασικές ειδικότητες' },
-      { icon:'🔬', title:'Διαγνωστικές Εξετάσεις',
-        desc:'Τιμές ΦΕΚ/ΕΟΠΥΥ ή έκπτωση έως 60% στον ιδιωτικό τιμοκατάλογο' },
-      { icon:'✅', title:'Ετήσιο Check-up €10',
-        desc:'12 βασικές εξετάσεις (Γενική, σάκχαρο, χολ., ηπατικά, TSH, ούρων)' },
-      { icon:'👨‍👩‍👧', title:'Προνόμια Οικογένειας',
-        desc:'20% έκπτωση νοσηλείας + €20 επισκέψεις για σύζυγο/τέκνα/γονείς' },
-      { icon:'🤰', title:'Μαιευτική Φροντίδα',
-        desc:'ΜΗΤΕΡΑ: Τοκετός + 3ήμερη νοσηλεία από €2.100 με πλήρη προγεννητικό' },
-      { icon:'📞', title:'Συντονιστικό 24/7',
-        desc:'210 9506000 — ιατρικές συμβουλές, ραντεβού, διακομιδές' },
-    ],
-  };
-
-  // ════════════════════════════════════════════════════════════════
   // STATE
   // ════════════════════════════════════════════════════════════════
   let currentStep = 0;
@@ -306,7 +244,7 @@
   // COLLECT ANSWERS
   // ════════════════════════════════════════════════════════════════
   function collectAnswers() {
-    answers.age           = parseInt(document.getElementById('age-slider').value) || 35;
+    answers.age           = parseInt(document.getElementById('age-input').value) || null;
     answers.monthly_budget = parseInt(document.getElementById('budget-slider').value) || 100;
     answers.target_years  = parseInt(document.getElementById('target-years-slider').value) || 15;
     answers.client_name   = (document.getElementById('client-name')?.value || '').trim();
@@ -340,6 +278,10 @@
   function validateStep(step) {
     const a = answers;
     if (step === 1) {
+      const ageEl = document.getElementById('age-input');
+      const ageVal = ageEl ? parseInt(ageEl.value) : NaN;
+      if (!ageEl || !ageEl.value || isNaN(ageVal)) return ['Παρακαλώ συμπληρώστε την ηλικία σας για να συνεχίσετε'];
+      if (ageVal < 18 || ageVal > 70) return ['Η ηλικία πρέπει να είναι μεταξύ 18 και 70 ετών'];
       if (!a.marital_status) return ['Επιλέξτε οικογενειακή κατάσταση'];
       if (a.marital_status === 'married') {
         const sa = document.getElementById('spouse-age')?.value;
@@ -397,7 +339,7 @@
   // SAVINGS SCENARIOS (αποταμίευση — ανεξάρτητο από engine)
   // Πηγή αποδόσεων: NN-E-422/07.2025
   // ════════════════════════════════════════════════════════════════
-  function calcSavingsScenarios(targetAmount, years) {
+  function calcSavingsScenarios(targetAmount, years, offerMonthly) {
     if (!targetAmount || !years || targetAmount <= 0 || years <= 0) return null;
     const returns = [
       { label:'Συντηρητικό',  annual:0.0270, color:'#4a9eda',
@@ -408,10 +350,15 @@
         desc:'Υψηλότερο ρίσκο με μεγαλύτερη δυνητική απόδοση' },
     ];
     const months = years * 12;
+    const pmt = Math.max(0, offerMonthly || 0);
     return returns.map(s => {
       const r = s.annual / 12;
-      const pmt = targetAmount * r / (Math.pow(1 + r, months) - 1);
-      return { ...s, monthlyRequired: Math.round(pmt), annualRequired: Math.round(pmt * 12) };
+      const factor = (Math.pow(1 + r, months) - 1) / r;   // annuity FV factor
+      const fv = Math.round(pmt * factor);                // τι χτίζει η προσφορά
+      const requiredMonthly = Math.round(targetAmount / factor);
+      const gap = Math.max(0, targetAmount - fv);         // κενό κεφαλαίου
+      const extraMonthly = Math.max(0, requiredMonthly - pmt); // επιπλέον €/μήνα
+      return { ...s, fv, gap, extraMonthly, requiredMonthly, reachesTarget: gap <= 0 };
     });
   }
 
@@ -454,47 +401,7 @@
     if (scores.retirement >= 45) parts.push(
       'Η ιδιωτική αποταμίευση αποτελεί σήμερα αναγκαίο συμπλήρωμα της κρατικής σύνταξης για αξιοπρεπή διαβίωση.'
     );
-    if (scores.health >= 30) parts.push(
-      'Επιπλέον, αποκτάτε πρόσβαση σε <strong>45+ συμβεβλημένα νοσοκομεία</strong> πανελλαδικά (Metropolitan, Υγεία, Ερρίκος Ντυνάν, Ιατρικό, Ευρωκλινική, Mediterraneo κ.ά.) με δωρεάν επείγοντα, εξετάσεις έως €600 και απορρόφηση συμμετοχής έως 20% στα Ειδικά Συμβεβλημένα.'
-    );
     return parts.join(' ');
-  }
-
-  // ════════════════════════════════════════════════════════════════
-  // HOSPITAL NETWORK HTML
-  // ════════════════════════════════════════════════════════════════
-  function buildNetworkHTML() {
-    const N = HOSPITAL_NETWORK;
-    const perksHTML = N.perks.map(p =>
-      `<div class="net-perk"><span class="ic">${p.icon}</span><span class="tx"><b>${p.title}</b>${p.desc}</span></div>`
-    ).join('');
-    const chips = arr => arr.map(h => `<span class="net-hosp">${h}</span>`).join('');
-    const premHTML = `
-      <div class="net-tier premium">
-        <div class="net-tier-head"><h5>🏆 ${N.premium.label}</h5><span class="badge">${N.premium.perk}</span></div>
-        <div class="net-tier-region">Αθήνα</div><div class="net-hospitals">${chips(N.premium.athens)}</div>
-        <div class="net-tier-region">Θεσσαλονίκη</div><div class="net-hospitals">${chips(N.premium.thessaloniki)}</div>
-        <div class="net-tier-region">Περιφέρεια</div><div class="net-hospitals">${chips(N.premium.other)}</div>
-      </div>`;
-    const p = N.partner;
-    const partHTML = `
-      <div class="net-tier partner">
-        <div class="net-tier-head"><h5>🏥 ${p.label}</h5><span class="badge">Πανελλαδική κάλυψη</span></div>
-        <div class="net-tier-region">Αθήνα</div><div class="net-hospitals">${chips(p.athens)}</div>
-        <div class="net-tier-region">Θεσσαλονίκη</div><div class="net-hospitals">${chips(p.thessaloniki)}</div>
-        <div class="net-tier-region">Κρήτη · Πάτρα · Λάρισα · Βόλος</div>
-        <div class="net-hospitals">${chips([...p.crete, ...p.patras, ...p.larisa, ...p.volos])}</div>
-      </div>`;
-    return `
-      <div class="network-section">
-        <div class="net-title">🏥 Δίκτυο Συμβεβλημένων Νοσοκομείων NN Hellas</div>
-        <div class="net-sub">45+ ιδιωτικά νοσοκομεία πανελλαδικά με δωρεάν παροχές για ασφαλισμένους</div>
-        <div class="net-perks">${perksHTML}</div>
-        ${premHTML}${partHTML}
-        <p style="margin-top:10px;font-size:11px;color:var(--text-muted);font-style:italic">
-          📞 Πριν από νοσηλεία ενημερώστε την NN Hellas στο 210 950 6000. Λίστα στο nnhellas.gr.
-        </p>
-      </div>`;
   }
 
   // ════════════════════════════════════════════════════════════════
@@ -692,28 +599,33 @@
     // ── Savings section (αν δήλωσε στόχο) ───────────────────────
     const targetAmt = (a.target_amount && a.target_amount !== 'none') ? parseInt(a.target_amount) : 0;
     const targetYrs = parseInt(a.target_years) || 15;
-    const savScenarios = calcSavingsScenarios(targetAmt, targetYrs);
+    const savingsLine = proposal.lines.find(l => l.category === 'savings');
+    const offerSavingsMonthly = savingsLine ? savingsLine.price.monthly : 0;
+    const savScenarios = calcSavingsScenarios(targetAmt, targetYrs, offerSavingsMonthly);
     const savingsHTML = savScenarios ? `
       <div class="savings-section">
         <div class="savings-title">🎯 Σενάρια Αποταμίευσης</div>
-        <div class="savings-sub">Μηνιαία συνεισφορά για να συγκεντρώσετε τον στόχο σας, με βάση 3 διαφορετικές επενδυτικές στρατηγικές.</div>
+        <div class="savings-sub">Με βάση το προτεινόμενο αποταμιευτικό ποσό της προσφοράς (<strong>€${offerSavingsMonthly.toLocaleString('el-GR')}/μήνα</strong>), δείτε τι κεφάλαιο μπορείτε να χτίσετε σε <strong>${targetYrs} χρόνια</strong> με 3 διαφορετικές επενδυτικές στρατηγικές.</div>
         <div class="savings-target">
-          Θέλετε να συγκεντρώσετε <strong>€${targetAmt.toLocaleString('el-GR')}</strong> σε <strong>${targetYrs} χρόνια</strong>
+          Στόχος σας: <strong>€${targetAmt.toLocaleString('el-GR')}</strong> σε <strong>${targetYrs} χρόνια</strong>
         </div>
         <div class="savings-grid">
           ${savScenarios.map(s => `
             <div class="savings-card" style="--scen-color:${s.color}">
               <div class="savings-label">${s.label}</div>
-              <div class="savings-pmt">€${s.monthlyRequired.toLocaleString('el-GR')}<span>/μήνα</span></div>
-              <div class="savings-rate">απόδοση ${(s.annual * 100).toFixed(2)}% ετησίως</div>
+              <div class="savings-pmt">€${s.fv.toLocaleString('el-GR')}</div>
+              <div class="savings-rate">προβλεπόμενο κεφάλαιο · απόδοση ${(s.annual * 100).toFixed(2)}% ετησίως</div>
               <div class="savings-desc">${s.desc}</div>
+              ${s.reachesTarget
+                ? `<div class="savings-ok">✅ Καλύπτει τον στόχο σας</div>`
+                : `<div class="savings-gap">
+                     ⚠️ Υπολείπεται <strong>€${s.gap.toLocaleString('el-GR')}</strong> από τον στόχο.<br/>
+                     Για να τον πετύχετε χρειάζεστε <strong>+€${s.extraMonthly.toLocaleString('el-GR')}/μήνα</strong>
+                     (σύνολο €${s.requiredMonthly.toLocaleString('el-GR')}/μήνα).
+                   </div>`}
             </div>`).join('')}
         </div>
       </div>` : '';
-
-    // ── Network ──────────────────────────────────────────────────
-    const hasHealth = proposal.lines.some(l => l.category === 'health' || l.category === 'primaryCare');
-    const networkHTML = hasHealth ? buildNetworkHTML() : '';
 
     // ── Build proposalText for email/sheets ──────────────────────
     const familyNote = proposal.notes.find(n => n.category === 'familyDiscount');
@@ -725,6 +637,13 @@
         return `• ${l.label}${l.capital ? ' ' + Math.round(l.capital / 1000) + 'k' : ''}${member}${disc}: €${l.price.annual}/έτος`;
       }).join('\n') +
       `\nΣύνολο: €${totalAnnual}/έτος (€${totalMonthly}/μήνα)` +
+      (savScenarios ? '\n\n🎯 Σενάρια Αποταμίευσης (στόχος €' + targetAmt.toLocaleString('el-GR')
+        + ' σε ' + targetYrs + ' χρόνια, με €' + offerSavingsMonthly.toLocaleString('el-GR') + '/μήνα):\n'
+        + savScenarios.map(s => `• ${s.label} (${(s.annual*100).toFixed(2)}%): €${s.fv.toLocaleString('el-GR')}`
+            + (s.reachesTarget
+                ? ' ✅ καλύπτει τον στόχο'
+                : ` — υπολείπεται €${s.gap.toLocaleString('el-GR')} (+€${s.extraMonthly.toLocaleString('el-GR')}/μήνα)`)).join('\n')
+        : '') +
       (familyNote   ? '\n👨‍👩‍👧 ' + familyNote.message : '') +
       (savingsNote   ? '\n📌 ' + savingsNote.message : '') +
       (budgetWarning ? '\n⚠️ ' + budgetWarning.message : '');
@@ -741,7 +660,6 @@
       <div class="scenarios">${scenHTML}</div>
 
       ${savingsHTML}
-      ${networkHTML}
 
       <div class="contact-cta-section">
         <div class="contact-cta-title">📞 Επικοινωνήστε με τον Σύμβουλό σας</div>
@@ -884,8 +802,9 @@
     document.querySelectorAll('.opt.sel').forEach(el => el.classList.remove('sel'));
     document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(inp => inp.checked = false);
     document.querySelectorAll('.form-input').forEach(inp => inp.value = '');
-    document.getElementById('age-slider').value = 35;
-    document.getElementById('age-display').textContent = '35';
+    const ageInputEl = document.getElementById('age-input');
+    if (ageInputEl) ageInputEl.value = '';
+    answers.age = null;
     document.getElementById('budget-slider').value = 100;
     document.getElementById('budget-display').textContent = '100';
     document.getElementById('annual-display').textContent = '1.200';
@@ -903,10 +822,9 @@
   // INIT
   // ════════════════════════════════════════════════════════════════
   document.addEventListener('DOMContentLoaded', () => {
-    const ageSlider = document.getElementById('age-slider');
-    ageSlider.addEventListener('input', () => {
-      document.getElementById('age-display').textContent = ageSlider.value;
-      answers.age = parseInt(ageSlider.value);
+    const ageInput = document.getElementById('age-input');
+    if (ageInput) ageInput.addEventListener('input', () => {
+      answers.age = parseInt(ageInput.value) || null;
     });
 
     const budgetSlider = document.getElementById('budget-slider');
@@ -921,13 +839,6 @@
       r.addEventListener('change', () => {
         document.getElementById('spouse-section').style.display =
           r.value === 'married' ? 'block' : 'none';
-      });
-    });
-
-    document.querySelectorAll('input[name="target_amount"]').forEach(r => {
-      r.addEventListener('change', () => {
-        document.getElementById('target-years-section').style.display =
-          r.value !== 'none' ? 'block' : 'none';
       });
     });
 
