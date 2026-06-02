@@ -54,16 +54,16 @@
   // ────────────────────────────────────────────────────────────────────
   const PROGRAMS = {
     life:            { id:'life',            label:'LIFE',                   family:'life',              tier:'basic',   maxAge: 65 },
-    lifePlus:        { id:'lifePlus',        label:'Life Plus – Ασφάλεια Ζωής και Ανικανότητας', family:'life',          tier:'premium', maxAge: 60 },
+    lifePlus:        { id:'lifePlus',        label:'Ασφάλεια Ζωής και Ανικανότητας', family:'life',          tier:'premium', maxAge: 60 },
 
-    crossPlus:       { id:'crossPlus',       label:'Cross Plus – Ασφάλειας Υγείας χωρίς ετήσιο εκπιπτόμενο ποσό', family:'health-outpatient', tier:'flagship', deductible:'none',   maxAge: 65 },
-    cross1:          { id:'cross1',          label:'Cross 1 – Ασφάλειας Υγείας με 300€ ετήσιο εκπιπτόμενο ποσό',   family:'health-outpatient', tier:'premium',  deductible:'annual', maxAge: 65 },
-    cross2:          { id:'cross2',          label:'Cross 2 – Ασφάλειας Υγείας με 1500€ ετήσιο εκπιπτόμενο ποσό',  family:'health-outpatient', tier:'mid',      deductible:'annual', maxAge: 65 },
-    cross3:          { id:'cross3',          label:'Cross 3 – Ασφάλειας Υγείας με 3000€ ετήσιο εκπιπτόμενο ποσό',  family:'health-outpatient', tier:'mid',      deductible:'annual', maxAge: 65 },
-    cross4:          { id:'cross4',          label:'Cross 4 – Ασφάλειας Υγείας με 10000€ ετήσιο εκπιπτόμενο ποσό', family:'health-outpatient', tier:'basic',    deductible:'annual', maxAge: 65 },
+    crossPlus:       { id:'crossPlus',       label:'Ασφάλειας Υγείας χωρίς ετήσιο εκπιπτόμενο ποσό', family:'health-outpatient', tier:'flagship', deductible:'none',   maxAge: 65 },
+    cross1:          { id:'cross1',          label:'Ασφάλειας Υγείας με 300€ ετήσιο εκπιπτόμενο ποσό',   family:'health-outpatient', tier:'premium',  deductible:'annual', maxAge: 65 },
+    cross2:          { id:'cross2',          label:'Ασφάλειας Υγείας με 1500€ ετήσιο εκπιπτόμενο ποσό',  family:'health-outpatient', tier:'mid',      deductible:'annual', maxAge: 65 },
+    cross3:          { id:'cross3',          label:'Ασφάλειας Υγείας με 3000€ ετήσιο εκπιπτόμενο ποσό',  family:'health-outpatient', tier:'mid',      deductible:'annual', maxAge: 65 },
+    cross4:          { id:'cross4',          label:'Ασφάλειας Υγείας με 10000€ ετήσιο εκπιπτόμενο ποσό', family:'health-outpatient', tier:'basic',    deductible:'annual', maxAge: 65 },
 
-    health500:       { id:'health500',       label:'Health 500 – Ασφάλειας Υγείας με 500€ εκπιπτόμενο ποσό ανά περιστατικό',   family:'health-hospital',   tier:'premium',  deductible:'perIncident', maxAge: 70 },
-    health1500:      { id:'health1500',      label:'Health 1500 – Ασφάλειας Υγείας με 1500€ εκπιπτόμενο ποσό ανά περιστατικό', family:'health-hospital',   tier:'mid',      deductible:'perIncident', maxAge: 70 },
+    health500:       { id:'health500',       label:'Ασφάλειας Υγείας με 500€ εκπιπτόμενο ποσό ανά περιστατικό',   family:'health-hospital',   tier:'premium',  deductible:'perIncident', maxAge: 70 },
+    health1500:      { id:'health1500',      label:'Ασφάλειας Υγείας με 1500€ εκπιπτόμενο ποσό ανά περιστατικό', family:'health-hospital',   tier:'mid',      deductible:'perIncident', maxAge: 70 },
     easyGroup500:    { id:'easyGroup500',    label:'EASY GROUP 500',         family:'health-hospital',   tier:'mid',      deductible:'perIncident', maxAge: 65 },
     easyGroup1000:   { id:'easyGroup1000',   label:'EASY GROUP 1000',        family:'health-hospital',   tier:'basic',    deductible:'perIncident', maxAge: 65 },
     hospitalForAll:  { id:'hospitalForAll',  label:'HOSPITAL FOR ALL',       family:'health-hospital',   tier:'basic',    deductible:'perIncident', maxAge: 65 },
@@ -82,14 +82,14 @@
   // category: σε ποια κατηγορία ανήκει· επιτρέπεται ΤΟ ΠΟΛΥ 1 ανά κατηγορία
   // ────────────────────────────────────────────────────────────────────
   const ATTACHMENTS = {
-    extramed7:           { id:'extramed7',           label:'Extramed 7 – Εφάπαξ 30.000€ για τις 7 πιο βασικές παθήσεις',            category:'criticalIllness' },
-    extramed31:          { id:'extramed31',          label:'Extramed 31 – Εφάπαξ 30.000€ για πλήρη προστασία από 31 σοβαρές παθήσεις', category:'criticalIllness' },
+    extramed7:           { id:'extramed7',           label:'Εφάπαξ 30.000€ για τις 7 πιο βασικές παθήσεις',            category:'criticalIllness' },
+    extramed31:          { id:'extramed31',          label:'Εφάπαξ 30.000€ για πλήρη προστασία από 31 σοβαρές παθήσεις', category:'criticalIllness' },
 
-    mediPlan500:         { id:'mediPlan500',         label:'MediPlan 500 – Επίδομα νοσηλείας 500€',   category:'hospitalAllowance' },
-    mediPlan1000:        { id:'mediPlan1000',        label:'MediPlan 1000 – Επίδομα νοσηλείας 1000€', category:'hospitalAllowance' },
-    mediPlan1500:        { id:'mediPlan1500',        label:'MediPlan 1500 – Επίδομα νοσηλείας 1500€', category:'hospitalAllowance' },
-    mediPlan2000:        { id:'mediPlan2000',        label:'MediPlan 2000 – Επίδομα νοσηλείας 2000€', category:'hospitalAllowance' },
-    mediPlan2500:        { id:'mediPlan2500',        label:'MediPlan 2500 – Επίδομα νοσηλείας 2500€', category:'hospitalAllowance' },
+    mediPlan500:         { id:'mediPlan500',         label:'Επίδομα νοσηλείας 500€',   category:'hospitalAllowance' },
+    mediPlan1000:        { id:'mediPlan1000',        label:'Επίδομα νοσηλείας 1000€', category:'hospitalAllowance' },
+    mediPlan1500:        { id:'mediPlan1500',        label:'Επίδομα νοσηλείας 1500€', category:'hospitalAllowance' },
+    mediPlan2000:        { id:'mediPlan2000',        label:'Επίδομα νοσηλείας 2000€', category:'hospitalAllowance' },
+    mediPlan2500:        { id:'mediPlan2500',        label:'Επίδομα νοσηλείας 2500€', category:'hospitalAllowance' },
 
     primaryCareBio:      { id:'primaryCareBio',      label:'Πρωτοβάθμια Περίθαλψη — Βιοιατρική', category:'primaryCare' },
     primaryCareAffidea:  { id:'primaryCareAffidea',  label:'Πρωτοβάθμια Περίθαλψη — Affidea',    category:'primaryCare' },

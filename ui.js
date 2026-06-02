@@ -601,16 +601,19 @@
     const targetYrs = parseInt(a.target_years) || 15;
     const savingsLine = proposal.lines.find(l => l.category === 'savings');
     const offerSavingsMonthly = savingsLine ? savingsLine.price.monthly : 0;
+    const hasOfferSavings = offerSavingsMonthly > 0;
     const savScenarios = calcSavingsScenarios(targetAmt, targetYrs, offerSavingsMonthly);
     const savingsHTML = savScenarios ? `
       <div class="savings-section">
         <div class="savings-title">🎯 Σενάρια Αποταμίευσης</div>
-        <div class="savings-sub">Με βάση το προτεινόμενο αποταμιευτικό ποσό της προσφοράς (<strong>€${offerSavingsMonthly.toLocaleString('el-GR')}/μήνα</strong>), δείτε τι κεφάλαιο μπορείτε να χτίσετε σε <strong>${targetYrs} χρόνια</strong> με 3 διαφορετικές επενδυτικές στρατηγικές.</div>
+        <div class="savings-sub">${hasOfferSavings
+          ? `Με βάση το προτεινόμενο αποταμιευτικό ποσό της προσφοράς (<strong>€${offerSavingsMonthly.toLocaleString('el-GR')}/μήνα</strong>), δείτε τι κεφάλαιο μπορείτε να χτίσετε σε <strong>${targetYrs} χρόνια</strong> και πόσο απέχει από τον στόχο σας, με 3 διαφορετικές επενδυτικές στρατηγικές.`
+          : `Με βάση τον στόχο σας, δείτε το μηνιαίο ποσό που χρειάζεται για να τον πετύχετε σε <strong>${targetYrs} χρόνια</strong>, με 3 διαφορετικές επενδυτικές στρατηγικές.`}</div>
         <div class="savings-target">
           Στόχος σας: <strong>€${targetAmt.toLocaleString('el-GR')}</strong> σε <strong>${targetYrs} χρόνια</strong>
         </div>
         <div class="savings-grid">
-          ${savScenarios.map(s => `
+          ${savScenarios.map(s => hasOfferSavings ? `
             <div class="savings-card" style="--scen-color:${s.color}">
               <div class="savings-label">${s.label}</div>
               <div class="savings-pmt">€${s.fv.toLocaleString('el-GR')}</div>
@@ -623,6 +626,12 @@
                      Για να τον πετύχετε χρειάζεστε <strong>+€${s.extraMonthly.toLocaleString('el-GR')}/μήνα</strong>
                      (σύνολο €${s.requiredMonthly.toLocaleString('el-GR')}/μήνα).
                    </div>`}
+            </div>` : `
+            <div class="savings-card" style="--scen-color:${s.color}">
+              <div class="savings-label">${s.label}</div>
+              <div class="savings-pmt">€${s.requiredMonthly.toLocaleString('el-GR')}<span>/μήνα</span></div>
+              <div class="savings-rate">για τον στόχο σας · απόδοση ${(s.annual * 100).toFixed(2)}% ετησίως</div>
+              <div class="savings-desc">${s.desc}</div>
             </div>`).join('')}
         </div>
       </div>` : '';
@@ -637,12 +646,16 @@
         return `• ${l.label}${l.capital ? ' ' + Math.round(l.capital / 1000) + 'k' : ''}${member}${disc}: €${l.price.annual}/έτος`;
       }).join('\n') +
       `\nΣύνολο: €${totalAnnual}/έτος (€${totalMonthly}/μήνα)` +
-      (savScenarios ? '\n\n🎯 Σενάρια Αποταμίευσης (στόχος €' + targetAmt.toLocaleString('el-GR')
-        + ' σε ' + targetYrs + ' χρόνια, με €' + offerSavingsMonthly.toLocaleString('el-GR') + '/μήνα):\n'
-        + savScenarios.map(s => `• ${s.label} (${(s.annual*100).toFixed(2)}%): €${s.fv.toLocaleString('el-GR')}`
-            + (s.reachesTarget
-                ? ' ✅ καλύπτει τον στόχο'
-                : ` — υπολείπεται €${s.gap.toLocaleString('el-GR')} (+€${s.extraMonthly.toLocaleString('el-GR')}/μήνα)`)).join('\n')
+      (savScenarios ? (hasOfferSavings
+        ? '\n\n🎯 Σενάρια Αποταμίευσης (στόχος €' + targetAmt.toLocaleString('el-GR')
+          + ' σε ' + targetYrs + ' χρόνια, με €' + offerSavingsMonthly.toLocaleString('el-GR') + '/μήνα):\n'
+          + savScenarios.map(s => `• ${s.label} (${(s.annual*100).toFixed(2)}%): €${s.fv.toLocaleString('el-GR')}`
+              + (s.reachesTarget
+                  ? ' ✅ καλύπτει τον στόχο'
+                  : ` — υπολείπεται €${s.gap.toLocaleString('el-GR')} (+€${s.extraMonthly.toLocaleString('el-GR')}/μήνα)`)).join('\n')
+        : '\n\n🎯 Σενάρια Αποταμίευσης — απαιτούμενο μηνιαίο ποσό για στόχο €' + targetAmt.toLocaleString('el-GR')
+          + ' σε ' + targetYrs + ' χρόνια:\n'
+          + savScenarios.map(s => `• ${s.label} (${(s.annual*100).toFixed(2)}%): €${s.requiredMonthly.toLocaleString('el-GR')}/μήνα`).join('\n'))
         : '') +
       (familyNote   ? '\n👨‍👩‍👧 ' + familyNote.message : '') +
       (savingsNote   ? '\n📌 ' + savingsNote.message : '') +
