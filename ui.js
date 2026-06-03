@@ -456,33 +456,16 @@
 
     // Αν όλες είναι πολύ χαμηλές, μήνυμα ηρεμίας
     if (topScore < 45) {
-      return 'Με βάση τις απαντήσεις σας, δεν εντοπίστηκε άμεση ανάγκη ασφαλιστικής κάλυψης. ' +
-             'Παρόλα αυτά, μπορώ να σας βοηθήσω να αξιολογήσετε μελλοντικές ανάγκες ' +
-             'που μπορεί να προκύψουν με αλλαγές στην οικογενειακή ή επαγγελματική σας κατάσταση.';
+      return 'Με βάση τις απαντήσεις σας, δεν προκύπτει κάποια άμεση ασφαλιστική ανάγκη. ' +
+             'Μπορούμε όμως να δούμε μαζί τι θα χρειαστείτε στο μέλλον, καθώς αλλάζουν τα δεδομένα σας.';
     }
 
-    // Δομή: εισαγωγή + 1η/2η/3η ανάγκη με ροή
-    const intro = 'Από την ανάλυση των απαντήσεών σας, οι ασφαλιστικές σας ανάγκες ιεραρχούνται ως εξής:';
-
-    const describe = (cat, pos) => {
-      const level = cat.score >= 65 ? 'υψηλή' : cat.score >= 45 ? 'σημαντική' : 'βασική';
-      const prefix = pos === 1 ? 'Πρωταρχικά' : pos === 2 ? 'Παράλληλα' : 'Επιπρόσθετα';
-      switch (cat.key) {
-        case 'health':
-          return `${prefix}, η ${cat.name} αναδεικνύεται ως ${level} προτεραιότητα — η προστασία απέναντι σε νοσηλεία, χειρουργείο και ιατρικές δαπάνες αποτελεί θεμέλιο της οικογενειακής σας ασφάλειας.`;
-        case 'life':
-          return `${prefix}, η ${cat.name} αποτελεί ${level} ανάγκη — η οικονομική προστασία της οικογένειάς σας σε περίπτωση απρόοπτου εξασφαλίζει τη συνέχιση του τρόπου ζωής τους.`;
-        case 'retirement':
-          return `${prefix}, το ${cat.name} εμφανίζεται ως ${level} προτεραιότητα — η ιδιωτική αποταμίευση είναι σήμερα αναγκαία για να διασφαλίσετε αξιοπρεπή σύνταξη και ανεξαρτησία στο μέλλον.`;
-      }
-    };
-
-    const sentences = [intro];
-    ranked.forEach((cat, i) => {
-      if (cat.score >= 45 || i === 0) sentences.push(describe(cat, i + 1));
-    });
-    sentences.push('Θα σας προτείνω εξατομικευμένες λύσεις με βάση αυτή την ιεράρχηση και τον προϋπολογισμό σας.');
-    return sentences.join(' ');
+    // Απλό, ξεκάθαρο κείμενο προτεραιοτήτων με βάση τις απαντήσεις
+    const order = ranked.map((c, i) => `${i + 1}) ${c.name}`).join(', ');
+    const top = ranked[0].name;
+    return `Με βάση τις απαντήσεις σας, η σειρά προτεραιότητας για εσάς είναι: ${order}. `
+         + `Πιο σημαντική ανάγκη αναδεικνύεται η ${top}. `
+         + `Η πρόταση που ακολουθεί ξεκινά από αυτήν και είναι προσαρμοσμένη στον προϋπολογισμό σας.`;
   }
 
   // ════════════════════════════════════════════════════════════════
@@ -609,7 +592,7 @@
       const frame1 = `
       <div class="savings-section">
         <div class="savings-title">🎯 Σενάρια Αποταμίευσης</div>
-        <div class="savings-sub">Με βάση το προτεινόμενο αποταμιευτικό ποσό της προσφοράς (<strong>€${offerSavingsMonthly.toLocaleString('el-GR')}/μήνα</strong>), δείτε τι κεφάλαιο μπορείτε να χτίσετε σε <strong>${targetYrs} χρόνια</strong>, με 3 διαφορετικές επενδυτικές στρατηγικές.</div>
+        <div class="savings-sub">Το προτεινόμενο αποταμιευτικό ποσό της προσφοράς (<strong>€${offerSavingsMonthly.toLocaleString('el-GR')}/μήνα</strong>) είναι αυτό που <strong>υπολείπεται αφού καλυφθούν οι ανάγκες Υγείας και Ζωής</strong>. Δείτε τι κεφάλαιο μπορείτε να χτίσετε σε <strong>${targetYrs} χρόνια</strong>, με 3 διαφορετικές επενδυτικές στρατηγικές.</div>
         <div class="savings-grid">
           ${savScenarios.map(s => `
             <div class="savings-card" style="--scen-color:${s.color}">
@@ -670,16 +653,19 @@
         const member = (l.memberType && l.memberType !== 'client') ? ` [${l.memberLabel}]` : '';
         const disc   = (l.price.discountPct && l.price.discountPct > 0)
           ? ` (-${Math.round(l.price.discountPct * 100)}%)` : '';
-        return `• ${l.label}${l.capital ? ' ' + Math.round(l.capital / 1000) + 'k' : ''}${member}${disc}: €${l.price.annual}/έτος`;
+        const note   = (l.category === 'savings')
+          ? ' (το ποσό που υπολείπεται αφού καλυφθούν Υγεία & Ζωή)' : '';
+        return `• ${l.label}${l.capital ? ' ' + Math.round(l.capital / 1000) + 'k' : ''}${member}${disc}: €${l.price.monthly}/μήνα${note}`;
       }).join('\n') +
-      `\nΣύνολο: €${totalAnnual}/έτος (€${totalMonthly}/μήνα)` +
+      `\nΣύνολο: €${totalMonthly}/μήνα` +
       (savScenarios ? (hasOfferSavings
-        ? '\n\n🎯 Σενάρια Αποταμίευσης (στόχος €' + targetAmt.toLocaleString('el-GR')
-          + ' σε ' + targetYrs + ' χρόνια, με €' + offerSavingsMonthly.toLocaleString('el-GR') + '/μήνα):\n'
-          + savScenarios.map(s => `• ${s.label} (${(s.annual*100).toFixed(2)}%): €${s.fv.toLocaleString('el-GR')}`
-              + (s.reachesTarget
-                  ? ' ✅ καλύπτει τον στόχο'
-                  : ` — υπολείπεται €${s.gap.toLocaleString('el-GR')} (+€${s.extraMonthly.toLocaleString('el-GR')}/μήνα)`)).join('\n')
+        ? '\n\n🎯 Σενάρια Αποταμίευσης'
+          + '\nΜε €' + offerSavingsMonthly.toLocaleString('el-GR') + '/μήνα, σε ' + targetYrs + ' χρόνια χτίζετε:\n'
+          + savScenarios.map(s => `• ${s.label} (${(s.annual*100).toFixed(2)}%): €${s.fv.toLocaleString('el-GR')}`).join('\n')
+          + '\n\nΠόσα χρειάζονται ακόμα για στόχο €' + targetAmt.toLocaleString('el-GR') + ':\n'
+          + savScenarios.map(s => `• ${s.label}: ` + (s.reachesTarget
+              ? '✅ καλύπτει τον στόχο'
+              : `+€${s.extraMonthly.toLocaleString('el-GR')}/μήνα (υπολείπονται €${s.gap.toLocaleString('el-GR')})`)).join('\n')
         : '\n\n🎯 Σενάρια Αποταμίευσης — απαιτούμενο μηνιαίο ποσό για στόχο €' + targetAmt.toLocaleString('el-GR')
           + ' σε ' + targetYrs + ' χρόνια:\n'
           + savScenarios.map(s => `• ${s.label} (${(s.annual*100).toFixed(2)}%): €${s.requiredMonthly.toLocaleString('el-GR')}/μήνα`).join('\n'))
@@ -730,10 +716,7 @@
       <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
         <button class="btn btn-ghost" onclick="resetForm()">🔄 Νέα Αξιολόγηση</button>
         <button class="btn btn-accent" onclick="window.print()">🖨️ Εκτύπωση</button>
-      </div>
-      <p style="text-align:center;margin-top:16px;font-size:11px;color:var(--text-muted);line-height:1.6">
-        Τα ασφάλιστρα είναι ενδεικτικά (Class B) και ενδέχεται να διαφέρουν στην πραγματική προσφορά ανάλογα με υγεία, επάγγελμα και άλλους παράγοντες αξιολόγησης.
-      </p>`;
+      </div>`;
 
     // Integrations
     const resultData = {

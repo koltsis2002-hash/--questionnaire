@@ -32,7 +32,19 @@
         </table>
       </td></tr>
 
-      <!-- NEEDS HIERARCHY — Podium + Paragraph -->
+      <!-- PROPOSAL -->
+      <tr><td style="padding:16px 32px 8px">
+        <h2 style="font-size:15px;color:#1a2238;margin:0 0 12px;text-transform:uppercase;letter-spacing:1px;color:#F47920">Προτεινόμενη Κάλυψη για Εσάς</h2>
+        <p style="font-size:12px;color:#666;margin:0 0 10px;font-style:italic">Τα προγράμματα αναγράφονται με μηνιαίο κόστος, ξεκινώντας από την πιο σημαντική σας ανάγκη.</p>
+        <pre style="background:#f8f9fc;padding:16px;border-radius:8px;white-space:pre-wrap;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;color:#222;margin:0;border-left:4px solid #F47920">{{proposal_text}}</pre>
+        <p style="font-size:13px;color:#666;margin:12px 0 0">
+          💰 <strong>Μηνιαίος προϋπολογισμός:</strong> €{{monthly_budget}}/μήνα
+          &nbsp;·&nbsp;
+          🧾 <strong>Εκπιπτόμενο:</strong> {{deductible_pref}}{{#deductible_amount}} (€{{deductible_amount}}){{/deductible_amount}}
+        </p>
+      </td></tr>
+
+      <!-- NEEDS HIERARCHY — Podium + Paragraph (μετά την πρόταση) -->
       <tr><td style="padding:16px 32px 8px">
         <h2 style="font-size:15px;color:#F47920;margin:0 0 12px;text-transform:uppercase;letter-spacing:1px">Ιεράρχηση Ασφαλιστικών Αναγκών σας</h2>
 
@@ -43,19 +55,6 @@
         <div style="background:#fff4e6;border-left:4px solid #F47920;border-radius:6px;padding:16px 18px;margin-top:8px">
           <p style="font-size:14px;line-height:1.8;color:#222;margin:0">{{needs_hierarchy}}</p>
         </div>
-
-        <p style="font-size:13px;color:#666;margin:12px 0 0">
-          💰 <strong>Μηνιαίος προϋπολογισμός:</strong> €{{monthly_budget}}/μήνα
-          &nbsp;·&nbsp;
-          🧾 <strong>Εκπιπτόμενο:</strong> {{deductible_pref}}{{#deductible_amount}} (€{{deductible_amount}}){{/deductible_amount}}
-        </p>
-      </td></tr>
-
-      <!-- PROPOSAL -->
-      <tr><td style="padding:16px 32px 8px">
-        <h2 style="font-size:15px;color:#1a2238;margin:0 0 12px;text-transform:uppercase;letter-spacing:1px;color:#F47920">Προτεινόμενη Κάλυψη για Εσάς</h2>
-        <p style="font-size:12px;color:#666;margin:0 0 10px;font-style:italic">Η σειρά παρακάτω αντιστοιχεί στην ιεράρχηση των αναγκών σας.</p>
-        <pre style="background:#f8f9fc;padding:16px;border-radius:8px;white-space:pre-wrap;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;color:#222;margin:0;border-left:4px solid #F47920">{{proposal_text}}</pre>
       </td></tr>
 
       <!-- DISCLAIMER -->
@@ -90,7 +89,7 @@
           📞 <a href="tel:{{advisor_phone}}" style="color:#F47920;text-decoration:none;font-weight:600">{{advisor_phone}}</a>
         </div>
         <div style="font-size:10px;margin-top:12px;color:#6a7d92;font-style:italic">
-          Με εκτίμηση — Τα ασφάλιστρα είναι ενδεικτικά (Class B).
+          Με εκτίμηση.
         </div>
       </td></tr>
 
