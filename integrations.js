@@ -152,6 +152,7 @@
       deductible_pref:  data.deductible_type  || '',
       deductible_amount:data.deductible_amount|| '',
       needs_hierarchy_short: data.needs_hierarchy_short || '',
+      client_profile:   data.client_profile   || '',
       podium_html:      data.podium_html      || '',
       proposal_text:    data.proposal_text    || '',
       date:             new Date().toLocaleDateString('el-GR'),
