@@ -322,15 +322,12 @@
     return cheapest;
   }
 
-  /** Επιλογή critical illness rider βάσει P7 + auto από health score. */
+  /** Επιλογή critical illness rider ΜΟΝΟ βάσει της απάντησης P7 (όχι auto από score). */
   function selectCriticalIllness(answers, scores) {
     const pref = answers.criticalIllnessPref;
     if (pref === 'em31') return 'extramed31';
     if (pref === 'em7')  return 'extramed7';
-    // pref === 'none' ή undefined → auto από score
-    const h = scores.health;
-    if (h >= DATA.scoring.thresholds.extramed31AutoMin) return 'extramed31';
-    if (h >= DATA.scoring.thresholds.extramed7AutoMin)  return 'extramed7';
+    // pref === 'none' ή undefined → καμία αυτόματη πρόταση
     return null;
   }
 
@@ -347,15 +344,6 @@
       if (p.monthly <= remainingMonthlyBudget) return tierId;
     }
     return null;
-  }
-
-  /** Επιλογή Primary Care όταν το health πρόγραμμα είναι hospital-only. */
-  function selectPrimaryCare(programId) {
-    const hospitalOnly = DATA.scoring.ofc.hospitalOnlyPrograms || [];
-    if (!hospitalOnly.includes(programId)) return null;
-    // Προτίμηση: firstCare1 (premium AFFIDEA) — fallback firstCare2
-    const order = DATA.scoring.ofc.preferenceOrder || ['firstCare1','firstCare2'];
-    return order[0];
   }
 
   /** Επιλογή Life product (life vs lifePlus) βάσει age + scores. */
@@ -638,24 +626,7 @@
         }
       }
 
-      // 4.3 Primary Care (αν το πρόγραμμα είναι hospital-only)
-      if (remainingBudget() > 0) {
-        const pcId = selectPrimaryCare(healthProgId);
-        if (pcId) {
-          const pcPrice = calcPrice(pcId, { age });
-          if (pcPrice && pcPrice.monthly <= remainingBudget()) {
-            pushLine({
-              category: 'primaryCare',
-              kind:     'program',
-              id:       pcId,
-              label:    DATA.programs[pcId].label,
-              memberType: 'client',
-              memberLabel: 'Εσείς',
-              price:    pcPrice,
-            });
-          }
-        }
-      }
+      // 4.3 Primary Care (First Care) — αφαιρέθηκε εντελώς κατόπιν αιτήματος.
     }
 
     // ═══ STAGE 5: ΣΥΝΤΑΞΗ — μόνο αν χωράει στο budget ═════════════
@@ -725,7 +696,6 @@
     selectHealthProgram,
     selectCriticalIllness,
     selectHospitalAllowance,
-    selectPrimaryCare,
     selectLifeProduct,
     buildProposal,
     // Internal helpers (εκτεθειμένα για testing)
