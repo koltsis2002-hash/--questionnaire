@@ -1979,7 +1979,7 @@
     thresholds: {
       healthIncludePct:   0.20,   // share ≥ 20% ⇒ include
       lifeIncludePct:     0.20,
-      savingsNoteMin:     45,     // retirement score ≥ 45 ⇒ note (όχι προϊόν)
+      savingsNoteMin:     40,     // retirement score ≥ 40 ⇒ εξετάζεται αποταμιευτικό
       acceleratorMinAnnualBudget: 600,  // υπόλοιπο budget ≥ €600/έτος ⇒ +acceleratorPlus
     },
   };
