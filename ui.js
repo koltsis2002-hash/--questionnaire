@@ -448,6 +448,38 @@
   }
 
   // ════════════════════════════════════════════════════════════════
+  // PODIUM HTML για EMAIL — table-based (συμβατό με Gmail/Outlook)
+  // Ίδια εμφάνιση με το podium της σελίδας, χωρίς flexbox.
+  // ════════════════════════════════════════════════════════════════
+  function buildPodiumEmailHTML(h, l, r) {
+    const ranked = rankNeeds(h, l, r);
+    const layout = [
+      { rank: 2, height: 110, color: '#9aa5b1', medal: '🥈' },
+      { rank: 1, height: 150, color: '#F47920', medal: '🥇' },
+      { rank: 3, height: 80,  color: '#b08758', medal: '🥉' },
+    ];
+    const cells = layout.map(pos => {
+      const cat = ranked[pos.rank - 1];
+      return `
+            <td width="33%" valign="bottom" align="center" style="padding:0 4px">
+              <div style="font-size:26px;line-height:1;margin-bottom:4px">${pos.medal}</div>
+              <div style="font-size:13px;font-weight:bold;color:#1a2238;margin-bottom:4px;text-align:center">${cat.short}</div>
+              <div style="width:96px;height:${pos.height}px;background:${pos.color};border-radius:8px 8px 0 0;color:#ffffff;font-weight:bold;font-size:18px;text-align:center;line-height:34px;margin:0 auto">${pos.rank}η</div>
+            </td>`;
+    }).join('');
+    return `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8f9fc;border:1px solid #e0e6ed;border-radius:12px;margin:8px 0">
+        <tr><td style="padding:20px 16px">
+          <div style="text-align:center;font-size:16px;color:#1a2238;font-weight:bold;margin-bottom:4px">Ιεράρχηση Ασφαλιστικών Αναγκών σας</div>
+          <div style="text-align:center;font-size:12px;color:#666666;margin-bottom:16px">με βάση τις απαντήσεις σας</div>
+          <table role="presentation" align="center" width="420" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;border-bottom:2px solid #cbd2da">
+            <tr>${cells}</tr>
+          </table>
+        </td></tr>
+      </table>`;
+  }
+
+  // ════════════════════════════════════════════════════════════════
   // NEEDS HIERARCHY TEXT — ενιαίο κείμενο παραγράφου για το email πελάτη
   // ════════════════════════════════════════════════════════════════
   function buildNeedsHierarchyText(h, l, r) {
@@ -456,16 +488,27 @@
 
     // Αν όλες είναι πολύ χαμηλές, μήνυμα ηρεμίας
     if (topScore < 45) {
-      return 'Με βάση τις απαντήσεις σας, δεν προκύπτει κάποια άμεση ασφαλιστική ανάγκη. ' +
-             'Μπορούμε όμως να δούμε μαζί τι θα χρειαστείτε στο μέλλον, καθώς αλλάζουν τα δεδομένα σας.';
+      return 'Με βάση τις απαντήσεις που μου δώσατε, αυτή τη στιγμή δεν προκύπτει κάποια ιδιαίτερα '
+           + 'επείγουσα ασφαλιστική ανάγκη — κάτι που είναι θετικό. Παρ’ όλα αυτά, οι ανάγκες του '
+           + 'καθενός μας αλλάζουν με τον χρόνο, καθώς αλλάζουν η οικογενειακή και η επαγγελματική '
+           + 'μας κατάσταση. Θα χαρώ να τα δούμε μαζί, ώστε να είστε προετοιμασμένος/η για ό,τι '
+           + 'φέρει το μέλλον, με ηρεμία και σιγουριά.';
     }
 
-    // Απλό, ξεκάθαρο κείμενο προτεραιοτήτων με βάση τις απαντήσεις
+    // Φιλικό, κατανοητό κείμενο προτεραιοτήτων με βάση τις απαντήσεις
     const order = ranked.map((c, i) => `${i + 1}) ${c.name}`).join(', ');
-    const top = ranked[0].name;
-    return `Με βάση τις απαντήσεις σας, η σειρά προτεραιότητας για εσάς είναι: ${order}. `
-         + `Πιο σημαντική ανάγκη αναδεικνύεται η ${top}. `
-         + `Η πρόταση που ακολουθεί ξεκινά από αυτήν και είναι προσαρμοσμένη στον προϋπολογισμό σας.`;
+    const top    = ranked[0].name;
+    const second = ranked[1].name;
+    const third  = ranked[2].name;
+    return `Σας ευχαριστώ για τον χρόνο σας. Αφού μελέτησα προσεκτικά τις απαντήσεις σας, κατέγραψα `
+         + `τις ασφαλιστικές σας ανάγκες και τις ταξινόμησα ανάλογα με το πόσο σημαντική είναι η `
+         + `καθεμία για εσάς αυτή τη στιγμή. Έτσι, η σειρά προτεραιότητας διαμορφώνεται ως εξής: `
+         + `${order}. `
+         + `Στην κορυφή βρίσκεται «${top}», που σημαίνει ότι εκεί αξίζει να εστιάσουμε κατά `
+         + `προτεραιότητα. Ακολουθούν «${second}» και «${third}», τα οποία επίσης αξίζει να `
+         + `λάβουμε υπόψη ώστε η προστασία σας να είναι όσο το δυνατόν πιο ολοκληρωμένη. `
+         + `Η πρόταση κάλυψης που ακολουθεί ξεκινά ακριβώς από την πιο σημαντική σας ανάγκη και `
+         + `είναι προσαρμοσμένη τόσο στις προτεραιότητές σας όσο και στον προϋπολογισμό σας.`;
   }
 
   // ════════════════════════════════════════════════════════════════
@@ -725,7 +768,7 @@
       urgency:       urg, proposal_text: proposalText,
       needs_hierarchy:       buildNeedsHierarchyText(h, l, r),
       needs_hierarchy_short: buildNeedsHierarchyShort(h, l, r),
-      podium_html:           buildPodiumHTML(h, l, r),
+      podium_html:           buildPodiumEmailHTML(h, l, r),
       advisor_name:  BRAND.advisor,
       advisor_email: BRAND.email,
       advisor_phone: BRAND.phone,

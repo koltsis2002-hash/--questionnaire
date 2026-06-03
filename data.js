@@ -53,7 +53,7 @@
   // maxAge: max ηλικία έκδοσης συμβολαίου
   // ────────────────────────────────────────────────────────────────────
   const PROGRAMS = {
-    life:            { id:'life',            label:'LIFE',                   family:'life',              tier:'basic',   maxAge: 65 },
+    life:            { id:'life',            label:'Ασφάλεια Ζωής',          family:'life',              tier:'basic',   maxAge: 65 },
     lifePlus:        { id:'lifePlus',        label:'Ασφάλεια Ζωής και Ανικανότητας', family:'life',          tier:'premium', maxAge: 60 },
 
     crossPlus:       { id:'crossPlus',       label:'Ασφάλειας Υγείας χωρίς ετήσιο εκπιπτόμενο ποσό', family:'health-outpatient', tier:'flagship', deductible:'none',   maxAge: 65 },
