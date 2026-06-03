@@ -10,7 +10,7 @@
       <tr><td style="background:#0d1b2a;padding:24px 32px;color:#ffffff;border-bottom:4px solid #F47920">
         <div style="font-size:12px;letter-spacing:2px;color:#F47920">✦ Η ΑΣΦΑΛΙΣΤΙΚΗ ΣΑΣ ΑΝΑΛΥΣΗ ✦</div>
         <h1 style="margin:6px 0 0;font-size:22px;font-weight:700">Αγαπητέ/ή {{client_name}},</h1>
-        <div style="margin-top:4px;font-size:13px;color:#cfd6e4">{{date}} · Επίπεδο Ανάγκης: <strong style="color:#F47920">{{urgency_level}}</strong></div>
+        <div style="margin-top:4px;font-size:13px;color:#cfd6e4">{{date}}</div>
       </td></tr>
 
       <!-- THANK YOU MESSAGE -->
@@ -32,22 +32,29 @@
         </table>
       </td></tr>
 
-      <!-- ASSESSMENT -->
+      <!-- NEEDS HIERARCHY — Podium + Paragraph -->
       <tr><td style="padding:16px 32px 8px">
         <h2 style="font-size:15px;color:#F47920;margin:0 0 12px;text-transform:uppercase;letter-spacing:1px">Ιεράρχηση Ασφαλιστικών Αναγκών σας</h2>
-        <div style="background:#fff4e6;border-left:4px solid #F47920;border-radius:6px;padding:16px 18px">
-          <p style="font-size:14px;line-height:1.8;color:#222;margin:0;white-space:pre-line">{{needs_hierarchy}}</p>
+
+        <!-- Podium HTML (injected from app) -->
+        {{{podium_html}}}
+
+        <!-- Παράγραφος περιγραφής -->
+        <div style="background:#fff4e6;border-left:4px solid #F47920;border-radius:6px;padding:16px 18px;margin-top:8px">
+          <p style="font-size:14px;line-height:1.8;color:#222;margin:0">{{needs_hierarchy}}</p>
         </div>
+
         <p style="font-size:13px;color:#666;margin:12px 0 0">
           💰 <strong>Μηνιαίος προϋπολογισμός:</strong> €{{monthly_budget}}/μήνα
           &nbsp;·&nbsp;
-          🧾 <strong>Εκπιπτόμενο:</strong> {{deductible_pref}}
+          🧾 <strong>Εκπιπτόμενο:</strong> {{deductible_pref}}{{#deductible_amount}} (€{{deductible_amount}}){{/deductible_amount}}
         </p>
       </td></tr>
 
       <!-- PROPOSAL -->
       <tr><td style="padding:16px 32px 8px">
         <h2 style="font-size:15px;color:#1a2238;margin:0 0 12px;text-transform:uppercase;letter-spacing:1px;color:#F47920">Προτεινόμενη Κάλυψη για Εσάς</h2>
+        <p style="font-size:12px;color:#666;margin:0 0 10px;font-style:italic">Η σειρά παρακάτω αντιστοιχεί στην ιεράρχηση των αναγκών σας.</p>
         <pre style="background:#f8f9fc;padding:16px;border-radius:8px;white-space:pre-wrap;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;color:#222;margin:0;border-left:4px solid #F47920">{{proposal_text}}</pre>
       </td></tr>
 
@@ -68,7 +75,7 @@
         <p style="font-size:13px;color:#444;margin:0 0 14px">
           <strong>Είμαι στη διάθεσή σας για οποιαδήποτε ερώτηση:</strong>
         </p>
-        <a href="tel:{{advisor_phone}}" style="display:inline-block;background:#F47920;color:#ffffff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;margin:4px">📞 Καλέστε τον σύμβουλό σας</a>
+        <a href="tel:{{advisor_phone}}" style="display:inline-block;background:#F47920;color:#ffffff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;margin:4px">📞 Καλέστε με</a>
         <a href="mailto:{{advisor_email}}" style="display:inline-block;background:#0d1b2a;color:#ffffff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;margin:4px">📧 Στείλτε Email</a>
       </td></tr>
 

@@ -457,7 +457,7 @@
     // Αν όλες είναι πολύ χαμηλές, μήνυμα ηρεμίας
     if (topScore < 45) {
       return 'Με βάση τις απαντήσεις σας, δεν εντοπίστηκε άμεση ανάγκη ασφαλιστικής κάλυψης. ' +
-             'Παρόλα αυτά, ο σύμβουλός σας μπορεί να σας βοηθήσει να αξιολογήσετε μελλοντικές ανάγκες ' +
+             'Παρόλα αυτά, μπορώ να σας βοηθήσω να αξιολογήσετε μελλοντικές ανάγκες ' +
              'που μπορεί να προκύψουν με αλλαγές στην οικογενειακή ή επαγγελματική σας κατάσταση.';
     }
 
@@ -481,7 +481,7 @@
     ranked.forEach((cat, i) => {
       if (cat.score >= 45 || i === 0) sentences.push(describe(cat, i + 1));
     });
-    sentences.push('Ο σύμβουλός σας θα σας προτείνει εξατομικευμένες λύσεις με βάση αυτή την ιεράρχηση και τον προϋπολογισμό σας.');
+    sentences.push('Θα σας προτείνω εξατομικευμένες λύσεις με βάση αυτή την ιεράρχηση και τον προϋπολογισμό σας.');
     return sentences.join(' ');
   }
 
@@ -566,7 +566,7 @@
       <div class="prod-row">
         <span style="color:var(--text-muted);font-size:13px;padding:4px 0">
           Βάσει των απαντήσεών σας δεν προκύπτει τρέχουσα ανάγκη ασφαλιστικής κάλυψης.
-          Επικοινωνήστε με τον σύμβουλό σας για αξιολόγηση.
+          Επικοινωνήστε μαζί μου για αξιολόγηση.
         </span>
       </div>`;
 
@@ -603,30 +603,53 @@
     const offerSavingsMonthly = savingsLine ? savingsLine.price.monthly : 0;
     const hasOfferSavings = offerSavingsMonthly > 0;
     const savScenarios = calcSavingsScenarios(targetAmt, targetYrs, offerSavingsMonthly);
-    const savingsHTML = savScenarios ? `
+    let savingsHTML = '';
+    if (savScenarios && hasOfferSavings) {
+      // ΠΛΑΙΣΙΟ 1 — τι κεφάλαιο χτίζει η προσφορά + στόχος/χρόνια από κάτω
+      const frame1 = `
       <div class="savings-section">
         <div class="savings-title">🎯 Σενάρια Αποταμίευσης</div>
-        <div class="savings-sub">${hasOfferSavings
-          ? `Με βάση το προτεινόμενο αποταμιευτικό ποσό της προσφοράς (<strong>€${offerSavingsMonthly.toLocaleString('el-GR')}/μήνα</strong>), δείτε τι κεφάλαιο μπορείτε να χτίσετε σε <strong>${targetYrs} χρόνια</strong> και πόσο απέχει από τον στόχο σας, με 3 διαφορετικές επενδυτικές στρατηγικές.`
-          : `Με βάση τον στόχο σας, δείτε το μηνιαίο ποσό που χρειάζεται για να τον πετύχετε σε <strong>${targetYrs} χρόνια</strong>, με 3 διαφορετικές επενδυτικές στρατηγικές.`}</div>
-        <div class="savings-target">
-          Στόχος σας: <strong>€${targetAmt.toLocaleString('el-GR')}</strong> σε <strong>${targetYrs} χρόνια</strong>
-        </div>
+        <div class="savings-sub">Με βάση το προτεινόμενο αποταμιευτικό ποσό της προσφοράς (<strong>€${offerSavingsMonthly.toLocaleString('el-GR')}/μήνα</strong>), δείτε τι κεφάλαιο μπορείτε να χτίσετε σε <strong>${targetYrs} χρόνια</strong>, με 3 διαφορετικές επενδυτικές στρατηγικές.</div>
         <div class="savings-grid">
-          ${savScenarios.map(s => hasOfferSavings ? `
+          ${savScenarios.map(s => `
             <div class="savings-card" style="--scen-color:${s.color}">
               <div class="savings-label">${s.label}</div>
               <div class="savings-pmt">€${s.fv.toLocaleString('el-GR')}</div>
               <div class="savings-rate">προβλεπόμενο κεφάλαιο · απόδοση ${(s.annual * 100).toFixed(2)}% ετησίως</div>
               <div class="savings-desc">${s.desc}</div>
+            </div>`).join('')}
+        </div>
+        <div class="savings-target">
+          Στόχος σας: <strong>€${targetAmt.toLocaleString('el-GR')}</strong> σε <strong>${targetYrs} χρόνια</strong>
+        </div>
+      </div>`;
+      // ΠΛΑΙΣΙΟ 2 — πόσα χρήματα χρειάζονται ακόμα για τον στόχο
+      const frame2 = `
+      <div class="savings-section">
+        <div class="savings-title">📊 Πόσα χρειάζονται ακόμα για τον στόχο σας</div>
+        <div class="savings-sub">Επιπλέον μηνιαία αποταμίευση για να φτάσετε τα <strong>€${targetAmt.toLocaleString('el-GR')}</strong> σε <strong>${targetYrs} χρόνια</strong>, ανά στρατηγική.</div>
+        <div class="savings-grid">
+          ${savScenarios.map(s => `
+            <div class="savings-card" style="--scen-color:${s.color}">
+              <div class="savings-label">${s.label}</div>
               ${s.reachesTarget
-                ? `<div class="savings-ok">✅ Καλύπτει τον στόχο σας</div>`
-                : `<div class="savings-gap">
-                     ⚠️ Υπολείπεται <strong>€${s.gap.toLocaleString('el-GR')}</strong> από τον στόχο.<br/>
-                     Για να τον πετύχετε χρειάζεστε <strong>+€${s.extraMonthly.toLocaleString('el-GR')}/μήνα</strong>
-                     (σύνολο €${s.requiredMonthly.toLocaleString('el-GR')}/μήνα).
-                   </div>`}
-            </div>` : `
+                ? `<div class="savings-pmt" style="color:#3ec46d">✅</div>
+                   <div class="savings-ok">Καλύπτει τον στόχο σας</div>`
+                : `<div class="savings-pmt">+€${s.extraMonthly.toLocaleString('el-GR')}<span>/μήνα</span></div>
+                   <div class="savings-rate">σύνολο €${s.requiredMonthly.toLocaleString('el-GR')}/μήνα</div>
+                   <div class="savings-desc">Υπολείπονται <strong>€${s.gap.toLocaleString('el-GR')}</strong> κεφάλαιο από τον στόχο.</div>`}
+            </div>`).join('')}
+        </div>
+      </div>`;
+      savingsHTML = frame1 + frame2;
+    } else if (savScenarios) {
+      // Χωρίς διαθέσιμο ποσό προσφοράς — απαιτούμενο μηνιαίο ποσό για τον στόχο
+      savingsHTML = `
+      <div class="savings-section">
+        <div class="savings-title">🎯 Σενάρια Αποταμίευσης</div>
+        <div class="savings-sub">Με βάση τον στόχο σας, δείτε το μηνιαίο ποσό που χρειάζεται για να τον πετύχετε σε <strong>${targetYrs} χρόνια</strong>, με 3 διαφορετικές επενδυτικές στρατηγικές.</div>
+        <div class="savings-grid">
+          ${savScenarios.map(s => `
             <div class="savings-card" style="--scen-color:${s.color}">
               <div class="savings-label">${s.label}</div>
               <div class="savings-pmt">€${s.requiredMonthly.toLocaleString('el-GR')}<span>/μήνα</span></div>
@@ -634,7 +657,11 @@
               <div class="savings-desc">${s.desc}</div>
             </div>`).join('')}
         </div>
-      </div>` : '';
+        <div class="savings-target">
+          Στόχος σας: <strong>€${targetAmt.toLocaleString('el-GR')}</strong> σε <strong>${targetYrs} χρόνια</strong>
+        </div>
+      </div>`;
+    }
 
     // ── Build proposalText for email/sheets ──────────────────────
     const familyNote = proposal.notes.find(n => n.category === 'familyDiscount');
@@ -675,7 +702,7 @@
       ${savingsHTML}
 
       <div class="contact-cta-section">
-        <div class="contact-cta-title">📞 Επικοινωνήστε με τον Σύμβουλό σας</div>
+        <div class="contact-cta-title">📞 Επικοινωνήστε μαζί μου</div>
         <div class="contact-cta-row">
           <div class="contact-card" onclick="revealContact('phone',this)">
             <div class="contact-card-icon">📱</div>
@@ -697,7 +724,7 @@
 
       <div class="indicative-banner">
         📌 <strong>Σημαντικό:</strong> Η παραπάνω πρόταση είναι <strong>ενδεικτική</strong> και βασίζεται στις απαντήσεις που δώσατε.<br/>
-        Για την <strong>πραγματική προσφορά</strong> προσαρμοσμένη στις λεπτομέρειες σας, παρακαλώ επικοινωνήστε με τον σύμβουλό σας.
+        Για την <strong>πραγματική προσφορά</strong> προσαρμοσμένη στις λεπτομέρειες σας, παρακαλώ επικοινωνήστε μαζί μου.
       </div>
 
       <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
