@@ -521,6 +521,55 @@
   }
 
   // ════════════════════════════════════════════════════════════════
+  // CLIENT PROFILE — πλήρες, αναγνώσιμο προφίλ απαντήσεων (email συμβούλου)
+  // ════════════════════════════════════════════════════════════════
+  function buildClientProfileText(a, scores) {
+    const L = {
+      marital:  { single:'Άγαμος/η', married:'Έγγαμος/η', divorced:'Διαζευγμένος/η', widowed:'Χήρος/α', single_parent:'Μονογονέας' },
+      occ:      { employee:'Μισθωτός/ή ιδ. τομέα', civil_servant:'Δημόσιος υπάλληλος', freelancer:'Ελ. επαγγελματίας', retired:'Συνταξιούχος', other:'Άλλο' },
+      fund:     { none:'Καθόλου', little:'Λίγο', enough:'Αρκετά', fully:'Απόλυτα' },
+      dedType:  { none:'Χωρίς εκπιπτόμενο', annual:'Ετήσιο', per_incident:'Ανά νοσηλεία' },
+      scope:    { self:'Μόνο ο ίδιος', family:'Οικογένεια' },
+      ci:       { em31:'Ναι — 31 ασθένειες', em7:'Ναι — 7 ασθένειες', none:'Όχι / αυτόματα' },
+      yn:       { yes:'Ναι', no:'Όχι' },
+      lifeCap:  { '50k':'€50.000', '100k':'€100.000', '150k':'€150.000', '200k':'€200.000+' },
+      pension:  { none:'Καμία', small:'Μικρή', adequate:'Ικανοποιητική', big:'Μεγάλη' },
+      savings:  { yes:'Έχει ήδη πρόγραμμα', soon:'Σκέφτεται να ξεκινήσει', family:'Οικογενειακό πρόγραμμα', no:'Δεν αποταμιεύει' },
+      hosp:     { local_pub:'Τοπικό δημόσιο', city_pub:'Δημόσιο Αθ./Θεσ.', local_priv:'Τοπικό ιδιωτικό', big_priv:'Μεγάλο ιδιωτικό', abroad:'Εξωτερικό' },
+      benefits: { diagnostics:'Διαγνωστικές', visits:'Επισκέψεις γιατρών', hospital:'Νοσηλεία', checkup:'Check-up', abroad:'Πρόσβαση στο εξωτερικό' },
+      uncov:    { expenses:'Πάγια έξοδα', education:'Σπουδές παιδιών', loans:'Δάνεια', taxes:'Φορολογικές υποχρεώσεις' },
+    };
+    const g = (map, v) => (v != null && map[v]) ? map[v] : (v != null && v !== '' ? String(v) : '—');
+    const lines = [];
+    lines.push(`Ηλικία: ${a.age || '—'}`);
+    lines.push(`Οικογ. κατάσταση: ${g(L.marital, a.marital_status)}`);
+    if (a.spouse_age) lines.push(`Ηλικία συζύγου: ${a.spouse_age}`);
+    lines.push(`Παιδιά: ${a.children || '0'}${(a.kids_ages && a.kids_ages.length) ? ' (ηλικίες: ' + a.kids_ages.join(', ') + ')' : ''}`);
+    lines.push(`Επάγγελμα: ${g(L.occ, a.occupation)}`);
+    lines.push(`Ικανοποίηση από δημόσιο ταμείο: ${g(L.fund, a.fund_satisfaction)}`);
+    lines.push(`Νοσοκομείο για ήπιο θέμα: ${g(L.hosp, a.hospital_mild)}`);
+    lines.push(`Νοσοκομείο για σοβαρό θέμα: ${g(L.hosp, a.hospital_severe)}`);
+    if (a.health_benefits && a.health_benefits.length)
+      lines.push(`Επιθυμητές παροχές: ${a.health_benefits.map(x => g(L.benefits, x)).join(', ')}`);
+    lines.push(`Τύπος εκπιπτόμενου: ${g(L.dedType, a.deductible_type)}${a.deductible_amount ? ' (€' + a.deductible_amount + ')' : ''}`);
+    lines.push(`Εύρος κάλυψης: ${g(L.scope, a.coverage_scope)}`);
+    lines.push(`Ενδιαφέρον για κρίσιμες ασθένειες: ${g(L.ci, a.ci_pref)}`);
+    lines.push(`Ενδιαφέρον για επίδομα νοσηλείας: ${g(L.yn, a.hospital_allowance)}`);
+    lines.push(`Ανησυχία για απώλεια εισοδήματος: ${g(L.yn, a.income_concern)}`);
+    if (a.uncovered_needs && a.uncovered_needs.length)
+      lines.push(`Ακάλυπτες ανάγκες σε απώλεια: ${a.uncovered_needs.map(x => g(L.uncov, x)).join(', ')}`);
+    lines.push(`Επιθυμητό κεφάλαιο Ζωής: ${g(L.lifeCap, a.life_capital)}`);
+    lines.push(`Εκτίμηση μελλοντικής σύνταξης: ${g(L.pension, a.pension_estimate)}`);
+    lines.push(`Αποταμιευτικό προφίλ: ${g(L.savings, a.savings_plan)}`);
+    if (a.target_amount && a.target_amount !== 'none')
+      lines.push(`Στόχος αποταμίευσης: €${parseInt(a.target_amount).toLocaleString('el-GR')} σε ${a.target_years || 15} χρόνια`);
+    lines.push(`Μηνιαίος προϋπολογισμός: €${a.monthly_budget}/μήνα`);
+    if (scores)
+      lines.push(`\nScores αναγκών → Υγεία: ${Math.round(scores.health)}/100 · Ζωή: ${Math.round(scores.life)}/100 · Σύνταξη: ${Math.round(scores.retirement)}/100`);
+    return lines.join('\n');
+  }
+
+  // ════════════════════════════════════════════════════════════════
   // RESULTS RENDERING
   // ════════════════════════════════════════════════════════════════
   function renderResults() {
@@ -768,6 +817,7 @@
       urgency:       urg, proposal_text: proposalText,
       needs_hierarchy:       buildNeedsHierarchyText(h, l, r),
       needs_hierarchy_short: buildNeedsHierarchyShort(h, l, r),
+      client_profile:        buildClientProfileText(a, scores),
       podium_html:           buildPodiumEmailHTML(h, l, r),
       advisor_name:  BRAND.advisor,
       advisor_email: BRAND.email,
