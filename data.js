@@ -1979,19 +1979,8 @@
     thresholds: {
       healthIncludePct:   0.20,   // share ≥ 20% ⇒ include
       lifeIncludePct:     0.20,
-      extramed7AutoMin:   40,     // health score ≥ 40 ⇒ +extramed7 (αν P7=none)
-      extramed31AutoMin:  70,     // health score ≥ 70 ⇒ upgrade σε extramed31
       savingsNoteMin:     45,     // retirement score ≥ 45 ⇒ note (όχι προϊόν)
       acceleratorMinAnnualBudget: 600,  // υπόλοιπο budget ≥ €600/έτος ⇒ +acceleratorPlus
-    },
-
-    // ─── OFC RULE ──────────────────────────────────────────────────
-    // Αν το επιλεγμένο health είναι hospital-only ⇒ προσπάθεια προσθήκης
-    // primary care (FIRST CARE) — πρώτα firstCare1, fallback firstCare2.
-    ofc: {
-      hospitalOnlyPrograms: ['health500','health1500','easyGroup500','easyGroup1000','hospitalForAll'],
-      preferenceOrder:      ['firstCare1','firstCare2'],
-      // outpatient programs (crossPlus, cross1..4) δεν χρειάζονται OFC
     },
   };
 
