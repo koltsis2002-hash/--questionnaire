@@ -74,6 +74,11 @@
   function isQBlockAnswered(qb) {
     if (!qb) return true;
 
+    // Αν το q-block είναι σημαδεμένο ως ΠΡΟΑΙΡΕΤΙΚΟ στην ετικέτα του,
+    // πάντα περνά (π.χ. πεδίο τηλεφώνου στην s5).
+    const label = qb.querySelector('.q-label');
+    if (label && /προαιρετικ/i.test(label.textContent)) return true;
+
     // Radios → χρειάζεται τουλάχιστον ένα checked
     const radios = qb.querySelectorAll('input[type="radio"]');
     if (radios.length > 0) {
