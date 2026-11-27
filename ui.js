@@ -16,19 +16,14 @@
     name:    'NN Hellas',
     advisor: 'Χρήστος Κόλτσης',
     email:   'koltsis2002@gmail.com',
+    publicEmail: 'christos.koltsis@nnadvisors.gr',
     phone:   '6989118348',
   };
-
-  // ════════════════════════════════════════════════════════════════
-  // DISPLAY MAPS
-  // ════════════════════════════════════════════════════════════════
-  const CAT_LABELS = {
-    health:            '🏥 Υγεία',
-    primaryCare:       '🩺 Εξωνοσ.',
-    criticalIllness:   '⚕️ Κρίσιμες',
-    hospitalAllowance: '🏨 Επίδομα',
-    life:              '💛 Ζωή',
-    savings:           '💰 Αποταμίευση',
+  const SITE = 'https://koltsis2002-hash.github.io/christoskoltsis-site/';
+  const TOPICS = {
+    health:     { word: 'ΥΓΕΙΑ',       path: 'ygeia/' },
+    life:       { word: 'ΖΩΗ',         path: 'zoi/' },
+    retirement: { word: 'ΑΠΟΤΑΜΙΕΥΣΗ', path: 'apotamieusi/' },
   };
 
   // ════════════════════════════════════════════════════════════════
@@ -140,18 +135,6 @@
     collectAnswers();
     showStep(6);
     renderResults();
-  }
-
-  function revealContact(type, card) {
-    const reveal = document.getElementById('reveal-' + type);
-    if (!reveal) return;
-    const isRevealed = reveal.style.display === 'block';
-    reveal.style.display = isRevealed ? 'none' : 'block';
-    card.classList.toggle('revealed', !isRevealed);
-    if (!isRevealed) {
-      const link = reveal.querySelector('a');
-      if (link && window.innerWidth <= 600) setTimeout(() => link.click(), 300);
-    }
   }
 
   function showErr(step, msg) {
@@ -280,56 +263,56 @@
     if (step === 1) {
       const ageEl = document.getElementById('age-input');
       const ageVal = ageEl ? parseInt(ageEl.value) : NaN;
-      if (!ageEl || !ageEl.value || isNaN(ageVal)) return ['Παρακαλώ συμπληρώστε την ηλικία σας για να συνεχίσετε'];
-      if (ageVal < 18 || ageVal > 70) return ['Η ηλικία πρέπει να είναι μεταξύ 18 και 70 ετών'];
-      if (!a.marital_status) return ['Επιλέξτε οικογενειακή κατάσταση'];
+      if (!ageEl || !ageEl.value || isNaN(ageVal)) return ['Γράψε την ηλικία σου για να συνεχίσεις'];
+      if (ageVal < 18 || ageVal > 70) return ['Η ηλικία πρέπει να είναι από 18 έως 70'];
+      if (!a.marital_status) return ['Διάλεξε την οικογενειακή σου κατάσταση'];
       if (a.marital_status === 'married') {
         const sa = document.getElementById('spouse-age')?.value;
-        if (!sa || parseInt(sa) < 18) return ['Εισάγετε έγκυρη ηλικία συζύγου'];
+        if (!sa || parseInt(sa) < 18) return ['Γράψε την ηλικία του/της συντρόφου σου'];
       }
-      if (a.children === undefined) return ['Επιλέξτε αριθμό παιδιών'];
+      if (a.children === undefined) return ['Πες μου αν έχεις παιδιά'];
       if (a.children && a.children !== '0') {
         const filled = Array.from(document.querySelectorAll('.kid-age'))
           .every(inp => inp.value && parseInt(inp.value) >= 0);
-        if (!filled) return ['Συμπληρώστε τις ηλικίες όλων των παιδιών'];
+        if (!filled) return ['Γράψε την ηλικία κάθε παιδιού'];
       }
-      if (!a.occupation) return ['Επιλέξτε επάγγελμα'];
+      if (!a.occupation) return ['Πες μου με τι ασχολείσαι'];
       return [];
     }
     if (step === 2) {
-      if (!a.fund_satisfaction)  return ['Αξιολογήστε την ικανοποίησή σας από το ταμείο'];
-      if (!a.hospital_mild)      return ['Επιλέξτε νοσοκομείο για ήπιο θέμα υγείας'];
-      if (!a.hospital_severe)    return ['Επιλέξτε νοσοκομείο για σοβαρό θέμα υγείας'];
-      if (!a.deductible_type)    return ['Επιλέξτε τύπο εκπιπτόμενου'];
+      if (!a.fund_satisfaction)  return ['Πες μου πόσο σίγουρος/η νιώθεις για τα έξοδα υγείας'];
+      if (!a.hospital_mild)      return ['Διάλεξε πού θα πήγαινες για ένα απλό θέμα υγείας'];
+      if (!a.hospital_severe)    return ['Διάλεξε πού θα ήθελες να είσαι για κάτι σοβαρό'];
+      if (!a.deductible_type)    return ['Πες μου αν θέλεις απαλλαγή'];
       if ((a.deductible_type === 'annual' || a.deductible_type === 'per_incident') && !a.deductible_amount) {
-        return ['Επιλέξτε το ύψος του εκπιπτόμενου ποσού'];
+        return ['Διάλεξε πόσο μεγάλη να είναι η απαλλαγή'];
       }
       const scopeBlock = document.getElementById('coverage-scope-block');
       if (scopeBlock && scopeBlock.style.display !== 'none' && !a.coverage_scope) {
-        return ['Επιλέξτε ποια μέλη θέλετε να συμπεριλάβετε στην πρόταση'];
+        return ['Διάλεξε ποιους θέλεις να καλύψουμε'];
       }
-      if (!a.ci_pref)            return ['Επιλέξτε προτίμηση για Κρίσιμες Ασθένειες'];
-      if (!a.hospital_allowance) return ['Επιλέξτε αν επιθυμείτε ημερήσιο επίδομα νοσηλείας'];
+      if (!a.ci_pref)            return ['Απάντησε για το ποσό σε σοβαρή ασθένεια'];
+      if (!a.hospital_allowance) return ['Απάντησε για το ποσό ανά μέρα στο νοσοκομείο'];
       return [];
     }
     if (step === 3) {
-      if (!a.income_concern) return ['Απαντήστε στην ερώτηση εισοδήματος'];
-      if (!a.life_capital)   return ['Επιλέξτε επιθυμητό κεφάλαιο ζωής'];
+      if (!a.income_concern) return ['Απάντησε για το εισόδημα του σπιτιού'];
+      if (!a.life_capital)   return ['Διάλεξε πόσο δυνατό «δίχτυ» θέλεις'];
       return [];
     }
     if (step === 4) {
-      if (!a.pension_estimate) return ['Εκτιμήστε την κρατική σύνταξή σας'];
-      if (!a.savings_plan)     return ['Επιλέξτε σχέδιο αποταμίευσης'];
-      if (!a.target_amount)    return ['Επιλέξτε στόχο αποταμίευσης (ή «δεν με ενδιαφέρει»)'];
+      if (!a.pension_estimate) return ['Πες μου πώς βλέπεις τη σύνταξή σου'];
+      if (!a.savings_plan)     return ['Πες μου αν βάζεις ήδη χρήματα στην άκρη'];
+      if (!a.target_amount)    return ['Διάλεξε έναν στόχο (ή «Δεν με απασχολεί τώρα»)'];
       return [];
     }
     if (step === 5) {
       const name  = document.getElementById('client-name')?.value?.trim();
       const email = document.getElementById('client-email')?.value?.trim();
       const phone = document.getElementById('client-phone')?.value?.trim();
-      if (!name)                           return ['Εισάγετε το ονοματεπώνυμό σας'];
-      if (!email || !email.includes('@'))  return ['Εισάγετε έγκυρη διεύθυνση email'];
-      if (phone && phone.length < 10)      return ['Αν θέλετε να δηλώσετε τηλέφωνο, εισάγετε τουλάχιστον 10 ψηφία (ή αφήστε το κενό)'];
+      if (!name)                           return ['Γράψε το ονοματεπώνυμό σου'];
+      if (!email || !email.includes('@'))  return ['Γράψε ένα σωστό email'];
+      if (phone && phone.length < 10)      return ['Το τηλέφωνο θέλει 10 ψηφία (ή άφησέ το κενό)'];
       return [];
     }
     return [];
@@ -409,74 +392,66 @@
   // ════════════════════════════════════════════════════════════════
   function rankNeeds(h, l, r) {
     const cats = [
-      { key:'health',     name:'Ασφάλεια Υγείας',      short:'Υγεία',   score:h, color:'#F47920' },
-      { key:'life',       name:'Ασφάλεια Ζωής',        short:'Ζωή',     score:l, color:'#C9A84C' },
-      { key:'retirement', name:'Συνταξιοδοτικό Πλάνο', short:'Σύνταξη', score:r, color:'#4a9eda' },
+      { key:'health',     name:'Υγεία',                short:'ΥΓΕΙΑ',       score:h },
+      { key:'life',       name:'Ζωή',                  short:'ΖΩΗ',         score:l },
+      { key:'retirement', name:'Αποταμίευση & σύνταξη', short:'ΑΠΟΤΑΜΙΕΥΣΗ', score:r },
     ];
     return cats.sort((a, b) => b.score - a.score);
   }
 
   // ════════════════════════════════════════════════════════════════
-  // PODIUM HTML — βάθρο νικητών (1η/2η/3η θέση) χωρίς αριθμούς/ποσοστά
-  // Χρησιμοποιείται και στη σελίδα αποτελεσμάτων και στο email πελάτη
-  // ════════════════════════════════════════════════════════════════
-  function buildPodiumHTML(h, l, r) {
-    const ranked = rankNeeds(h, l, r);
-    // Διάταξη βάθρου: 2η αριστερά, 1η μέση, 3η δεξιά
-    const layout = [
-      { rank: 2, height: 110, color: '#9aa5b1', medal: '🥈' },
-      { rank: 1, height: 150, color: '#F47920', medal: '🥇' },
-      { rank: 3, height: 80,  color: '#b08758', medal: '🥉' },
-    ];
-    const pillars = layout.map(pos => {
-      const cat = ranked[pos.rank - 1];
-      return `
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0">
-          <div style="font-size:28px;margin-bottom:4px">${pos.medal}</div>
-          <div style="font-size:13px;font-weight:700;color:#1a2238;margin-bottom:4px;text-align:center;line-height:1.2">${cat.short}</div>
-          <div style="width:90%;max-width:120px;height:${pos.height}px;background:linear-gradient(180deg,${pos.color},${pos.color}cc);border-radius:8px 8px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:8px;color:#fff;font-weight:800;font-size:18px">${pos.rank}η</div>
-        </div>`;
-    }).join('');
-    return `
-      <div class="podium-section" style="background:#f8f9fc;border-radius:12px;padding:24px 20px;margin:24px 0;border:1px solid #e0e6ed">
-        <h3 style="text-align:center;margin:0 0 8px;font-size:16px;color:#1a2238;font-weight:700">Ιεράρχηση Ασφαλιστικών Αναγκών σας</h3>
-        <p style="text-align:center;margin:0 0 18px;font-size:12px;color:#666">με βάση τις απαντήσεις σας</p>
-        <div style="display:flex;align-items:flex-end;justify-content:center;gap:8px;max-width:420px;margin:0 auto;border-bottom:2px solid #cbd2da;padding-bottom:0">
-          ${pillars}
-        </div>
-      </div>`;
-  }
-
-  // ════════════════════════════════════════════════════════════════
   // PODIUM HTML για EMAIL — table-based (συμβατό με Gmail/Outlook)
-  // Ίδια εμφάνιση με το podium της σελίδας, χωρίς flexbox.
   // ════════════════════════════════════════════════════════════════
   function buildPodiumEmailHTML(h, l, r) {
     const ranked = rankNeeds(h, l, r);
-    const layout = [
-      { rank: 2, height: 110, color: '#9aa5b1', medal: '🥈' },
-      { rank: 1, height: 150, color: '#F47920', medal: '🥇' },
-      { rank: 3, height: 80,  color: '#b08758', medal: '🥉' },
-    ];
-    const cells = layout.map(pos => {
-      const cat = ranked[pos.rank - 1];
-      return `
-            <td width="33%" valign="bottom" align="center" style="padding:0 4px">
-              <div style="font-size:26px;line-height:1;margin-bottom:4px">${pos.medal}</div>
-              <div style="font-size:13px;font-weight:bold;color:#1a2238;margin-bottom:4px;text-align:center">${cat.short}</div>
-              <div style="width:96px;height:${pos.height}px;background:${pos.color};border-radius:8px 8px 0 0;color:#ffffff;font-weight:bold;font-size:18px;text-align:center;line-height:34px;margin:0 auto">${pos.rank}η</div>
-            </td>`;
-    }).join('');
+    const rows = ranked.map((cat, i) => `
+          <tr><td style="padding:12px 16px;border-bottom:1px solid #f0f0f0;font-family:Arial,Helvetica,sans-serif">
+            <div style="font-size:12px;font-weight:bold;color:#555555;text-transform:uppercase">${i + 1}η ανάγκη</div>
+            <div style="font-size:26px;font-weight:bold;color:#e56410;line-height:1.2">${cat.short}</div>
+            <a href="${SITE}${TOPICS[cat.key].path}" style="font-size:14px;font-weight:bold;color:#111111">Μάθε για αυτήν →</a>
+          </td></tr>`).join('');
     return `
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8f9fc;border:1px solid #e0e6ed;border-radius:12px;margin:8px 0">
-        <tr><td style="padding:20px 16px">
-          <div style="text-align:center;font-size:16px;color:#1a2238;font-weight:bold;margin-bottom:4px">Ιεράρχηση Ασφαλιστικών Αναγκών σας</div>
-          <div style="text-align:center;font-size:12px;color:#666666;margin-bottom:16px">με βάση τις απαντήσεις σας</div>
-          <table role="presentation" align="center" width="420" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;border-bottom:2px solid #cbd2da">
-            <tr>${cells}</tr>
-          </table>
-        </td></tr>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;border:1px solid #e3e3e3;border-radius:12px;margin:8px 0">
+        ${rows}
       </table>`;
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // NEED REASONS — γιατί βγήκε κάθε ανάγκη (για τον επισκέπτη, χωρίς ποσά)
+  // ════════════════════════════════════════════════════════════════
+  function needReasons(key, a) {
+    const out = [];
+    const needs = Array.isArray(a.uncovered_needs) ? a.uncovered_needs : [];
+    if (key === 'health') {
+      if (a.fund_satisfaction === 'none' || a.fund_satisfaction === 'little') out.push('Νιώθεις ότι υπάρχουν κενά στα έξοδα υγείας.');
+      if (a.hospital_severe === 'big_priv' || a.hospital_severe === 'abroad') out.push('Για κάτι σοβαρό θέλεις να διαλέγεις εσύ πού θα πας.');
+      if (a.ci_pref && a.ci_pref !== 'none') out.push('Θέλεις ένα ποσό στο χέρι, αν εμφανιστεί σοβαρή ασθένεια.');
+      if (a.coverage_scope === 'family') out.push('Θέλεις να είναι καλυμμένη όλη η οικογένεια.');
+      if (a.hospital_allowance === 'yes') out.push('Ένα ποσό για κάθε μέρα στο νοσοκομείο θα σε βοηθούσε.');
+      if (!out.length) out.push('Ένα θέμα υγείας δεν το διαλέγει κανείς. Καλό είναι να ξέρεις από πριν τι καλύπτεται.');
+    }
+    if (key === 'life') {
+      if (a.income_concern === 'yes') out.push('Εσύ φέρνεις το βασικό εισόδημα στο σπίτι.');
+      if (a.children && a.children !== '0') out.push('Έχεις παιδιά που στηρίζονται σε σένα.');
+      if (needs.includes('mortgage')) out.push('Θέλεις να μη μείνει ακάλυπτο το σπίτι.');
+      if (needs.includes('education')) out.push('Θέλεις να είναι σίγουρες οι σπουδές των παιδιών.');
+      if (needs.includes('spouse_income')) out.push('Θέλεις να συνεχίσει κανονικά η καθημερινότητα των δικών σου.');
+      if (!out.length) out.push('Ένα «δίχτυ» για τους δικούς σου, αν συμβεί κάτι απρόοπτο.');
+    }
+    if (key === 'retirement') {
+      if (a.pension_estimate === 'none' || a.pension_estimate === 'small') out.push('Δεν περιμένεις ότι η σύνταξη θα σου φτάνει.');
+      if (a.savings_plan === 'soon' || a.savings_plan === 'no') out.push('Θέλεις να ξεκινήσεις να βάζεις χρήματα στην άκρη.');
+      if (a.target_amount && a.target_amount !== 'none') out.push(`Έχεις έναν στόχο για τα επόμενα ${a.target_years || 15} χρόνια.`);
+      if (!out.length) out.push('Λίγα χρήματα κάθε μήνα, με σταθερότητα, κάνουν μεγάλη διαφορά με τα χρόνια.');
+    }
+    return out;
+  }
+
+  function buildClientSummaryText(h, l, r, a) {
+    return rankNeeds(h, l, r).map((c, i) =>
+      `${i + 1}. ${c.short}\n` + needReasons(c.key, a).map(x => '• ' + x).join('\n')
+      + `\nΜάθε για αυτήν: ${SITE}${TOPICS[c.key].path}`
+    ).join('\n\n');
   }
 
   // ════════════════════════════════════════════════════════════════
@@ -484,31 +459,15 @@
   // ════════════════════════════════════════════════════════════════
   function buildNeedsHierarchyText(h, l, r) {
     const ranked = rankNeeds(h, l, r);
-    const topScore = ranked[0].score;
-
-    // Αν όλες είναι πολύ χαμηλές, μήνυμα ηρεμίας
-    if (topScore < 45) {
-      return 'Με βάση τις απαντήσεις που μου δώσατε, αυτή τη στιγμή δεν προκύπτει κάποια ιδιαίτερα '
-           + 'επείγουσα ασφαλιστική ανάγκη — κάτι που είναι θετικό. Παρ’ όλα αυτά, οι ανάγκες του '
-           + 'καθενός μας αλλάζουν με τον χρόνο, καθώς αλλάζουν η οικογενειακή και η επαγγελματική '
-           + 'μας κατάσταση. Θα χαρώ να τα δούμε μαζί, ώστε να είστε προετοιμασμένος/η για ό,τι '
-           + 'φέρει το μέλλον, με ηρεμία και σιγουριά.';
+    if (ranked[0].score < 45) {
+      return 'Με βάση τις απαντήσεις σου, δεν βλέπω κάτι επείγον αυτή τη στιγμή, και αυτό είναι καλό νέο. '
+           + 'Οι ανάγκες μας όμως αλλάζουν με τα χρόνια, μαζί με την οικογένεια και τη δουλειά. '
+           + 'Όποτε θέλεις, τα βλέπουμε μαζί, με την ησυχία σου.';
     }
-
-    // Φιλικό, κατανοητό κείμενο προτεραιοτήτων με βάση τις απαντήσεις
-    const order = ranked.map((c, i) => `${i + 1}) ${c.name}`).join(', ');
-    const top    = ranked[0].name;
-    const second = ranked[1].name;
-    const third  = ranked[2].name;
-    return `Σας ευχαριστώ για τον χρόνο σας. Αφού μελέτησα προσεκτικά τις απαντήσεις σας, κατέγραψα `
-         + `τις ασφαλιστικές σας ανάγκες και τις ταξινόμησα ανάλογα με το πόσο σημαντική είναι η `
-         + `καθεμία για εσάς αυτή τη στιγμή. Έτσι, η σειρά προτεραιότητας διαμορφώνεται ως εξής: `
-         + `${order}. `
-         + `Στην κορυφή βρίσκεται «${top}», που σημαίνει ότι εκεί αξίζει να εστιάσουμε κατά `
-         + `προτεραιότητα. Ακολουθούν «${second}» και «${third}», τα οποία επίσης αξίζει να `
-         + `λάβουμε υπόψη ώστε η προστασία σας να είναι όσο το δυνατόν πιο ολοκληρωμένη. `
-         + `Η πρόταση κάλυψης που ακολουθεί ξεκινά ακριβώς από την πιο σημαντική σας ανάγκη και `
-         + `είναι προσαρμοσμένη τόσο στις προτεραιότητές σας όσο και στον προϋπολογισμό σας.`;
+    const [top, second, third] = ranked.map(c => c.short);
+    return `Σε ευχαριστώ για τον χρόνο σου. Με βάση τις απαντήσεις σου, η πρώτη σου ανάγκη είναι η ${top}. `
+         + `Ακολουθούν η ${second} και η ${third}. `
+         + `Από εκεί ξεκινάμε μαζί. Το πρόγραμμα και το κόστος τα βρίσκουμε στη συζήτησή μας, πάνω σε ό,τι σου ταιριάζει.`;
   }
 
   // ════════════════════════════════════════════════════════════════
@@ -575,7 +534,7 @@
   function renderResults() {
     const s6 = document.getElementById('s6');
     if (!window.NN_ENGINE) {
-      s6.innerHTML = '<div class="error-msg" style="display:block;margin-top:32px">⚠️ Σφάλμα φόρτωσης μηχανής. Ανανεώστε τη σελίδα.</div>';
+      s6.innerHTML = '<div class="error-msg" style="display:block;margin-top:32px">Κάτι δεν φόρτωσε σωστά. Ανανέωσε τη σελίδα και δοκίμασε ξανά.</div>';
       return;
     }
 
@@ -614,62 +573,9 @@
       return oa - ob;
     });
 
-    // ── Proposal card lines ──────────────────────────────────────
-    const linesHTML = proposal.lines.map(line => {
-      const catLabel = CAT_LABELS[line.category] || line.category;
-      const monthly  = Math.round(line.price.monthly);
-      const capStr   = line.capital
-        ? `<span style="color:var(--text-muted);font-weight:400;font-size:11px"> · Κεφ. €${Math.round(line.capital / 1000)}k</span>`
-        : '';
-      // Family member indicator (Εσείς / Σύζυγος / Παιδί N)
-      const memberStr = (line.memberType && line.memberType !== 'client')
-        ? `<span style="color:var(--primary);font-weight:600;font-size:11px"> · ${line.memberLabel}${line.memberAge ? ' (' + line.memberAge + ' ετών)' : ''}</span>`
-        : '';
-      // Discount badge
-      const discStr = (line.price.discountPct && line.price.discountPct > 0)
-        ? `<span style="color:#4caf50;font-weight:600;font-size:11px"> · -${Math.round(line.price.discountPct * 100)}%</span>`
-        : '';
-      return `
-        <div class="prod-row">
-          <span class="prod-cat">${catLabel}</span>
-          <span class="prod-name">${line.label}${capStr}${memberStr}${discStr}</span>
-          <span class="prod-price">€${monthly}/μήνα</span>
-        </div>`;
-    }).join('');
-
-    const emptyCard = `
-      <div class="prod-row">
-        <span style="color:var(--text-muted);font-size:13px;padding:4px 0">
-          Βάσει των απαντήσεών σας δεν προκύπτει τρέχουσα ανάγκη ασφαλιστικής κάλυψης.
-          Επικοινωνήστε μαζί μου για αξιολόγηση.
-        </span>
-      </div>`;
-
     // Notes from engine
     const savingsNote   = proposal.notes.find(n => n.category === 'savings');
     const budgetWarning = proposal.warnings.find(w => w.type === 'budgetExceeded');
-
-    const scenHTML = `
-      <div class="scenario-card rec">
-        <div class="rec-badge">✦ Εξατομικευμένη Πρόταση</div>
-        <div class="scen-header" style="margin-top:8px">
-          <div class="scen-letter">Α</div>
-          <div>
-            <div class="scen-title">Προτεινόμενη Κάλυψη</div>
-            <div class="scen-sub">Βέλτιστη ισορροπία κάλυψης &amp; κόστους</div>
-          </div>
-        </div>
-        <div class="products">
-          ${proposal.lines.length > 0 ? linesHTML : emptyCard}
-        </div>
-        ${proposal.lines.length > 0 ? `
-        <div class="scen-total">
-          <div class="total-annual">€${totalAnnual.toLocaleString('el-GR')}/έτος</div>
-          <div class="total-monthly">€${totalMonthly}<span>/μήνα</span></div>
-        </div>` : ''}
-        ${savingsNote   ? `<div class="ret-note">📌 ${savingsNote.message}</div>` : ''}
-        ${budgetWarning ? `<div class="ret-note" style="border-left-color:var(--danger);color:var(--danger)">${budgetWarning.message}</div>` : ''}
-      </div>`;
 
     // ── Savings section (αν δήλωσε στόχο) ───────────────────────
     const targetAmt = (a.target_amount && a.target_amount !== 'none') ? parseInt(a.target_amount) : 0;
@@ -678,66 +584,6 @@
     const offerSavingsMonthly = savingsLine ? savingsLine.price.monthly : 0;
     const hasOfferSavings = offerSavingsMonthly > 0;
     const savScenarios = calcSavingsScenarios(targetAmt, targetYrs, offerSavingsMonthly);
-    let savingsHTML = '';
-    if (savScenarios && hasOfferSavings) {
-      // ΠΛΑΙΣΙΟ 1 — τι κεφάλαιο χτίζει η προσφορά + στόχος/χρόνια από κάτω
-      const frame1 = `
-      <div class="savings-section">
-        <div class="savings-title">🎯 Σενάρια Αποταμίευσης</div>
-        <div class="savings-sub">Το προτεινόμενο αποταμιευτικό ποσό της προσφοράς (<strong>€${offerSavingsMonthly.toLocaleString('el-GR')}/μήνα</strong>) είναι αυτό που <strong>υπολείπεται αφού καλυφθούν οι ανάγκες Υγείας και Ζωής</strong>. Δείτε τι κεφάλαιο μπορείτε να χτίσετε σε <strong>${targetYrs} χρόνια</strong>, με 3 διαφορετικές επενδυτικές στρατηγικές.</div>
-        <div class="savings-grid">
-          ${savScenarios.map(s => `
-            <div class="savings-card" style="--scen-color:${s.color}">
-              <div class="savings-label">${s.label}</div>
-              <div class="savings-pmt">€${s.fv.toLocaleString('el-GR')}</div>
-              <div class="savings-rate">προβλεπόμενο κεφάλαιο · απόδοση ${(s.annual * 100).toFixed(2)}% ετησίως</div>
-              <div class="savings-desc">${s.desc}</div>
-            </div>`).join('')}
-        </div>
-        <div class="savings-target">
-          Στόχος σας: <strong>€${targetAmt.toLocaleString('el-GR')}</strong> σε <strong>${targetYrs} χρόνια</strong>
-        </div>
-      </div>`;
-      // ΠΛΑΙΣΙΟ 2 — πόσα χρήματα χρειάζονται ακόμα για τον στόχο
-      const frame2 = `
-      <div class="savings-section">
-        <div class="savings-title">📊 Πόσα χρειάζονται ακόμα για τον στόχο σας</div>
-        <div class="savings-sub">Επιπλέον μηνιαία αποταμίευση για να φτάσετε τα <strong>€${targetAmt.toLocaleString('el-GR')}</strong> σε <strong>${targetYrs} χρόνια</strong>, ανά στρατηγική.</div>
-        <div class="savings-grid">
-          ${savScenarios.map(s => `
-            <div class="savings-card" style="--scen-color:${s.color}">
-              <div class="savings-label">${s.label}</div>
-              ${s.reachesTarget
-                ? `<div class="savings-pmt" style="color:#3ec46d">✅</div>
-                   <div class="savings-ok">Καλύπτει τον στόχο σας</div>`
-                : `<div class="savings-pmt">+€${s.extraMonthly.toLocaleString('el-GR')}<span>/μήνα</span></div>
-                   <div class="savings-rate">σύνολο €${s.requiredMonthly.toLocaleString('el-GR')}/μήνα</div>
-                   <div class="savings-desc">Υπολείπονται <strong>€${s.gap.toLocaleString('el-GR')}</strong> κεφάλαιο από τον στόχο.</div>`}
-            </div>`).join('')}
-        </div>
-      </div>`;
-      savingsHTML = frame1 + frame2;
-    } else if (savScenarios) {
-      // Χωρίς διαθέσιμο ποσό προσφοράς — απαιτούμενο μηνιαίο ποσό για τον στόχο
-      savingsHTML = `
-      <div class="savings-section">
-        <div class="savings-title">🎯 Σενάρια Αποταμίευσης</div>
-        <div class="savings-sub">Με βάση τον στόχο σας, δείτε το μηνιαίο ποσό που χρειάζεται για να τον πετύχετε σε <strong>${targetYrs} χρόνια</strong>, με 3 διαφορετικές επενδυτικές στρατηγικές.</div>
-        <div class="savings-grid">
-          ${savScenarios.map(s => `
-            <div class="savings-card" style="--scen-color:${s.color}">
-              <div class="savings-label">${s.label}</div>
-              <div class="savings-pmt">€${s.requiredMonthly.toLocaleString('el-GR')}<span>/μήνα</span></div>
-              <div class="savings-rate">για τον στόχο σας · απόδοση ${(s.annual * 100).toFixed(2)}% ετησίως</div>
-              <div class="savings-desc">${s.desc}</div>
-            </div>`).join('')}
-        </div>
-        <div class="savings-target">
-          Στόχος σας: <strong>€${targetAmt.toLocaleString('el-GR')}</strong> σε <strong>${targetYrs} χρόνια</strong>
-        </div>
-      </div>`;
-    }
-
     // ── Build proposalText for email/sheets ──────────────────────
     const familyNote = proposal.notes.find(n => n.category === 'familyDiscount');
     const proposalText =
@@ -766,48 +612,46 @@
       (savingsNote   ? '\n📌 ' + savingsNote.message : '') +
       (budgetWarning ? '\n⚠️ ' + budgetWarning.message : '');
 
-    // ── Render ───────────────────────────────────────────────────
+    // ── Render (μόνο ανάγκες, χωρίς τιμές και προγράμματα) ──────
+    const firstName = a.client_name ? a.client_name.trim().split(' ')[0] : '';
+    const calm = rankedNeeds[0].score < 45;
+    const cards = rankedNeeds.map((c, i) => `
+        <div class="need-card${i === 0 && !calm ? ' top' : ''}">
+          <div class="need-rank">${i + 1}η ανάγκη</div>
+          <div class="topic-word">${TOPICS[c.key].word}</div>
+          <ul class="need-why">${needReasons(c.key, a).map(x => `<li>${x}</li>`).join('')}</ul>
+          <a class="learn" href="${SITE}${TOPICS[c.key].path}" target="_blank" rel="noopener">Μάθε για αυτήν →</a>
+        </div>`).join('');
+
     s6.innerHTML = `
-      <div class="step-label">Τα Αποτελέσματά σας</div>
-      <h2 class="screen-title">Η Ανάλυσή σας${a.client_name ? ', ' + a.client_name.split(' ')[0] : ''}</h2>
-      <p class="screen-sub">Βάσει των απαντήσεών σας δημιουργήθηκε εξατομικευμένη πρόταση κάλυψης.</p>
+      <div class="step-label">Τα αποτελέσματά σου</div>
+      <h2 class="screen-title">${firstName ? firstName + ', ' : ''}${calm ? 'είσαι σε καλό δρόμο' : 'από εδώ ξεκινάμε'}</h2>
+      <p class="screen-sub">${calm
+        ? 'Δεν βλέπω κάτι επείγον σήμερα. Οι ανάγκες σου, με τη σειρά που βγήκαν:'
+        : 'Με βάση τις απαντήσεις σου, οι ανάγκες σου μπαίνουν με αυτή τη σειρά:'}</p>
 
-      ${buildPodiumHTML(h, l, r)}
-
-      <div class="section-label">Προτεινόμενη Κάλυψη</div>
-      <div class="scenarios">${scenHTML}</div>
-
-      ${savingsHTML}
-
-      <div class="contact-cta-section">
-        <div class="contact-cta-title">📞 Επικοινωνήστε μαζί μου</div>
-        <div class="contact-cta-row">
-          <div class="contact-card" onclick="revealContact('phone',this)">
-            <div class="contact-card-icon">📱</div>
-            <div class="contact-card-label">Τηλεφωνική Επικοινωνία</div>
-            <div class="contact-reveal" id="reveal-phone"><a href="tel:${BRAND.phone}">${BRAND.phone}</a></div>
-            <div class="contact-card-hint">Πατήστε για τον αριθμό</div>
-          </div>
-          <div class="contact-card" onclick="revealContact('email',this)">
-            <div class="contact-card-icon">✉️</div>
-            <div class="contact-card-label">Email</div>
-            <div class="contact-reveal" id="reveal-email"><a href="mailto:${BRAND.email}">${BRAND.email}</a></div>
-            <div class="contact-card-hint">Πατήστε για το email</div>
-          </div>
-        </div>
-        <p style="text-align:center;margin-top:14px;font-size:11px;color:var(--text-muted)">${BRAND.advisor} — ${BRAND.name}</p>
-      </div>
-
-      <div id="email-status" class="email-status">📧 Αποστολή email…</div>
+      <div class="need-list">${cards}</div>
 
       <div class="indicative-banner">
-        📌 <strong>Σημαντικό:</strong> Η παραπάνω πρόταση είναι <strong>ενδεικτική</strong> και βασίζεται στις απαντήσεις που δώσατε.<br/>
-        Για την <strong>πραγματική προσφορά</strong> προσαρμοσμένη στις λεπτομέρειες σας, παρακαλώ επικοινωνήστε μαζί μου.
+        Είναι μια πρώτη εικόνα από τις απαντήσεις σου. Το πρόγραμμα και το κόστος τα βρίσκουμε μαζί, πάνω σε ό,τι σου ταιριάζει.
       </div>
 
+      <div class="contact-cta-section">
+        <div class="contact-cta-title">Ας τα πούμε από κοντά</div>
+        <p class="contact-cta-sub">Χωρίς υποχρέωση. Μια κουβέντα αρκεί για να δεις τι σου ταιριάζει.</p>
+        <div class="contact-cta-row">
+          <a class="btn btn-primary" href="tel:${BRAND.phone}">Πάρε με τηλέφωνο</a>
+          <a class="btn btn-ghost" href="${SITE}epikoinonia/" target="_blank" rel="noopener">Σε παίρνω εγώ</a>
+        </div>
+        <p class="contact-cta-meta">${BRAND.phone} · <a href="mailto:${BRAND.publicEmail}">${BRAND.publicEmail}</a></p>
+        <p class="contact-cta-meta">${BRAND.advisor} · Ασφαλιστικός &amp; Χρηματοοικονομικός Σύμβουλος · Έδεσσα</p>
+      </div>
+
+      <div id="email-status" class="email-status">Στέλνω τα αποτελέσματα στο email σου…</div>
+
       <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-        <button class="btn btn-ghost" onclick="resetForm()">🔄 Νέα Αξιολόγηση</button>
-        <button class="btn btn-accent" onclick="window.print()">🖨️ Εκτύπωση</button>
+        <button class="btn btn-ghost" onclick="resetForm()">Ξεκίνα από την αρχή</button>
+        <button class="btn btn-ghost" onclick="window.print()">Εκτύπωση</button>
       </div>`;
 
     // Integrations
@@ -819,9 +663,11 @@
       needs_hierarchy_short: buildNeedsHierarchyShort(h, l, r),
       client_profile:        buildClientProfileText(a, scores),
       podium_html:           buildPodiumEmailHTML(h, l, r),
+      client_summary:        buildClientSummaryText(h, l, r, a),
       advisor_name:  BRAND.advisor,
       advisor_email: BRAND.email,
       advisor_phone: BRAND.phone,
+      advisor_public_email: BRAND.publicEmail,
     };
     window.NN_INTEGRATIONS?.saveToSheets(resultData);
     window.NN_INTEGRATIONS?.sendEmails(resultData);
@@ -973,7 +819,6 @@
   window.nextStep       = nextStep;
   window.prevStep       = prevStep;
   window.submitForm     = submitForm;
-  window.revealContact  = revealContact;
   window.selOpt         = selOpt;
   window.togMulti       = togMulti;
   window.updateKidsAges = updateKidsAges;

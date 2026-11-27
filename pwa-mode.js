@@ -113,12 +113,12 @@
     if (!current.querySelector('.pwa-required-hint')) {
       const hint = document.createElement('div');
       hint.className = 'pwa-required-hint';
-      hint.textContent = 'Παρακαλώ επιλέξτε μία απάντηση για να συνεχίσετε.';
+      hint.textContent = 'Διάλεξε μία απάντηση για να συνεχίσεις.';
       // Customize message based on input type
       const textInputs = current.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"]');
       const checkboxes = current.querySelectorAll('input[type="checkbox"]');
-      if (textInputs.length > 0)      hint.textContent = 'Παρακαλώ συμπληρώστε το πεδίο για να συνεχίσετε.';
-      else if (checkboxes.length > 0) hint.textContent = 'Παρακαλώ επιλέξτε τουλάχιστον μία επιλογή για να συνεχίσετε.';
+      if (textInputs.length > 0)      hint.textContent = 'Συμπλήρωσε το πεδίο για να συνεχίσεις.';
+      else if (checkboxes.length > 0) hint.textContent = 'Διάλεξε τουλάχιστον μία επιλογή για να συνεχίσεις.';
       current.appendChild(hint);
     }
 
@@ -326,12 +326,12 @@
   function updateNavButtons(idx, total) {
     const nextBtn = document.getElementById('pwa-btn-next');
     if (nextBtn) {
-      nextBtn.textContent = (idx === total - 1) ? 'Ολοκλήρωση Βήματος →' : 'Επόμενο →';
+      nextBtn.textContent = (idx === total - 1) ? 'Συνέχεια →' : 'Επόμενο →';
     }
     // Last screen, last question — show "submit" feel
     const screen = getActiveScreen();
     if (screen && screen.id === 's5' && idx === total - 1) {
-      nextBtn.textContent = 'Δείτε τα Αποτελέσματα ✦';
+      nextBtn.textContent = 'Δες τα αποτελέσματα →';
     }
   }
 
