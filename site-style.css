@@ -1,0 +1,105 @@
+/* Στυλ του christoskoltsis.gr / JARVIS: ανοιχτό φόντο, Arial, πορτοκαλί, χωρίς πλάγια. Φορτώνει τελευταίο. */
+:root{
+  --bg:#f0f0f0; --surface:#f0f0f0; --card:#ffffff; --card2:#ffffff;
+  --border:#e3e3e3; --border2:#dcdcdc;
+  --primary:#e56410; --primary-glow:rgba(229,100,16,.14);
+  --accent:#e56410; --text:#111111; --text-muted:#5c5c5c;
+  --danger:#b3261e; --radius:14px; --radius-sm:10px;
+}
+html,body{background:#f0f0f0 !important;background-image:none !important;color:var(--text)}
+body::before{display:none !important}
+*,*::before,*::after{font-family:Arial,Arimo,Helvetica,sans-serif !important;font-style:normal !important}
+h1,h2,h3,.serif{font-family:Arial,Arimo,Helvetica,sans-serif !important}
+
+#progress-track{background:#e3e3e3}
+#progress-fill{background:var(--primary)}
+
+.step-label{color:var(--primary);letter-spacing:1px}
+.screen-title{font-weight:700;color:var(--text);font-size:clamp(26px,5vw,36px)}
+.screen-sub{color:var(--text-muted);font-size:16px;line-height:1.55}
+.q-label{font-size:17px;font-weight:700;line-height:1.4}
+.q-hint,.q-hint-explain{font-size:14px;color:var(--text-muted)}
+.q-hint-explain.q-hint-attention{font-size:15px;font-weight:400;color:var(--text);background:#fff;border:1px solid var(--border);border-left:4px solid var(--primary)}
+
+.opt{background:#fff;border:2px solid var(--border);padding:14px 16px}
+.opt:hover{border-color:var(--primary);background:#fff}
+.opt.sel{border-color:var(--primary);background:#fff4ec}
+.opt-text{font-size:16px;color:var(--text)}
+.opt-dot,.opt-check{border-color:#9a9a9a}
+.opt.sel .opt-check::after{color:#111}
+.form-input{background:#fff;border:2px solid var(--border);color:var(--text);font-size:16px}
+.form-input::placeholder{color:#8a8a8a}
+input[type=range]{background:#dcdcdc}
+.slider-val{color:var(--primary)}
+
+.btn{border-radius:999px;font-size:16px;padding:14px 28px;text-decoration:none}
+.btn-primary,.btn-accent{background:var(--primary) !important;color:#111 !important;box-shadow:none}
+.btn-primary:hover{transform:none;box-shadow:none;filter:brightness(1.05)}
+.btn-ghost{background:#fff;color:var(--text);border:2px solid var(--border)}
+.btn-ghost:hover{border-color:var(--primary);color:var(--text)}
+.error-msg{background:#fdecea;border-color:#f3c1bc;color:var(--danger);font-size:14px}
+
+.brand-logo{-webkit-mask-image:none;mask-image:none;mix-blend-mode:normal;filter:none;max-width:260px}
+.advisor-badge{background:#fff;border:1px solid var(--border);color:var(--text-muted)}
+.welcome-card{background:#fff;border:1px solid var(--border)}
+.welcome-card h2{font-size:26px;font-weight:700}
+.welcome-card p{color:var(--text);font-size:16px}
+.welcome-card strong{color:var(--primary)}
+.welcome-points{margin:14px 0 4px 20px;color:var(--text);font-size:15px;line-height:1.7}
+.step-item{background:#f6f6f6;font-size:15px;color:var(--text)}
+.step-num{color:#111}
+
+/* Αποτελέσματα: μόνο ανάγκες */
+.need-list{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
+.need-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:22px 20px;text-align:center}
+.need-card.top{border:2px solid var(--primary)}
+.need-rank{font-size:13px;font-weight:700;letter-spacing:1px;color:var(--text-muted)}
+.topic-word{font-size:clamp(34px,8vw,48px);font-weight:700;color:var(--primary);line-height:1.1;margin:6px 0 10px}
+.need-why{list-style:disc;text-align:left;display:inline-block;margin:0 0 12px 20px;font-size:16px;line-height:1.6;color:var(--text)}
+.learn{display:block;font-weight:700;font-size:16px;color:var(--text)}
+.learn:hover{color:var(--primary)}
+.indicative-banner{background:#fff;border:1px solid var(--border);border-left:4px solid var(--primary);color:var(--text);font-size:15px;line-height:1.6}
+.contact-cta-section{background:#fff;border:1px solid var(--border);text-align:center}
+.contact-cta-title{color:var(--text);font-size:22px;font-weight:700}
+.contact-cta-sub{color:var(--text-muted);font-size:15px;margin:6px 0 14px}
+.contact-cta-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.contact-cta-meta{font-size:14px;color:var(--text-muted);margin-top:10px}
+.contact-cta-meta a{color:var(--text);text-decoration:underline}
+.email-status{color:var(--text-muted);font-size:14px}
+
+.rating-modal{background:#fff;color:var(--text);border:1px solid var(--border)}
+.rating-title{color:var(--text)}
+.rating-sub,.rating-label{color:var(--text-muted)}
+.rating-star{color:#d0d0d0}
+.rating-star.active,.rating-star.hover{color:var(--primary)}
+.rating-comment{background:#fff;border:1px solid var(--border);color:var(--text)}
+.rating-close{color:var(--text-muted)}
+
+@media print{body{background:#fff !important}.btn,#progress-track{display:none !important}}
+
+/* Εγκατεστημένη εφαρμογή (μία ερώτηση τη φορά): ίδιο ανοιχτό στυλ */
+body.pwa-mode{background:#f0f0f0 !important;color:var(--text) !important}
+body.pwa-mode #progress-track,body.pwa-mode .pwa-mini-progress .dot{background:#dcdcdc !important}
+body.pwa-mode #progress-fill,body.pwa-mode .pwa-mini-progress .dot.done,body.pwa-mode .pwa-mini-progress .dot.current{background:var(--primary) !important}
+body.pwa-mode .screen.active .step-label{background:#fff !important;color:var(--primary) !important;border-color:var(--border) !important}
+body.pwa-mode .screen.active .screen-title{color:var(--text) !important}
+body.pwa-mode .screen.active .screen-sub{color:var(--text-muted) !important}
+body.pwa-mode .screen.active .q-block.pwa-q-current{background:#fff !important;border:1px solid var(--border) !important;box-shadow:none !important}
+body.pwa-mode .screen.active .q-block.pwa-q-current .q-label{color:var(--text) !important}
+body.pwa-mode .screen.active .q-block.pwa-q-current .q-hint,
+body.pwa-mode .screen.active .q-block.pwa-q-current .q-hint-explain{color:var(--text-muted) !important;background:transparent !important}
+body.pwa-mode .screen.active .q-block.pwa-q-current .q-hint-explain.q-hint-attention{color:var(--text) !important;background:#fff4ec !important;border-left:4px solid var(--primary) !important}
+body.pwa-mode .opt{background:#fff !important;border:2px solid var(--border) !important}
+body.pwa-mode .opt::before{background:#f0f0f0 !important;color:var(--text) !important}
+body.pwa-mode .opt .opt-text,body.pwa-mode .opt.sel .opt-text{color:var(--text) !important}
+body.pwa-mode .opt:hover{border-color:var(--primary) !important;background:#fff !important}
+body.pwa-mode .opt.sel{border-color:var(--primary) !important;background:#fff4ec !important}
+body.pwa-mode .opt.sel::before{background:var(--primary) !important;color:#111 !important}
+body.pwa-mode .form-input{background:#fff !important;border:2px solid var(--border) !important;color:var(--text) !important}
+body.pwa-mode .form-input:focus{border-color:var(--primary) !important}
+body.pwa-mode .slider-val{color:var(--primary) !important;background:none !important;-webkit-text-fill-color:var(--primary) !important}
+body.pwa-mode .slider-labels,body.pwa-mode .pwa-auto-hint-text{color:var(--text-muted) !important}
+body.pwa-mode .pwa-nav{background:linear-gradient(to top,#f0f0f0 55%,rgba(240,240,240,0)) !important}
+body.pwa-mode .pwa-btn-prev{background:#fff !important;color:var(--text) !important;border:2px solid var(--border) !important}
+body.pwa-mode .pwa-btn-next{background:var(--primary) !important;color:#111 !important;box-shadow:none !important}
+body.pwa-mode .pwa-required-hint,body.pwa-mode .error-msg:not(:empty){background:#fdecea !important;color:var(--danger) !important;border-color:#f3c1bc !important}

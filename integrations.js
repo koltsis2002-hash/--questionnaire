@@ -161,9 +161,18 @@
       advisor_phone:    data.advisor_phone    || '',
     };
     // eslint-disable-next-line no-undef
-    emailjs.send(SVC.ej_svc, SVC.ej_client, { ...params, to_email: params.client_email })
-      .then(() => { if (statusEl) statusEl.textContent = '✅ Το email στάλθηκε επιτυχώς!'; })
-      .catch(() => { if (statusEl) statusEl.textContent = '⚠️ Τα αποτελέσματα αποθηκεύτηκαν. Επικοινωνήστε μαζί μου.'; });
+    // Ο πελάτης παίρνει μόνο τις ανάγκες του: χωρίς προγράμματα, τιμές και ποσά.
+    const clientParams = {
+      ...params,
+      to_email:          params.client_email,
+      proposal_text:     data.client_summary || '',
+      deductible_pref:   '',
+      deductible_amount: '',
+      advisor_email:     data.advisor_public_email || params.advisor_email,
+    };
+    emailjs.send(SVC.ej_svc, SVC.ej_client, clientParams)
+      .then(() => { if (statusEl) statusEl.textContent = 'Τα αποτελέσματα στάλθηκαν στο email σου.'; })
+      .catch(() => { if (statusEl) statusEl.textContent = 'Οι απαντήσεις σου αποθηκεύτηκαν. Θα επικοινωνήσω εγώ μαζί σου.'; });
     // eslint-disable-next-line no-undef
     emailjs.send(SVC.ej_svc, SVC.ej_agent, { ...params, to_email: params.advisor_email })
       .catch(() => {});
